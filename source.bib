@@ -1,0 +1,129 @@
+@article{chor1998private,
+  title={Private information retrieval},
+  author={Chor, Benny and Kushilevitz, Eyal and Goldreich, Oded and Sudan, Madhu},
+  journal={Journal of the ACM (JACM)},
+  volume={45},
+  number={6},
+  pages={965--981},
+  year={1998},
+  publisher={ACM New York, NY, USA}
+}
+@inproceedings{wang2014oblivious,
+  title={Oblivious data structures},
+  author={Wang, Xiao Shaun and Nayak, Kartik and Liu, Chang and Chan, TH Hubert and Shi, Elaine and Stefanov, Emil and Huang, Yan},
+  booktitle={Proceedings of the 2014 ACM SIGSAC Conference on Computer and Communications Security},
+  pages={215--226},
+  year={2014}
+}
+
+@inproceedings{gentry2013optimizing,
+  title={Optimizing ORAM and using it efficiently for secure computation},
+  author={Gentry, Craig and Goldman, Kenny A and Halevi, Shai and Julta, Charanjit and Raykova, Mariana and Wichs, Daniel},
+  booktitle={Privacy Enhancing Technologies: 13th International Symposium, PETS 2013, Bloomington, IN, USA, July 10-12, 2013. Proceedings 13},
+  pages={1--18},
+  year={2013},
+  organization={Springer}
+}
+@inproceedings{shi2011oblivious,
+  title={Oblivious RAM with O ((log N) 3) worst-case cost},
+  author={Shi, Elaine and Chan, T -H Hubert and Stefanov, Emil and Li, Mingfei},
+  booktitle={Advances in Cryptology--ASIACRYPT 2011: 17th International Conference on the Theory and Application of Cryptology and Information Security, Seoul, South Korea, December 4-8, 2011. Proceedings 17},
+  pages={197--214},
+  year={2011},
+  organization={Springer}
+}
+@article{boyle2023information,
+  title={Information-theoretic distributed point functions},
+  author={Boyle, Elette and Gilboa, Niv and Ishai, Yuval and Kolobov, Victor I},
+  journal={Cryptology ePrint Archive},
+  year={2023}
+}
+@INPROCEEDINGS{7495562,
+  author={Branco, Rodrigo and Gueron, Shay},
+  booktitle={2016 IEEE International Symposium on Hardware Oriented Security and Trust (HOST)}, 
+  title={Blinded random corruption attacks}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={85-90},
+  keywords={Random access memory;Encryption;Hardware;Virtual machine monitors;Software;Software and hardware security;physical access attacks;memory encryption},
+  doi={10.1109/HST.2016.7495562}
+}
+@INPROCEEDINGS{991526,
+  author={Wenliang Du and Atallah, M.J.},
+  booktitle={Seventeenth Annual Computer Security Applications Conference}, 
+  title={Privacy-preserving cooperative statistical analysis}, 
+  year={2001},
+  volume={},
+  number={},
+  pages={102-110},
+  keywords={Statistical analysis;Educational institutions;Remuneration;Information security;Internet;Computer science education;Computer security;Ducts;Performance analysis;Cryptographic protocols},
+  doi={10.1109/ACSAC.2001.991526}
+}
+@inproceedings{10.1145/2976749.2978429,
+author = {Boyle, Elette and Gilboa, Niv and Ishai, Yuval},
+title = {Function Secret Sharing: Improvements and Extensions},
+year = {2016},
+isbn = {9781450341394},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2976749.2978429},
+doi = {10.1145/2976749.2978429},
+abstract = {Function Secret Sharing (FSS), introduced by Boyle et al. (Eurocrypt 2015), provides a way for additively secret-sharing a function from a given function family F. More concretely, an m-party FSS scheme splits a function f : {0, 1}n -> G, for some abelian group G, into functions f1,...,fm, described by keys k1,...,km, such that f = f1 + ... + fm and every strict subset of the keys hides f. A Distributed Point Function (DPF) is a special case where F is the family of point functions, namely functions f_{a,b} that evaluate to b on the input a and to 0 on all other inputs. FSS schemes are useful for applications that involve privately reading from or writing to distributed databases while minimizing the amount of communication. These include different flavors of private information retrieval (PIR), as well as a recent application of DPF for large-scale anonymous messaging.We improve and extend previous results in several ways: * Simplified FSS constructions. We introduce a tensoring operation for FSS which is used to obtain a conceptually simpler derivation of previous constructions and present our new constructions. * Improved 2-party DPF. We reduce the key size of the PRG-based DPF scheme of Boyle et al. roughly by a factor of 4 and optimize its computational cost. The optimized DPF significantly improves the concrete costs of 2-server PIR and related primitives. * FSS for new function families. We present an efficient PRG-based 2-party FSS scheme for the family of decision trees, leaking only the topology of the tree and the internal node labels. We apply this towards FSS for multi-dimensional intervals. We also present a general technique for extending FSS schemes by increasing the number of parties. * Verifiable FSS. We present efficient protocols for verifying that keys (k*/1,...,k*/m ), obtained from a potentially malicious user, are consistent with some f in F. Such a verification may be critical for applications that involve private writing or voting by many users.},
+booktitle = {Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {1292–1303},
+numpages = {12},
+keywords = {function secret sharing, homomorphic encryption, private information retrieval, secure multiparty computation},
+location = {Vienna, Austria},
+series = {CCS '16}
+}
+@article{10.1145/6490.6503,
+author = {Goldreich, Oded and Goldwasser, Shafi and Micali, Silvio},
+title = {How to construct random functions},
+year = {1986},
+issue_date = {Oct. 1986},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {33},
+number = {4},
+issn = {0004-5411},
+url = {https://doi.org/10.1145/6490.6503},
+doi = {10.1145/6490.6503},
+abstract = {A constructive theory of randomness for functions, based on computational complexity, is developed, and a pseudorandom function generator is presented. This generator is a deterministic polynomial-time algorithm that transforms pairs (g, r), where g is any one-way function and r is a random k-bit string, to polynomial-time computable functions undefinedr: {1, … , 2k} → {1, … , 2k}. These undefinedr's cannot be distinguished from random functions by any probabilistic polynomial-time algorithm that asks and receives the value of a function at arguments of its choice. The result has applications in cryptography, random constructions, and complexity theory.},
+journal = {J. ACM},
+month = aug,
+pages = {792–807},
+numpages = {16}
+}
+@article{cheng2024efficient,
+  title={Efficient Two-Party Secure Aggregation via Incremental Distributed Point Function},
+  author={Cheng, Nan and Mitrokotsa, Aikaterini and Zhang, Feng and Hartmann, Frank},
+  year={2024}
+}
+@misc{cryptoeprint:2023/108,
+      author = {Kyle Storrier and Adithya Vadapalli and Allan Lyons and Ryan Henry},
+      title = {Grotto: Screaming fast $(2 + 1)$-{PC} for $\mathbb{Z}_{2^{n}}$ via (2, 2)-{DPFs}},
+      howpublished = {Cryptology {ePrint} Archive, Paper 2023/108},
+      year = {2023},
+      url = {https://eprint.iacr.org/2023/108}
+}
+@inproceedings{boyle2021function,
+  title={Function secret sharing for mixed-mode and fixed-point secure computation},
+  author={Boyle, Elette and Chandran, Nishanth and Gilboa, Niv and Gupta, Divya and Ishai, Yuval and Kumar, Nishant and Rathee, Mayank},
+  booktitle={Annual International Conference on the Theory and Applications of Cryptographic Techniques},
+  pages={871--900},
+  year={2021},
+  organization={Springer}
+}
+@article{vadapalli2021you,
+  title={You may also like... privacy: Recommendation systems meet pir},
+  author={Vadapalli, Adithya and Bayatbabolghani, Fattaneh and Henry, Ryan},
+  journal={Proceedings on Privacy Enhancing Technologies},
+  year={2021}
+}
+@article{pullonen2013actively,
+  title={Actively secure two-party computation: Efficient beaver triple generation},
+  author={Pullonen, Pille and others},
+  journal={Instructor},
+  year={2013}
+}
