@@ -63,7 +63,53 @@ Eval(k_0, x) + Eval(k_1,x) = \begin{cases}
 Note that both parties use the same $Eval$ algorithm, which is solely parametrized by the input index and the used key $k_i\in\{k_0,k_1\}$.
 The implementation (\ref{ch:Implementation}) uses this scheme which allows for implementing $Eval$ once and parametrizing by varying the function input.
 
-
 \subsection{Boyle-Gilboa-Ishiai DPF Construction}
 \label{sub:BGIDPFConstruction}
-Private Information Retreival (PIR) \cite{chor1998private}.
+This research uses the DPF construction technique of Boyle et al. \cite{boyle2016function}.
+It is based on any Pseudo Random Generator (PRG) \cite{vadapalli2023duoram}.
+Recall that point functions can be represented by using binary trees.
+Thus, by taking two binary trees representing the shares of a point function, one can build a DPF using two binary trees.
+Using a length-doubling PRG on a random seed, which takes any $n$-bit seed and returns a pseudorandom output of length $2n$, one can construct such binary tree.
+
+To represent a DPF, the following tree invariants must be met \cite{boyle2023information}:
+\begin{itemize}
+   \item Nodes on the path to the target index $\alpha$ must not be identical
+   \item Nodes that do not lead to target index $\alpha$ must be identical 
+\end{itemize}
+Identical here means both node-labels are the same and thus will XOR to $0$.
+Since PRGs are pseudorandom, equal labels will lead to equal subtrees.
+By keeping the tree invariants intact, every tree will represent the share of the DPF which will XOR to $0$ for every leaf unequal to the target index and to $\beta$ for the leaf pair on the target index $\alpha$.
+
+We will use the following notation:
+The subscript indicates the party to which the tree belongs.
+The superscript indicates the path - $0$ for left, $1$ for right.
+For example, $s_0^0$ is the left child of the seed in party 0s tree.
+The seeds $s_0^{[]},s_1^{[]}$ are chosen randomly by each party.
+A \textit{Node Pair} is a pair of nodes with one from each tree respectively and the same superscript, for example $s_0^{01},s_1^{01}$.
+
+Since this concept uses a length-doubling PRG on a random starting label both trees will be completely random.
+Therefore, Boyle et al. \cite{boyle2016function} introduce the concepts of \textit{Correction Words (cw)} and \textit{Flag Bits (fb)}.
+\begin{itemize}
+   \item{Correction Words (cw)}: 
+   Are used to equalize a node pair. 
+   Both trees keep the same list of correction words with each level having assigned one correction word.
+   A \textit{Final Correction Word ($F$)} is assigned to the leaf layer.
+   It will change the random label of the leaf layer at the target index to reach the target value.
+   Therefore, each binary-DPF-tree of height $n$ holds a tuple of type $(cw_1, ..., cw_n, F)$.
+   \item{Flag Bits (fb)}:
+   Each label is assigned a single flag bit.
+   It indicates, whether the cw will be XORed into the label or not.
+   Recall the tree invariant of nodes being different on the path and equal if they are not.
+   This can be easily implemented by keeping the flag bits on node pairs on the path unqual while having them equal in node pairs not on the path.
+\end{itemize}
+
+To evaluate the tree, Vadapalli et al. \cite{vadapalli2023duoram} propose the $EVALFULL$ method.
+It traverses the DPF-tree in a depth first search (DFS) like manner and returns two vectors.
+After evaluation $v_b$ will hold a vector of all leaf labels of tree $b$.
+$t_b$ will hold a vector of all flag bits of tree $b$.
+The result can be obtained by XORing the results of both trees.
+$t_0\oplus t_1 = e_\alpha$ which is the one hot vector with the one at index $\alpha$ (also called the \textit{Shifting Vector}).
+$v_0\oplus v_1 = e_\alpha\cdot\beta$ with $\beta$, again, being the target value. 
+
+This means, a DPF tree can be represented by its seed, the vector of flag bits, and the vector of correction words.
+Alternatively, to minimize calculation time, Vadapalli et al. \cite{vadapalli2023duoram} store a DPF tree by saving the random seed, the vector holding the correction words, $v_b$, and $t_b$.
