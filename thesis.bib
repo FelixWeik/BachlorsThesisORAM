@@ -37,7 +37,7 @@
   journal={Cryptology ePrint Archive},
   year={2023}
 }
-@INPROCEEDINGS{7495562,
+@INPROCEEDINGS{bra2016blind,
   author={Branco, Rodrigo and Gueron, Shay},
   booktitle={2016 IEEE International Symposium on Hardware Oriented Security and Trust (HOST)}, 
   title={Blinded random corruption attacks}, 
@@ -48,7 +48,7 @@
   keywords={Random access memory;Encryption;Hardware;Virtual machine monitors;Software;Software and hardware security;physical access attacks;memory encryption},
   doi={10.1109/HST.2016.7495562}
 }
-@INPROCEEDINGS{991526,
+@INPROCEEDINGS{wen01priv,
   author={Wenliang Du and Atallah, M.J.},
   booktitle={Seventeenth Annual Computer Security Applications Conference}, 
   title={Privacy-preserving cooperative statistical analysis}, 
@@ -59,24 +59,7 @@
   keywords={Statistical analysis;Educational institutions;Remuneration;Information security;Internet;Computer science education;Computer security;Ducts;Performance analysis;Cryptographic protocols},
   doi={10.1109/ACSAC.2001.991526}
 }
-@inproceedings{10.1145/2976749.2978429,
-author = {Boyle, Elette and Gilboa, Niv and Ishai, Yuval},
-title = {Function Secret Sharing: Improvements and Extensions},
-year = {2016},
-isbn = {9781450341394},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/2976749.2978429},
-doi = {10.1145/2976749.2978429},
-abstract = {Function Secret Sharing (FSS), introduced by Boyle et al. (Eurocrypt 2015), provides a way for additively secret-sharing a function from a given function family F. More concretely, an m-party FSS scheme splits a function f : {0, 1}n -> G, for some abelian group G, into functions f1,...,fm, described by keys k1,...,km, such that f = f1 + ... + fm and every strict subset of the keys hides f. A Distributed Point Function (DPF) is a special case where F is the family of point functions, namely functions f_{a,b} that evaluate to b on the input a and to 0 on all other inputs. FSS schemes are useful for applications that involve privately reading from or writing to distributed databases while minimizing the amount of communication. These include different flavors of private information retrieval (PIR), as well as a recent application of DPF for large-scale anonymous messaging.We improve and extend previous results in several ways: * Simplified FSS constructions. We introduce a tensoring operation for FSS which is used to obtain a conceptually simpler derivation of previous constructions and present our new constructions. * Improved 2-party DPF. We reduce the key size of the PRG-based DPF scheme of Boyle et al. roughly by a factor of 4 and optimize its computational cost. The optimized DPF significantly improves the concrete costs of 2-server PIR and related primitives. * FSS for new function families. We present an efficient PRG-based 2-party FSS scheme for the family of decision trees, leaking only the topology of the tree and the internal node labels. We apply this towards FSS for multi-dimensional intervals. We also present a general technique for extending FSS schemes by increasing the number of parties. * Verifiable FSS. We present efficient protocols for verifying that keys (k*/1,...,k*/m ), obtained from a potentially malicious user, are consistent with some f in F. Such a verification may be critical for applications that involve private writing or voting by many users.},
-booktitle = {Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security},
-pages = {1292–1303},
-numpages = {12},
-keywords = {function secret sharing, homomorphic encryption, private information retrieval, secure multiparty computation},
-location = {Vienna, Austria},
-series = {CCS '16}
-}
-@article{10.1145/6490.6503,
+@article{gol86random,
 author = {Goldreich, Oded and Goldwasser, Shafi and Micali, Silvio},
 title = {How to construct random functions},
 year = {1986},
@@ -175,4 +158,35 @@ numpages = {16}
   booktitle={Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security},
   pages={1292--1303},
   year={2016}
+}
+@inproceedings{gilboa2014distributed,
+  title={Distributed point functions and their applications},
+  author={Gilboa, Niv and Ishai, Yuval},
+  booktitle={Advances in Cryptology--EUROCRYPT 2014: 33rd Annual International Conference on the Theory and Applications of Cryptographic Techniques, Copenhagen, Denmark, May 11-15, 2014. Proceedings 33},
+  pages={640--658},
+  year={2014},
+  organization={Springer}
+}
+@misc{chor1998private,
+  title={Private information retrieval},
+  author={Chor, Ben-Zion and Goldreich, Oded and Kushilevitz, Eyal},
+  year={1998},
+  month=dec # "~29",
+  publisher={Google Patents},
+  note={US Patent 5,855,018}
+}
+@inproceedings{vadapalli2023duoram,
+  title={Duoram: A $\{$Bandwidth-Efficient$\}$ Distributed $\{$ORAM$\}$ for 2-and 3-Party Computation},
+  author={Vadapalli, Adithya and Henry, Ryan and Goldberg, Ian},
+  booktitle={32nd USENIX Security Symposium (USENIX Security 23)},
+  pages={3907--3924},
+  year={2023}
+}
+@inproceedings{vadapalli2022sabre,
+  title={Sabre: Sender-anonymous messaging with fast audits},
+  author={Vadapalli, Adithya and Storrier, Kyle and Henry, Ryan},
+  booktitle={2022 IEEE Symposium on Security and Privacy (SP)},
+  pages={1953--1970},
+  year={2022},
+  organization={IEEE}
 }

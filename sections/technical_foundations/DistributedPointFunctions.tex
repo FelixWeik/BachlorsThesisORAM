@@ -1,14 +1,15 @@
 \subsection{Point Functions}
-On a high level view, a point function $f$ is defined around a target index $\alpha$ and its target value $\beta$.
+\label{sub:PointFunctions}
+On a high level view, a \textit{Point Function} $f$ is defined around a target index $\alpha$ and its target value $\beta$.
 For each input $i\neq\alpha$ the point function will output $0$.
-Only if the input $i$ is equal to the target index $\alpha$, $f$ will output $\beta$.
+Only if the input $i$ is equal to the target index $\alpha$, $f$ will output $\beta$ \cite{gilboa2014distributed}.
 \[
 f_{\alpha,\beta}(i) = \begin{cases} 
       \beta & \text{if } i = \alpha, \\
-      0 & \text{else}.
+      0^{|\beta|} & \text{else}.
    \end{cases}
 \]
-\cite{boyle2023information} describe a point function with $f_{\alpha, \beta}:[N]\rightarrow G$. 
+Boyle et al. \cite{boyle2023information} describe a point function with $f_{\alpha, \beta}:[N]\rightarrow G$. 
 $G$ is an Abelian group and $N$ is the domain size.
 Note that $\alpha\in[N]$ and $\beta\in G$.
 $f$ evaluates $\alpha$ to $\beta$ and to $0\in G$ for all other inputs.
@@ -25,6 +26,44 @@ f_{\alpha,1}(i) = \begin{cases}
 This implies that this special case $f_{\alpha,1}$ is a functional representation of a one-hot vector which has its only value unequal zero at index $\alpha$.
 Such representations will be necessarry for representing the target index of which element to retreive from the database lateron.
 
+Note that Point Functions can be represented by using binary trees \cite{vadapalli2023duoram}.
+Figure //TODO FIGURE EINFÜGEN explains this. % Soll man hier noch weiter ausführen?
+
 \subsection{Distributed Point Functions}
+\label{sub:DistributedPointFunctions}
+\textit{Distributed Point Functions (DPFs)} are considered the simplest nontrivial special case of function secret sharing (\ref{sub:FunctionSecretSharingScheme}) \cite{boyle2016function}.
+Paralells between both concepts are clearly visible.
+DPFs was first introduced by Gilboa et al. \cite{gilboa2014distributed}.
+
+The tuple of PPT algorithms $\Pi = (Gen, Eval_0, ..., Eval_{m-1})$ defines a m-DPF \cite{boyle2023information}.
+This means, $m$ parties are necessarry to reconstruct the secret point function.
+The algorithms are designed as follows \cite{boyle2023information,gilboa2014distributed,vadapalli2023duoram}:
+\begin{itemize}
+   \item $Gen(1^\lambda, f_{\alpha, \beta})\rightarrow(k_0,...,k_{m-1})$: Given a security parameter $\lambda\in N$ and the description of a point function $f_{\alpha, \beta}$, $Gen$ will return $m$ keys $k_i\in\{0,1\}^*$.
+   \item $Eval_i(k_i,x)\rightarrow y_i$: Given an input $x\in [N]$ and a key $k_i\in\{0,1\}^*$, $Eval_i$ deterministically return a group element $y_i\in G$.
+\end{itemize}
+
+$\Pi$ needs to fulfil the criteria of Correctness and Security \cite{boyle2023information}.
+Boyle et al. \cite{boyle2023information} define correctness is defined as follows: $$
+\forall\lambda,f_{\alpha,\beta}=(N,G,\alpha,\beta),x\in [N]:(k_0,...,k_{m-1})\leftarrow Gen(1^\lambda, f_{\alpha,\beta})\Rightarrow PR[\sum_{i=0}^{m-1}Eval_i(k_i,x)=f_{\alpha,\beta}] = 1
+$$
+% Definition von Security auch noch einfügen?
+
+This research specifically deals with \textit{(2,2)-DPFs}.
+This means one wants to share a secret point function among two parties with both parties being needed for reconstructing the secret.
+Vadapalli et al. \cite{vadapalli2022sabre} define a \textit{(2,2)-DPF} with a pair of PPT algorithms $(Gen, Eval)$.
+$Gen$ will create a key-pair $(k_0,k_1)\leftarrow Gen(1^\lambda,N,G,\alpha,\beta)$ with $\alpha\in N$ and $\beta\in G$.
+The underlying point function will evaluate to target value $\beta$ given the right target index $\alpha$.
+For both keys $Eval$ will evaluate:\[
+Eval(k_0, x) + Eval(k_1,x) = \begin{cases} 
+      \beta & \text{if } x = \alpha, \\
+      0 & \text{else}.
+   \end{cases}
+\]
+Note that both parties use the same $Eval$ algorithm, which is solely parametrized by the input index and the used key $k_i\in\{k_0,k_1\}$.
+The implementation (\ref{ch:Implementation}) uses this scheme which allows for implementing $Eval$ once and parametrizing by varying the function input.
+
 
 \subsection{Boyle-Gilboa-Ishiai DPF Construction}
+\label{sub:BGIDPFConstruction}
+Private Information Retreival (PIR) \cite{chor1998private}.
