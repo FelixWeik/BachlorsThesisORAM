@@ -2408,7 +2408,9 @@
     <bcf:citekey order="32" intorder="1">pullonen2013actively</bcf:citekey>
     <bcf:citekey order="33" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="34" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="35" intorder="1">chor1998private</bcf:citekey>
+    <bcf:citekey order="35" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="36" intorder="1">ata01priv</bcf:citekey>
+    <bcf:citekey order="37" intorder="1">chor1998private</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">
