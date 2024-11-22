@@ -25,7 +25,7 @@ This research will use both the definitions of AND Triples and Dot-Product Tripl
 Just like with Beaver Triples, performing an AND or dot-product operation will consume one triple.
 Therefore, again, one can precompute the communication expensive parts and perform the safe MPC operation on the real values lateron.
 
-The implementation (\ref{ch:Implementation}) uses the \textit{Du-Atallah Protocol} to calculate its AND and dot-product triples.
+The implementation (\ref{ch:Implementation}) uses the \textit{Du-Atallah Protocol} \cite{ata01priv} to calculate its AND and dot-product triples.
 It is a \textit{(2+1)-MPC Protocol}, often called \textit{Server-Adided 2-MPC}, which describes a 2-party MPC protocol with a third party \cite{vadapalli2023duoram}.
 This third party does not collude with the other two parties and facilitates the MPC by sending some correlated randomness to the two MPC parties.
 A more explicit description of the Du-Atallah Protocol can be found in the according paper by Du and Atallah \cite{ata01priv}.
