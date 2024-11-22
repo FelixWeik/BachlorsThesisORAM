@@ -63,6 +63,11 @@ Eval(k_0, x) + Eval(k_1,x) = \begin{cases}
 Note that both parties use the same $Eval$ algorithm, which is solely parametrized by the input index and the used key $k_i\in\{k_0,k_1\}$.
 The implementation (\ref{ch:Implementation}) uses this scheme which allows for implementing $Eval$ once and parametrizing by varying the function input.
 
+Each usage of a DPF will consume it.
+This means, doing $n$ reads, for example, will use up $n$ many DPFs since reusing a DPF may lead to the adversary being able to reconstruct the secret with linear combination.
+Therefore, one can preprocess multiple DPFs for the needed indices or use the trick of \textit{Cyclic Shifting} as explained by Vadapalli et al. \cite{vadapalli2023duoram}.
+In short, this will enable to preprocess DPFs on random indices and shift them to the wanted index when the DPF is used.
+
 \subsection{Boyle-Gilboa-Ishiai DPF Construction}
 \label{sub:BGIDPFConstruction}
 This research uses the DPF construction technique of Boyle et al. \cite{boyle2016function}.
