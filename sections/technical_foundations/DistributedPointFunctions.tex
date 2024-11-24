@@ -118,3 +118,26 @@ $v_0\oplus v_1 = e_\alpha\cdot\beta$ with $\beta$, again, being the target value
 
 This means, a DPF tree can be represented by its seed, the vector of flag bits, and the vector of correction words.
 Alternatively, to minimize calculation time, Vadapalli et al. \cite{vadapalli2023duoram} store a DPF tree by saving the random seed, the vector holding the correction words, $v_b$, and $t_b$.
+
+\subsection{Cyclic-Shifting Protocol}
+\label{sub:CyclicShiftingProtocol}
+A \textit{Cyclic-Shifting Protocol} allows parties to shift shares in their DPFs \cite{vadapalli2023duoram}.
+It is called Cyclic-shifting since it relies on cyclic bit-shifts.
+DUORAM's \textit{Online Phase} (\ref{subsub:DuoramOnlinePhase}) uses a cyclic shifting protocol to either postpone the decision of where to read/write or postpone the decision of what to write.
+This means, one can change the shifting-vector $e_i$ or the target value $M$ by executing a cyclic-shifting protocol.
+Explicit constructions and further descriptions can be found in \ref{subsub:DuoramOnlinePhase} and \ref{sub:ImprovingCyclicShifting}.
+
+\subsection{Traversing the DPF Tree}
+\label{sub:TraversingTheDPFTree}
+To traverse a DPF tree, one needs an input of the size of the tree's depth.
+So for a tree with $n$ elements, one needs an input of size $log(n)$.
+The algorithm will perform a bit-shift to assess the most significant bit.
+This bit will decide which child to evaluate, 0 for the left child and 1 for right.
+By using the \textit{Pseudo-Random-Generator (PRG)} one generates the label for the next node.
+The flag bit will decide whether the cw will be XORed into the label.
+This label will then be used for the next iteration until the leaf level is reached.
+On this level, one XORs the final correction word ($F$) if the flag bit allows it to.
+This is the result of the DPF and can be used to calculate the point function's evaluation by evaluating the other part of the DPF in the same way and XORing both results together.
+
+Note, that our implementation will not use this way of evaluation in read or write operations.
+The DPF is stored in an already evaluated form and can be used by first performing the cyclic shift and then using it in the wanted context.
