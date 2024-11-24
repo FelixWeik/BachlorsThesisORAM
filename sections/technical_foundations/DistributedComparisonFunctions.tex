@@ -30,11 +30,11 @@ The function will evaluate to $1$.
 \subsection{DCF Construction using the Grotto Framework}
 \label{sub:CDPFConstruction}
 Multiple DCF construction coexist.
-This research, however, will only mention the one used in the implementation by Kyle et al. \cite{kyle2023grotto}.
-Goal of this construction is to find out, whether a secret shared $x$ is greater or less than zero.
+This research focuses on the construction by Kyle et al. \cite{kyle2023grotto}.
+Goal of this construction is to find out, whether a shared secret $x$ is greater or less than zero.
 The benevolent reader might also be interested in the more prominent DCF construction of Boyle et al. \cite{boyle2021function}.
-
-Kyle et al. \cite{kyle2023grotto} are more favorable in their efficiency and ease of implementation.
+%TODO ist es so klug hier von den CDF Pairs zu reden und dann nicht darauf einzugehen? => Einfach weglassen?
+Kyle et al. \cite{kyle2023grotto} are more favorable in their communication cost and ease of implementation.
 For this purpose they use a pair of the already mentioned DPFs (\ref{sub:DistributedPointFunctions}), and expand them to meet the functional requirements of DCFs.
 Also, calculating the result only requires one single word to be exchanged.
 Therefore, this construction will be used in our own implementation.
