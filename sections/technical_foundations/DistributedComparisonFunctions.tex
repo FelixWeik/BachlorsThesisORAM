@@ -1,0 +1,59 @@
+\label{cha:DistributedComparisonFunctions}
+\subsection{Comparison Functions}
+\label{sub:ComparisonFunctions}
+Comparison Functions act like Point Functions (\ref{sub:PointFunctions}) just for intervals.
+This means:
+\[
+f^{<}_{\alpha}(i) = \begin{cases} 
+      1 & \text{if } i < \alpha, \\
+      0 & \text{else}.
+   \end{cases}
+\]
+
+Recall the binary tree implementation of point functions.
+Please note, the following implementation will only work if the leaves are placed in ascending order.
+This means, the smallest leaf is on the left while the biggest leaf is on the right.
+In our implementation, the leafs will present indices with the leaf on the left representing index $0$ and the rightmost leaf representing index $2^n$ (assuming a tree of depth $n$).
+
+\subsection{Distributed Comparison Functions (DCF)}
+\label{sub:DistributedComparisonFunctions}
+The function secret sharing scheme (\ref{ch_FunctionSecretSharing}) for secretly sharing Comparison Functions is called \textit{Distributed Comparison Function (DCF)}.
+On a high level, both shares are represented by binary trees.
+If one evaluates the function, she traverses the tree.
+In simple point functions (\ref{sub:PointFunctions}), one is just interested in the flag bits, correction words, and the label of the leaf.
+Now, however, one is interested, whether she stays on the path or not while traversing the tree.
+Since the leafs are places in ascending order, leaving the path to leaf $\alpha$ to the leaft implicates that the given value is smaller than the threshold $\alpha$.
+Thus, the function will evaluate to $1$.
+Leaving the path to $\alpha$ to the right or staying on the path to alpha with a given input $\alpha$ implicates that $i\geq\alpha$.
+The function will evaluate to $1$.
+
+\subsection{DCF Construction using the Grotto Framework}
+\label{sub:CDPFConstruction}
+Multiple DCF construction coexist.
+This research, however, will only mention the one used in the implementation by Kyle et al. \cite{kyle2023grotto}.
+Goal of this construction is to find out, whether a secret shared $x$ is greater or less than zero.
+The benevolent reader might also be interested in the more prominent DCF construction of Boyle et al. \cite{boyle2021function}.
+
+Kyle et al. \cite{kyle2023grotto} are more favorable in their efficiency and ease of implementation.
+For this purpose they use a pair of the already mentioned DPFs (\ref{sub:DistributedPointFunctions}), and expand them to meet the functional requirements of DCFs.
+Also, calculating the result only requires one single word to be exchanged.
+Therefore, this construction will be used in our own implementation.
+
+First, both DPFs are generated on the same, random target value.
+For ease of explanation, we will take a look at a construction using a single DPF first and evaluate on 64-bit signed integers only.
+Both parties $P_0,P_1$ will hold a share of the random target value $target_0, target_1$ with $target = target_0+target_1$.
+Given a secret-shared input $x$ with $x=x_0+x_1$ each party calculates $target_i-x_i$.
+Both parties exchange this value.
+This allows them to reconstruct $S=target-x=(target_0-x_0)+(target_1-x_1)$.
+
+To simplify the explanation consider a bit-vector $V$ with length $2^{64}$.
+It is populated with 1s in the range of $[S,S+2^{63}-1]$ and 0s everywhere else.
+This corresponds to the partitioning of the two's complement for a 64-bit signed integer.
+Let us assume the result of the DPF to be the dot-product of this vector $V$ and the DPF.
+This means, 0 everywhere but the target-index of the DPF.
+
+If we now evaluate the DPF on $target$, which is equal of calculating $V[target]$, we will receive a value of either $0$ or $1$.
+Assume $V[target]=1$.
+This means $target = S+k$ for some $k\in [1,2^{63}-1]$.
+We conclude that $x>0$ since $S$ is shifted to the left and therefore $V$ will evaluate to $0$.
+If $V[target]=0$ we conclude $x<=0$ since $S=target-(-x) = target + x$ which will shift the target into the $0$ area of $V$.
