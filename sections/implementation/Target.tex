@@ -1,0 +1,14 @@
+\subsection{Traversing the DPF Tree}
+\label{sub:TraversingTheDPFTree}
+To traverse a DPF tree, one needs an input of the size of the tree's depth.
+So for a tree with $n$ elements, one needs an input of size $log(n)$.
+The algorithm will perform a bit-shift to assess the most significant bit.
+This bit will decide which child to evaluate, 0 for the left child and 1 for right.
+By using the \textit{Pseudo-Random-Generator (PRG)} one generates the label for the next node.
+The flag bit will decide whether the cw will be XORed into the label.
+This label will then be used for the next iteration until the leaf level is reached.
+On this level, one XORs the final correction word ($F$) if the flag bit allows it to.
+This is the result of the DPF and can be used to calculate the point function's evaluation by evaluating the other part of the DPF in the same way and XORing both results together.
+
+Note, that our implementation will not use this way of evaluation in read or write operations.
+The DPF is stored in an already evaluated form and can be used by first performing the cyclic shift and then using it in the wanted context.
