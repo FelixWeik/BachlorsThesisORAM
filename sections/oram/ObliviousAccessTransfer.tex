@@ -1,6 +1,36 @@
-\subsection{Oblivious Transfer}
+\subsection*{Oblivious Transfer}
 \label{sub:ObliviousTransfer}
-Private Information Retreival (PIR) \cite{chor1998private}.
+Consider the following scenario:
+\begin{quotation}
+    Bob has a database with 10 entries.
+    Alice would like to query it.
+    \textit{Oblivious Transfer (OT)} allows Alice to retreive an entry of her choosing without Bob learning which one.
+    Bob is guaranteed that Alice can only see the single entry she chose.
+    She will not get any information about the other entries.
+\end{quotation}
 
-\subsection{Oblivious Access}
-\label{sub:ObliviousAccess}
+Yadav et al. \cite{yadav2022survey} describe \textit{Oblivious Transfer Protocols (OT)} as crucial tools for securely executing multi party computations.
+It comes in three flavors: \textit{1-out-of-2 OT}, \textit{1-out-of-n OT}, and \textit{k-out-of-n OT}.
+This research will focus on \textit{1-out-of-n PIR} as it can be used in \textit{Private Information Retreival} as described in the following subsection.
+Notations and definitions are taken from Yadav et al. \cite{yadav2022survey}.
+
+On a high level \textit{1-out-of-n OT} describes the data exchange of two parties, a sender and a receiver.
+The sender has $n$ inputs $(x_0,...,x_{n-1})\in \{0,1\}^l$.
+The receiver has a selection number $r\in [0,...,n-1]$.
+After protocol execution the receiver learns $x_r$ while the sender learns nothing about $r$.
+Note, that the receiver does not learn anything about $x_\psi$ with $\psi\in [0,...,n-1] \text{ and } \psi\neq r$.
+
+\subsection*{Private Information Retreival (PIR)}
+\label{sub:PrivateInformationRetreival}
+The difference between oblivious transfer and \textit{Private Information Retreival (PIR)} \cite{gasarch2004survey} can be explained by taking another perspective on the scenario from above:
+\begin{quotation}
+    Again, assume Bob's database to have 10 entries.
+    Alice would like to query it again.
+    PIR allows Alice to retreive an element of her choosing.
+    Bob will not learn which element Alice was interested in.
+    Alice, however, has access to the full database.
+\end{quotation}
+
+The most trivial PIR variant is Alice retreiving the whole database \cite{gasarch2004survey}.
+More advanced PIR-protocols fulfil this requirement in sublinear runtime.
+\textit{DUORAM} (\ref{sec:3pDuoram}) uses DPFs to implement PIR and PIR-write operations in sub-linear runtime \cite{vadapalli2023duoram}.
