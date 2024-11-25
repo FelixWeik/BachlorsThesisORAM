@@ -1,0 +1,13 @@
+\label{sec:ObliviousRAM}
+The following definitions and notations are as defined by Pinkas et al. \cite{pinkas2010oblivious}.
+An \textit{Oblivious Random Access Memory (ORAM)} allows the client to hide her access patterns on the storage system.
+Hiding the access patterns makes it \textit{oblivious}, which means that any equal-length sequence of clients' data requests to the server are equivalent from the point of view of the eavesdropper.
+This eavesdropper might be the server itself.
+Thus, the server must only know the number of queries in the sequence.
+
+Therefore, security in context of ORAMs is defined as follows \cite{pinkas2010oblivious}:
+\begin{quotation}
+    An access pattern $A(y)$ is a sequence of accesses to the server.
+    It contains both the indices accessed in the system and the data items read or written.
+    An ORAM system is considered \textit{secure} if for any two inputs $y,y'$ of equal length of the client, the access patterns $A(y),A(y')$ are computationally indistinguishable for anyone but the client.
+\end{quotation}
