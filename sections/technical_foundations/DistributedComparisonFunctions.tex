@@ -19,13 +19,13 @@ In our implementation, the leafs will present indices with the leaf on the left 
 \label{sub:DistributedComparisonFunctions}
 The function secret sharing scheme (\ref{ch_FunctionSecretSharing}) for secretly sharing Comparison Functions is called \textit{Distributed Comparison Function (DCF)}.
 On a high level, both shares are represented by binary trees.
-If one evaluates the function, she traverses the tree.
-In simple point functions (\ref{sub:PointFunctions}), one is just interested in the flag bits, correction words, and the label of the leaf.
+If one evaluates the function, she traverses the tree (\ref{sub:TraversingTheDPFTree}).
+In simple point functions (\ref{sub:PointFunctions}), one is just interested in the flag bits, correction words (including the final correction word), and the label of the leaf.
 Now, however, one is interested, whether she stays on the path or not while traversing the tree.
-Since the leafs are places in ascending order, leaving the path to leaf $\alpha$ to the leaft implicates that the given value is smaller than the threshold $\alpha$.
+Since the leafs are places in ascending order, leaving the path to leaf $\alpha$ to the left implicates that the given value is smaller than threshold $\alpha$.
 Thus, the function will evaluate to $1$.
-Leaving the path to $\alpha$ to the right or staying on the path to alpha with a given input $\alpha$ implicates that $i\geq\alpha$.
-The function will evaluate to $1$.
+Leaving the path to $\alpha$ to the right or staying on the path to alpha with a given input $i$ implicates $i\geq\alpha$.
+The function will evaluate to $0$.
 
 \subsection{DCF Construction using the Grotto Framework}
 \label{sub:CDPFConstruction}
@@ -34,10 +34,11 @@ This research focuses on the construction by Kyle et al. \cite{kyle2023grotto}.
 Goal of this construction is to find out, whether a shared secret $x$ is greater or less than zero.
 The benevolent reader might also be interested in the more prominent DCF construction of Boyle et al. \cite{boyle2021function}.
 %TODO ist es so klug hier von den CDF Pairs zu reden und dann nicht darauf einzugehen? => Einfach weglassen?
+
 Kyle et al. \cite{kyle2023grotto} are more favorable in their communication cost and ease of implementation.
+Therefore, this construction will be used in our own implementation.
 For this purpose they use a pair of the already mentioned DPFs (\ref{sub:DistributedPointFunctions}), and expand them to meet the functional requirements of DCFs.
 Also, calculating the result only requires one single word to be exchanged.
-Therefore, this construction will be used in our own implementation.
 
 First, both DPFs are generated on the same, random target value.
 For ease of explanation, we will take a look at a construction using a single DPF first and evaluate on 64-bit signed integers only.
