@@ -27,7 +27,7 @@ Thus, the function will evaluate to $1$.
 Leaving the path to $\alpha$ to the right or staying on the path to alpha with a given input $i$ implicates $i\geq\alpha$.
 The function will evaluate to $0$.
 
-\subsection{DCF Construction using the Grotto Framework}
+\subsection{DCF Construction}
 \label{sub:CDPFConstruction}
 Multiple DCF construction coexist.
 This research focuses on the construction by Kyle et al. \cite{kyle2023grotto}.
@@ -58,3 +58,5 @@ Assume $V[target]=1$.
 This means $target = S+k$ for some $k\in [1,2^{63}-1]$.
 We conclude that $x>0$ since $S$ is shifted to the left and therefore $V$ will evaluate to $0$.
 If $V[target]=0$ we conclude $x<=0$ since $S=target-(-x) = target + x$ which will shift the target into the $0$ area of $V$.
+
+% Hier noch auf die Grotto Insights eingehen?

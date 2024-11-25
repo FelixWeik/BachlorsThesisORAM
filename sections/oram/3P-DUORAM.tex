@@ -84,12 +84,13 @@ This protocol adjusts the shares of the shifting-vector $e_{ri}$ to the target i
 Thus, the target index changes from the random $ri$ to the actual target index $i^*=i^*_0+i^*_1$.
 Now, both parties need to get vectors $v_0+v_1=e_{i^*}$ to represent the shifting vector.
 
-They exchange $i^*_b-ri_b$, reconstruct $cs=(i_0^*+i_1^*-ri_-ri_1)$ and cyclic right shift $v_b$ by $cs$.
+They exchange $i^*_b-ri_b$, reconstruct $cs=(i_0^*+i_1^*-ri_0-ri_1)$ and cyclic right shift $v_b$ by $cs$.
 $P_2$ receives $i^*_b-ri_b$ from $P_b$ and can also compute $cs$.
 
 \paragraph{Postponing the decision of \textit{what} to write:}
-Recall the goal of the writing-operation: Adding $M=M_0+M_1$ at target index $i^*$ of the database $D$.
-$P_0,P_1$ exchange $M_b+F_b$ (with F being the final correction word).
+Recall the goal of the writing-operation: Adding $M=M_0+M_1$ at the already shifted target index $i^*$ to the database $D$.
+$P_0,P_1$ exchange $M_b+F_b$ (with $F$ being the final correction word).
 This allows both parties to reconstruct $M-(v_0[i^*]+v_1[i^*])$ which will serve as the new final correction word $F'$ to write $M$ in the desired location.
 
-After performing the cyclic shifts, all three parties execute the write or read protocol as shown in \ref{sub:DuoramReadingAndWriting}.
+After performing the cyclic shifts, the DPFs have to be evaluated to receive the new vectors $\tilde{t}_b^i,\tilde{v}_b^i, (i\in\{1,2,3\},b\in\{0,1\})$ as described in \ref{sec:3pDuoram}.
+Finally, all three parties execute the write or read protocol from \ref{sub:DuoramReadingAndWriting}.
