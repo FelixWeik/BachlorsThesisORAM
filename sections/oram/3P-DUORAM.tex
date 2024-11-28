@@ -43,6 +43,7 @@ This implies, one simply locally sets $D'_b\leftarrow D_b+v_b^1$ for $b\in\{0,1\
 \paragraph{Refresh Blinds:}
 \label{par:RefreshBlinds}
 The blinded, exchanged shares become "stale" after a single update operation.
+This means $\widetilde{D}'_b\neq D_{b-1}+\zeta_{b-1}, \text{ for } b\in\{0,1\}$ after executing a write operation.
 One needs to refresh them to guarantee correctness in the following operations.
 This means party $P_b, b\in\{0,1\}$ has to refresh $\widetilde{D}_b$ so it matches $D_{1-b}+\zeta_{1-b}$ and party $P_{1-b}$ has to refresh its blind $\zeta_{1-b}$ before.
 
