@@ -20,15 +20,16 @@ Will execute the online phase, again with three threads each.
 Specifying \code{duoram} will execute the tests as described in \ref{sub:testingAndBenchmarking} with 5 messages using RDPFs of depth 20 for each subtest.
 
 \subsubsection*{General Execution}
+The following sections denotes the computational peers $P_0,P_1$ as "player", $P_2$ is called "server".
 All executions start in \code{prac.cpp} which accomodates the \code{main} method.
 This includes the starting points for both the players' and the server's computations.
 If parses the given arguments, sets the adresses of the other parties, and deceides whether the current execution is a player's or server's computation.
 That means it calls \code{comp\_player\_main} or \code{server\_player\_main}.
 
-\code{comp\_player\_main} represents the player's computation.
+\code{comp\_player\_main} represents the players' computation.
 It is, again, separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the onlien phase.
 
-\code{server\_player\_main} represents the servers' computations.
+\code{server\_player\_main} represents the server's computations.
 It too is separated into its phases \code{preprocessing\_server} and \code{online\_main}.
 
 The careful reader notices both the server and the player calling \code{comp\_main} albeit the previous text assumed these computations to be implemented separately.
@@ -36,11 +37,29 @@ Notice that this too is only a starting point for more specialized calculations.
 Thus, \code{online\_main} too further specifies its computations given the number of the computational peer.
 
 \subsubsection*{Preprocessing} \label{subsub:implementationPreprocessing}
-%TODO wie wird das in files gespeichert und wo findet man die?
+This phase generates messages and its contents as defined in \ref{subsub:implementationMpcioAndCommunication}.
 
+\code{preproc.cpp} handles these computations for both the server and the players.
+Given the current type, which equals the address inside the current message, the code calls the specific constructor.
+Each type is assigned a certain file \code{<type><amount>.<party>.t0}.
+For example generating 20 RDPFs will result in three files \code{rdpf20.<party\_name>.t0} which are used in the next phase.
 
-\subsubsection*{Cyclic Shifting} \label{subsub:implementationCyclicShifting}
-\subsubsection*{Online Phase} \label{subsub:implementationOnlinePhase}
-%TODO wie werden die DPFs (RDPF, CDPF) aufgerufen
-\subsubsection*{Reading} \label{subsub:implementationReading}
-\subsubsection*{Writing} \label{subsub:implementationWriting}
+\subsubsection*{Reading, Writing and Cyclic Shifts} \label{subsub:implementationCyclicShifting}
+\code{duoram.tcc} accomodates both oblivious read and write operations.
+Each operations implements its own type of cyclic shifting since it performs these shift on different types of vectors (\ref{sub:CyclicShiftingProtocol}).
+Also, reading requires only two RDPFs while writing requires all three (\ref{sub:DuoramReadingAndWriting}).
+The general process from \ref{sub:DuoramReadingAndWriting}, however, stays the same.
+
+\paragraph{Cyclic Shifting for Reading}
+Reading requires the player to calculate the distance of the random target index to the share of the new target.
+This distance is called offset.
+Each player then sends her offset to the other player and simultaneously receive the offset of the other player.
+\code{ParallelEval()} then evaluates the DPFs on the new share, use it to read from the given shape, and return the result of the read operation.
+The server receives both offsets.
+It will then send the cancellation terms to the players as defined in \ref{sub:DuoramReadingAndWriting}.
+
+\paragraph{Cyclic Shifting for Writing}
+\code{Duoram::Shape::MemRefS::oram\_update()} implements the writing operation which also performs the cyclic shift.
+Both players again calculate the offset, send it to the other player and receive it from the other player.
+After combining the offsets, each player performs the cyclic shift, evaluates all three RDPFs and sets the database on the target index to the new target value.
+The server follows the basic writing protocol which includes receiving both offsets and combining them, using the same implementations as the players.

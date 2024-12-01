@@ -125,3 +125,17 @@ The program offers three possibilities for this value:
     With this specifier, too, one can choose which tests to execute.
     These tests will be the same as in the online mode.
 \end{itemize}
+
+All three parties will use a predefined structure of their messages.
+Therefore, generated precomputation \ref{subsub:implementationPreprocessing} data will implement this protocol.
+It separates a message into byte-segments with each segment accomodating a special type of data:
+\begin{itemize}
+    \item 0x01: Indicates the type.
+    \item 0x01 to 0x30: RDPFs. Since the size of RDPFs depends on its depth the given space is defined in this manner.
+    \item 0x40: CDPFs 
+    \item 0x80: Multiplication Triple for performing MPC-multiplications (\ref{sub:MultiplicationAdditionTriples})
+    \item 0x81: AND Triple for performing MPC-AND-operations (\ref{sub:MultiplicationAdditionTriples})
+    \item 0x83: Select Triple. Since it will not be uesd further the benevolent reader may read the comments in \code{types.hpp}.
+    \item 0x8e: Counter counting the AES-operations. This can be used for testing.
+    \item 0x00: Shows the end of preprocessing. 
+\end{itemize}
