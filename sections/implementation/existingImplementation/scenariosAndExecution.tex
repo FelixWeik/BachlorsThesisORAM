@@ -1,0 +1,46 @@
+As specified in the previous paragraph \ref{subsub:implementationMpcioAndCommunication}, \code{prac} is executed three times simultaneously.
+Hence, assuming one executes locally without using docker, one needs to run \code{prac} in three terminals at once.
+Calling \code{prac} requires several arguments: player number, which mode to execute (-p, -o, or blank), number of threads for faster execution (-t), and for the server $P_2$ the type, amount and depth of functions to calculate.
+\code{r} will represent RDPFs (\ref{sub:RDPFTriples}).
+
+Thus, the function calls for preprocessing will look as follows:
+\begin{enumerate}
+    \item \code{./prac -t 3 -p 0}
+    \item \code{./prac -t 3 -p 1 localhost}
+    \item \code{./prac -t 3 -p 2 localhost localhost r20:20}
+\end{enumerate}
+This will execute the precomputation generating 20 RDPF-triples, each of depth 20, with each instance working in three threads.
+
+\begin{enumerate}
+    \item \code{./prac -t 3 0 duoram 20 5}
+    \item \code{./prac -t 3 1 localhost duoram 20 5}
+    \item \code{./prac -t 3 2 localhost localhost duoram 20 5}
+\end{enumerate}
+Will execute the online phase, again with three threads each.
+Specifying \code{duoram} will execute the tests as described in \ref{sub:testingAndBenchmarking} with 5 messages using RDPFs of depth 20 for each subtest.
+
+\subsubsection*{General Execution}
+All executions start in \code{prac.cpp} which accomodates the \code{main} method.
+This includes the starting points for both the players' and the server's computations.
+If parses the given arguments, sets the adresses of the other parties, and deceides whether the current execution is a player's or server's computation.
+That means it calls \code{comp\_player\_main} or \code{server\_player\_main}.
+
+\code{comp\_player\_main} represents the player's computation.
+It is, again, separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the onlien phase.
+
+\code{server\_player\_main} represents the servers' computations.
+It too is separated into its phases \code{preprocessing\_server} and \code{online\_main}.
+
+The careful reader notices both the server and the player calling \code{comp\_main} albeit the previous text assumed these computations to be implemented separately.
+Notice that this too is only a starting point for more specialized calculations.
+Thus, \code{online\_main} too further specifies its computations given the number of the computational peer.
+
+\subsubsection*{Preprocessing} \label{subsub:implementationPreprocessing}
+%TODO wie wird das in files gespeichert und wo findet man die?
+
+
+\subsubsection*{Cyclic Shifting} \label{subsub:implementationCyclicShifting}
+\subsubsection*{Online Phase} \label{subsub:implementationOnlinePhase}
+%TODO wie werden die DPFs (RDPF, CDPF) aufgerufen
+\subsubsection*{Reading} \label{subsub:implementationReading}
+\subsubsection*{Writing} \label{subsub:implementationWriting}
