@@ -44,7 +44,7 @@ Given the current type, which equals the address inside the current message, the
 Each type is assigned a certain file \code{<type><amount>.<party>.t0}.
 For example generating 20 RDPFs will result in three files \code{rdpf20.<party\_name>.t0} which are used in the next phase.
 
-\subsubsection*{Reading, Writing and Cyclic Shifts} \label{subsub:implementationCyclicShifting}
+\subsubsection*{Reading, Writing, and Cyclic Shifts} \label{subsub:implementationCyclicShifting}
 \code{duoram.tcc} accomodates both oblivious read and write operations.
 Each operations implements its own type of cyclic shifting since it performs these shift on different types of vectors (\ref{sub:CyclicShiftingProtocol}).
 Also, reading requires only two RDPFs while writing requires all three (\ref{sub:DuoramReadingAndWriting}).
@@ -58,8 +58,17 @@ Each player then sends her offset to the other player and simultaneously receive
 The server receives both offsets.
 It will then send the cancellation terms to the players as defined in \ref{sub:DuoramReadingAndWriting}.
 
+Reading in general can be done by indexing into the shape implemented by the duoram.
+This will return the reading protocol including cyclic shifting.
+The operation will return either \code{MemRefInd} meaning references to indipendent memory indices, or \code{MemRefExpl}, which represents an explicit memory reference.
+Each memory-reference type implements two operators that allow them to be casted into either an additively or XOR shared register entry.
+This will allow the client to access the data-value of the memory-referece.
+
 \paragraph{Cyclic Shifting for Writing}
 \code{Duoram::Shape::MemRefS::oram\_update()} implements the writing operation which also performs the cyclic shift.
 Both players again calculate the offset, send it to the other player and receive it from the other player.
 After combining the offsets, each player performs the cyclic shift, evaluates all three RDPFs and sets the database on the target index to the new target value.
 The server follows the basic writing protocol which includes receiving both offsets and combining them, using the same implementations as the players.
+
+Since writing is both reading and updating, the update operation (\code{+=}) is done on the memory reference returned by reading at index \code{ind}.
+This memory-reference will then be written into the duoram automatically using the \code{duoram\_update} operation.
