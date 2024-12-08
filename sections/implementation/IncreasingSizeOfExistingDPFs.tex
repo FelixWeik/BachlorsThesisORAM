@@ -1,0 +1,54 @@
+\label{sub:IncreasingTheSizeOfExistingDPFs}
+Another rather trivial approach is hardcoding larger datatypes replacing the original datatypes.
+The user chooses her preferred data-size, specifies it before compilation, and uses this specified size during exuction.
+This will commit each duoram to a single size which, however, can be chosen freely before compilation.
+The code supports 64, 128, 256, and 532 bit values. %TODO das stimmt ja gar nicht
+The implementation is located on branch \code{64ToUnlimited} in the author's repository.
+
+\subsubsection*{Locating necessary Changes} \label{subsub:necessaryChanges}
+Considering the source code's structure, the author chose a top-down approach for implementing this solution.
+This includes locating the most general datatypes, distinguishing cases and assigning each case its special datatype.
+The most optimal solution could trigger a trickle-down-effect, where more general datatypes affect more specialized datatypes with the ultimate goal of changing a single datatype or even a single flag in order to adjust the whole process of storing and retreiving data of a special size.
+Therefore, the required efforts of achieving the optimal solution for this approach extend the efforts of solely switching the datatype used by the RDPFs.
+
+The topmost elements in  this datatype-top-to-bottom structure are macros (\ref{subsub:implementationTypeshpp}).
+These are specified by \code{types.hpp}.
+They specify the most general datatypes and thus their derivates.
+The most important alias, \code{value\_t}, by itself is used 269 times throughout the code.
+Its most prominent usage is in the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
+
+As already explained in \ref{subsub:implementationTypeshpp}, \code{types.hpp} also holds \code{ADDRESS\_MAX\_BITS} specifying the size of addresses impacting the used datatype.
+The derived type-alias \code{address\_t} is used 143 times throughout the base-implementation.
+
+\subsubsection*{Macro Case-Distinctions}\label{subsub:macroCaseDistinction}
+Cpp offers functionality for case distinction via macros.
+This enables to use or not to use code based on the set macro.
+
+
+It is set using the \code{VALUE\_BITS} macro, implementing a case distinction based on the value set for \code{VALUE\_BITS}.
+
+\subsubsection*{Arbitrary large AES}\label{subsub:arbitraryLargeAES}
+Each label in a DPF tree is AES encrypted.
+This affects generation and traversion of such trees.
+The base implementation uses an approach based on Intel AES-NI (\ref{subsub:implementationAesni}).
+It is solely implemented for \code{\_\_m128i} vectors.
+This fits the base definition of 128-bit labels in a DPF-tree.
+
+Scaling the duoram requires the expansion to larger datatypes.
+Current Intel AES-NI implementations, however, are solely described for 128, and 256 bit values. %TODO hier vielleicht das tolle paper verlinken und stimmt das überhaupt?
+This contradicts the goal of scaling duoram arbitrarily.
+Therefore, the author chose a solution similar to the prior approach of combination while leaving AES' security premises untouched.
+By separating the base input in 128-bit blocks, encrypting each block independtly, and concatenating them after encryption makes AES scalable.
+Thus, by looping the encryption dependent on the size of the given input, one implements an arbitrarily scalable AES protocol.
+
+\subsubsection*{Adjusting Compilation}\label{subsub:adjustingCompilation}
+To switch the datatype before compilation one needs to set a flag bit.
+\code{-DVALUE\_BITS} is set in the \code{MAKEFILE}.
+It represents the length of data one wants to store and retreive.
+It will trigger the \code{VALUE\_BIT} macro and place the given value into it.
+\code{VALUE\_BIT} then automatically adjusts the other macros which then will change the used datatypes and protocols to match the given value.
+If nothing else is specified, \code{-DVALUE\_BITS} is set to $128$ by default which makes the code use \code{\_\_m128i} vectors for $M$.
+
+\subsubsection*{Difficulties}
+
+\subsubsection*{General Discussion}
