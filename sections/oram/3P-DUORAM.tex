@@ -9,9 +9,9 @@ At a high level, the database $D$ is additively secret shared among two non-coll
 Both parties hold the additive shares of the target index they want to access in form of the shifting vector $e_i$.
 Writing accesses are done via additively sharing the value both parties want to write.
 This value is denoted with $M$.
-These values are stored in so called \textit{RDPF-Triples}.
+These values are stored in so called \textit{RDPF-Triples} (\ref{sub:RDPFTriples}).
 RDPF means DPF for accessing and manipulating the database.
-Evaluating them gives six pairs of word vectors with the property that $t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3=e_i$ and $v_0^1+v_1^1=v_0^2+v_1^2=v_0^3+v_1^3=M\cdot e_i$.
+Evaluating them, either by using $EVALFULL$ (\ref{sub:TraversingTheDPFTree}) or while generating both RDPF-Triples on target index $i$, returns six pairs of word vectors with the property that $t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3=e_i$ and $v_0^1+v_1^1=v_0^2+v_1^2=v_0^3+v_1^3=M\cdot e_i$.
 
 Also, each party carries a \textit{Blinding Factor ($\zeta$)} that will be used to mask its share of the database $D_i$.
 The blinded share will be denoted with $\widetilde{D}_i\leftarrow D_i+\zeta_i$.
@@ -20,6 +20,7 @@ This means party $P_b, b\in\{0,1\}$ holds $\widetilde{D}_{1-b}$.
 
 This 3-party variant also has a stateful auxiliary part $P_2$.
 It does neither hold the database nor index shares and merely facilitates the computation.
+By introducing this third party, (2+1)-MPC protocols become possible replacing a trusted source.
 
 \subsection{Reading and Writing}
 \label{sub:DuoramReadingAndWriting}

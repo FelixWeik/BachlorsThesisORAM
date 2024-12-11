@@ -69,10 +69,17 @@ The most prominent structs are:
 
 \subsubsection*{Intel AES-NI} \label{subsub:implementationAesni}
 The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}.
-As the name suggests, it extends and optimizes the existing instruction set for AES-operations.
-The DPF trees in the source code are AES-ecnrypted, hence the need for optimization.
+As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
+The implementation uses AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode), hence the need for optimization.
 Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} SIMD datatype, representing a 128-bit vector.
 Therefore, datatypes that will be used in an AES-context are stored in this format.
+
+The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} values the client wants to store and retreive in the vanilla implementation.
+This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF-trees.
+The code uses its security properties of being random to calculate new labels given a seed and key.
+Both parties use the same private key, thus AES-ECB becomes pseudorandom.
+Labels are stored as \code{\_\_m128i}, leafs as 64-bit vectors.
+Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simluates a length doubling pseudo random generator.
 
 \subsubsection*{duoram} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
