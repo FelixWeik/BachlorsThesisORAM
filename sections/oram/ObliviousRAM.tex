@@ -5,9 +5,12 @@ Hiding the access patterns makes it \textit{oblivious}, which means that any equ
 This eavesdropper might be the server itself.
 Thus, the server must only know the number of queries in the sequence.
 
-Therefore, security in context of ORAMs is defined as follows \cite{pinkas2010oblivious}:
+This leads us to the following definition of security \cite{pinkas2010oblivious} in context of the ORAM:
 \begin{quotation}
     An access pattern $A(y)$ is a sequence of accesses to the server.
     It contains both the indices accessed in the system and the data items read or written.
     An ORAM system is considered \textit{secure} if for any two inputs $y,y'$ of equal length of the client, the access patterns $A(y),A(y')$ are computationally indistinguishable for anyone but the client.
 \end{quotation}
+
+Multiple implementations of this concept exist, the most prominent being \textit{FLORAM}, \textit{RAMEN} and \textit{DUORAM}.
+This research solely focuses on \textit{DUORAM} (\ref{sec:3pDuoram}) as introduced by Vadapalli et al. \cite{vadapalli2023duoram}.
