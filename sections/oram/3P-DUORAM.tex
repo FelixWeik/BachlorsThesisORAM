@@ -19,8 +19,10 @@ Additionally, each party carries the blinded database of the other party.
 This means party $P_b, b\in\{0,1\}$ holds $\widetilde{D}_{1-b}$.
 
 This 3-party variant also has a stateful auxiliary part $P_2$.
-It does neither hold the database nor index shares and merely facilitates the computation.
-By introducing this third party, (2+1)-MPC protocols become possible replacing a trusted source.
+It does neither hold the database $D$ nor index shares and merely facilitates the computation.
+By introducing $P_2$ (2+1)-MPC protocols are possible.
+This means, three parties compute the result on two secret inputs with one party facilitating the computation without holding and sending secrets itself.
+Duoram uses these MPC-protocols to replace the trusted source \cite{vadapalli2023duoram}.
 
 \subsection{Reading and Writing}
 \label{sub:DuoramReadingAndWriting}
@@ -30,14 +32,15 @@ The client wants to read at index $i^*$ from $D$.
 This notation is equivalent to $D[i^*]=\langle D,e_{i^*}\rangle$.
 The algorithm works as follows:
 \begin{enumerate}
-    \item $P_2$ selects $p\in\{0,1\}^w$ uniformly at random and sends $y_1\leftarrow-\langle \zeta_0,t_1^3\rangle + p$ to $P_0$ and $y_1\leftarrow\langle\zeta_1,t_0^2\rangle -p$ to $P_1$.
+    \item $P_2$ selects $p\in\{0,1\}^w$ uniformly at random and sends $y_0\leftarrow-\langle \zeta_0,t_1^3\rangle + p$ to $P_0$ and $y_1\leftarrow\langle\zeta_1,t_0^2\rangle -p$ to $P_1$.
     \item $P_0$ outputs $\text{read}_0\leftarrow\langle D_0+\widetilde{D}_1, t_0^1\rangle - \langle\zeta_0,t_0^3-t_0^1\rangle + y_0$.
     \item $P_1$ outputs $\text{read}_1\leftarrow\langle D_1+\widetilde{D}_0,t_1^1\rangle - \langle\zeta_1,t_1^2-t_1^1\rangle +y_1$.
 \end{enumerate}
 
 \paragraph{Writing:}
 \label{par:DuoramWriting}
-Both parties want to obtain shares of a new Database $D'$, whose $i^{*^{th}}$ value is updated by $M$.
+Both parties want to obtain shares of a new Database $D'$, whose $i^*$-th value is updated by $M$.
+This is equivalent to updating the read value $r=D[i^*]$ by $M-r$ or completely overwriting $r$ by $M$.
 Recall the word-vectors $v_b^i$ with $v_0^i+v_1^i=e_{i^*}\cdot M$.
 This implies, one simply locally sets $D'_b\leftarrow D_b+v_b^1$ for $b\in\{0,1\}$.
 
