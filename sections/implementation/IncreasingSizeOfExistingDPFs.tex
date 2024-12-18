@@ -1,31 +1,56 @@
 \label{sub:IncreasingTheSizeOfExistingDPFs}
 Another rather trivial approach is hardcoding larger datatypes replacing the original datatypes.
-The user chooses her preferred data-size, specifies it before compilation, and uses this specified size during exuction.
+The user chooses her preferred data-size before compilation and uses this specified size during exuction.
 This will commit each duoram to a single size which, however, can be chosen freely before compilation.
-The code supports 64, 128, 256, and 532 bit values. %TODO das stimmt ja gar nicht
-The implementation is located on branch \code{64ToUnlimited} in the author's repository.
+The updated implementation supports 64, 128, and 256 bit values.
+It is located on branch \code{64ToUnlimited} in the \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{author's repository}.
 
 \subsubsection*{Locating necessary Changes} \label{subsub:necessaryChanges}
 Considering the source code's structure, the author chose a top-down approach for implementing this solution.
 This includes locating the most general datatypes, distinguishing cases and assigning each case its special datatype.
-The most optimal solution could trigger a trickle-down-effect, where more general datatypes affect more specialized datatypes with the ultimate goal of changing a single datatype or even a single flag in order to adjust the whole process of storing and retreiving data of a special size.
+The most optimal solution could trigger a trickle-down-effect, where general datatypes affect more specialized datatypes with the ultimate goal of changing a single datatype or even a single flag in order to adjust the whole process of storing and retreiving data of a given size.
 Therefore, the required efforts of achieving the optimal solution for this approach extend the efforts of solely switching the datatype used by the RDPFs.
 
 The topmost elements in  this datatype-top-to-bottom structure are macros (\ref{subsub:implementationTypeshpp}).
-These are specified by \code{types.hpp}.
-They specify the most general datatypes and thus their derivates.
-The most important alias, \code{value\_t}, by itself is used 269 times throughout the code.
-Its most prominent usage is in the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
+These are specified in \code{types.hpp}.
+They specify the most general datatypes and thus their derivates, aliases.
+\begin{itemize}
+    \item Type-alias \code{value\_t} by itself is used 258 times throughout the code.
+    \code{VALUE\_BITS} calls the according cases.
+    Its most prominent usage is in the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
+    \item \code{ADDRESS\_MAX\_BITS} specifies the size of addresses.
+    The derived type-alias \code{address\_t} is used 143 times throughout the base-implementation.
+    It deceides the type of indexing into the database.
+    As the database is of size $2^\text{INPUT\_BITS}$ at least \code{INPUT\_BITS} many bits are needed for formatting adresses correctly.
+\end{itemize}
 
-As already explained in \ref{subsub:implementationTypeshpp}, \code{types.hpp} also holds \code{ADDRESS\_MAX\_BITS} specifying the size of addresses impacting the used datatype.
-The derived type-alias \code{address\_t} is used 143 times throughout the base-implementation.
+\subsubsection*{Bitmasks and Bitutils}\label{subsub:bitmasksAndBitutils}
+\code{bitutils.hpp} provides bitmasks and important functions for bit operations.
 
-\subsubsection*{Macro Case-Distinctions}\label{subsub:macroCaseDistinction}
-Cpp offers functionality for case distinction via macros.
-This enables to use or not to use code based on the set macro.
+These operations include \code{xor\_if()} and \code{get\_lsb()} which are used multiple times throughout the code.
+\code{xor\_if()} will execute a bitwise xor operation if a flag-bit is set, \code{get\_lsb()} retreives the least significant bit of a given \code{\_\_m128i} value.
 
+Bitmasks like \code{bool128\_mask} and \code{if128\_mask} are utilised when generating and traversing DPF-trees, during bit-operations, or while blinding shares.
+In short, they increase bit-operations' performance by providing predefined values that will be used frequently during execution.
 
-It is set using the \code{VALUE\_BITS} macro, implementing a case distinction based on the value set for \code{VALUE\_BITS}.
+Since these bit-operations are executed primarily on \code{\_\_m128i} values, all function signatures and bitmasks are predefined for this specific datatype.
+If one wants to scale their size arbitrarily, three solutions exist:
+\begin{enumerate}
+    \item Hardcode multiple bitoperations for different datatypes:
+    This requires the developer to hardcode the same solution for any datatype.
+    Since this conflict collides with the goal of arbitrary scaling, this approach will not be pursued.
+    \item Cut larger values into 128-bit blocks:
+    This requires the input-type to be a multiple of 128-bit, which is not always the case.
+    Also, it requires each function call to cut the input into $N$ blocks, call the given function $n$ times and finally concatenate each result to receive the final result.
+    This too scales badely.
+    \item Using GMP (\ref{subsub:gmp}):
+    By using GMP, one can create bitfields of arbitrary size.
+    Also, bit-operations are predefined for any \code{mpz} value.
+    Thus, the specialized bit-operations defined in the code will utilise the more general GMP bit-operations.
+    Bitmasks can be left untouched, since the least significant bit or bit-inverses are not size-dependent.
+    By using this library for bit-operations while leaving the bitmasks as they are, one achieves an arbitrarily scaled set of bit-utils.
+    Therefore, the author further pursues this approach.
+\end{enumerate}
 
 \subsubsection*{Arbitrary large AES}\label{subsub:arbitraryLargeAES}
 Each label in a DPF tree is AES encrypted.
@@ -41,6 +66,8 @@ Therefore, the author chose a solution similar to the prior approach of combinat
 By separating the base input in 128-bit blocks, encrypting each block independtly, and concatenating them after encryption makes AES scalable.
 Thus, by looping the encryption dependent on the size of the given input, one implements an arbitrarily scalable AES protocol.
 
+\subsubsection*{GNU Multi Precision Arithmetic Library (GMP)} \label{subsub:gmp}
+
 \subsubsection*{Adjusting Compilation}\label{subsub:adjustingCompilation}
 To switch the datatype before compilation one needs to set a flag bit.
 \code{-DVALUE\_BITS} is set in the \code{MAKEFILE}.
@@ -49,6 +76,10 @@ It will trigger the \code{VALUE\_BIT} macro and place the given value into it.
 \code{VALUE\_BIT} then automatically adjusts the other macros which then will change the used datatypes and protocols to match the given value.
 If nothing else is specified, \code{-DVALUE\_BITS} is set to $128$ by default which makes the code use \code{\_\_m128i} vectors for $M$.
 
-\subsubsection*{Difficulties}
+\subsubsection*{Difficulties} \label{subsub:IncreasingSizeOfExistingDPFsDifficulties}
+\begin{itemize}
+    \item CPP does not accept non-trivial datatypes (like structs) for template definitions
+    \item One needs to represent specific \code{\_\_128i} datatypes or shift them 
+\end{itemize}
 
 \subsubsection*{General Discussion}
