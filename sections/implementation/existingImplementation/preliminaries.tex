@@ -1,27 +1,40 @@
 \subsubsection*{Representing DPFs} \label{subsub:implementationRepresentingDPFs}
-Both, Distributed Point Functions (\ref{sub:DistributedPointFunctions}) and Distributed Comparison Functions (\ref{sub:DistributedComparisonFunctions}), stem from the same parent class \code{dpf}.
-Again, recall point-function and comparison-function represented as binary trees.
+Both, Distributed Point Functions (\ref{sub:DistributedPointFunctions}) and Distributed Comparison Functions (\ref{sub:DistributedComparisonFunctions}), inherit from the same parent class \code{dpf}.
+Again, recall the representation of point- and comparison-functions as binary trees.
 Thus, the most trivial representation of a single point function is saving the seed of the root node and generating the whole tree every time the point function is used.
-The base class therefore saves the seed of the root node and implements the functionality of descending from a given seed to one of its children.
-Also, it stores the flag bits of the leaf level with bit $i$ being leaf $i$.
-This is equivalent to a single vector $t_b$ as explained in section \ref{sec:3pDuoram} and will XOR to $e_i$ when combined with the  the other party's counterpart.
+Since this approach is too computational expensive for repetitive evaluations, DPFs are stored in an already evaluated form with the possibility to recreate the tree when needed.
+
+Therefore, the base class \code{dpf} stores the seed of the root node.
+Also, it stores a vector \code{cfbits} which holds all flag bits on the path to target index $\alpha$.
+Bit $i$ of this vector represents the bit of the ith node on the path to $\alpha$.
+It also implements the functionality to descend a tree given a seed and a bool indicating which child to calculate.
 The code further distinguishes Distributed Point Functions for memory accesses, called \textit{RDPF}, and Distributed Comparison Functions labelled as \textit{CDPF}.
 
 RDPFs inherit from the basic DPF implementation.
-It expands its parent with the \code{LeafInfo} struct.
-This stores the final correction word and the sum of scaling to receive a share, which can be either additive or a XOR share, of the message $M$.
-Thus, combined with the flags of the leaf-vector implemented by the parent, the RDPF is stored in an already evaluated form holding both $t_b$ and $v_b$.
-%TODO Knoten werden als 128-bit werte gespeichert => warum ist das so => erklären!!!
+It expands its parent with further attributes and the \code{LeafInfo} struct.
+\code{leaf\_cfbits} stores the correction-flag bits for the leaf level.
+This is equivalent to $t_b$ from the high-level duoram overview, which means bit $i$ holds the correction flag-bit of leaf $i$.
+\code{li} is a vector holding \code{LeafInfo} structs.
+In normal RDPFs, which is the standard in this research, it will only hold a single \code{LeafInfo} struct.
+\code{LeafInfo} is essential for using the evaluated RDPF-result in a read or write operation.
+It holds the correction word for the leaf level, which itself is a XOR-share, and all further attributes to easily convert it into an additive share.
+This is essential, since \code{duoram} is based on additive shares. 
+Thus converting from XOR-RDPF-shares to additive shares simplifies further evaluation processes a lot.
+Also, it holds the XOR- and additive-share $M_b$ of the message to write $M$, which, in combination with $t_b$, evaluates to $v_b = e_b\cdot M_b$.
+Combined with $P_{b'}$'s value of $v_{b'}$ it evaluates to $v=v_0\oplus v_1=(e_0\cdot M_0)\oplus(e_1\cdot M_1)=e_i\cdot M$.
 
-%TODO das ist aes verschlüsselt -> soll man das miterklären oder ist das vorerst egal weil es ja keine rolle spielt?
-The code stores RDPFs as triples, called \code{RDPFTriple}.
+The code stores RDPFs as triples, called \code{RDPFTriple} (\ref{sub:RDPFTriples}).
 As the name suggests, it holds three RDPFs, each with the same target, again, either XOR or additively shared.
-To generate a RDPF-triple including three rdpfs on a given target, one uses its constructor which includes the complete functionality to do so.
+To generate a RDPF-triple including three rdpfs on a given target, one uses its constructor which itself calls the RDPF-constructor three times.
+All three RDPFs are stored in a vector, which is the \code{RDPFTriple}.
+The triple itself is stored in the \code{mpcio} class assigned to each player.
 This construction makes it easy to keep track of the used RDPFs.
 
-CDPFs too, inherit from the given DPF construction.
+CDPFs too, inherit from the base structures predefined by \code{dpf}.
 They are, however, stored as tuples.
-Both CDPFs have the same target \code{as\_target} for additive shares, and \code{xs\_target} for XOR shares.
+One can choose whether to share the target additively via \code{as\_target} or distribute XOR-shares, called \code{xs\_target}.
+This process is similar to RDPFs, since both CDPFs within a tuple hold the same target.
+Thus, combining the targets of $P_0,P_1$ results in the actual target index.
 A tuple of CDPFs allows the client to compare a given value to 0 as described in \ref{sub:CDPFConstruction}.
 
 \subsubsection*{types.hpp} \label{subsub:implementationTypeshpp}
@@ -64,15 +77,16 @@ The most prominent structs are:
     \item \code{RegXS}: 
     Represents a register holding an XOR share of type \code{value\_t}.
     \item \code{RegBS}: 
-    Represents a bit-share of type \code{bit\_t} which is a type-alias for a bool.
+    Represents a register holding a bit-share of type \code{bit\_t} which itself is a \code{bool} type-alias.
 \end{itemize}
 
 \subsubsection*{Intel AES-NI} \label{subsub:implementationAesni}
 The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}.
 As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
-The implementation uses AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode), hence the need for optimization.
-Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} SIMD datatype, representing a 128-bit vector.
-Therefore, datatypes that will be used in an AES-context are stored in this format.
+These improvements come in form of the \code{wmmintrin.h} header file implementing AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode) core functions based on the \textit{AES-NI} instruction set.
+Since AES-ECB is of great use when generating DPFs, these optimizations will foster great performance improvements.
+Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} \textit{Single Instruction Multiple Data (SIMD)} datatype, representing a 128-bit vector.
+Therefore, datatypes used in any AES-context are stored in this format.
 
 The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} values the client wants to store and retreive in the vanilla implementation.
 This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF-trees.
@@ -89,11 +103,11 @@ It holds the following information:
     The number of the party.
     0 or 1 for computational peers and 2 for the server.
     \item database: 
-    Vector of registers representing the database.
+    Vector of registers representing the party's share of the database $D_b$.
     It is either additively (RegAS) or XOR shared (RegXS).
     RegAS is set by default and can be changed manually.
     \item blind: 
-    The blinding factor to blind its own database.
+    The blinding factor $\zeta_b$ to blind its own database.
     \item {peer\_blinded\_db}:
     This is the blinded database of party $P_b, b\in\{0,1\}$ the other party $P_b, {b-1}\in\{0,1\}$.
     \item Party $P_2$ uses the attributes \code{p0\_blind}, \code{p1\_blind} to represent the blinded databases of both parties $P_0,P_1$.
