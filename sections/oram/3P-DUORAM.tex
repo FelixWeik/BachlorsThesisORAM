@@ -51,6 +51,7 @@ Both parties want to obtain shares of a new Database $D'$, whose $i^*$-th value 
 This is equivalent to updating the read value $r=D[i^*]$ by $M-r$ or completely overwriting $r$ by $M$ at position $i$.
 Recall the word-vectors $v_b^k$ with $v_0^k+v_1^k=e_{i^*}\cdot M$.
 This implies, parties $P_0,P_1$ locally set $D'_b\leftarrow D_b+v_b^1\text{ for }b\in\{0,1\}$.
+Since writing is a combination of reading and updating, one needs two RDPF-Triples (\ref{sub:RDPFTriples}) for executing a single write operation.
 
 \paragraph{Refresh Blinds:}
 \label{par:RefreshBlinds}
@@ -59,7 +60,7 @@ This means $\widetilde{D}'_b\neq D_{b-1}+\zeta_{b-1}, \text{ for } b\in\{0,1\}$ 
 One needs to refresh them to guarantee correctness in the following operations.
 This means party $P_b, b\in\{0,1\}$ has to refresh $\widetilde{D}_b$ so it matches $D_{1-b}+\zeta_{1-b}$ and party $P_{1-b}$ has to refresh its blind $\zeta_{1-b}$ before.
 
-This specific operation will is not of great importance in this research.
+This specific operation is not of great importance in this research.
 If not specified differently, $\text{RefreshBlinds}$ will just be adapted to the given datasize.
 The benevolent reader may read the more detailed research by Vadapalli et al. \cite{vadapalli2023duoram}.
 
