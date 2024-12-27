@@ -41,7 +41,7 @@ A tuple of CDPFs allows the client to compare a given value to 0 as described in
 This file defines basic macros, aliases, structs, and their operators.
 
 The most prominent type-aliases are:
-\begin{itemize}
+\begin{itemize}\label{itemize:importantAliases}
     \item \code{nbits\_t}: 
     This value counts the number of bits in a value, which means \code{value\_t}.
     Thus, the chosen datatype needs to be large enough to store \textit{VALUE\_BITS} bits.
@@ -62,7 +62,7 @@ The most prominent type-aliases are:
     The default value is \code{uint64\_t}.
 \end{itemize}
 Important macros are:
-\begin{itemize}
+\begin{itemize}\label{itemize:importantMacros}
     \item {VALUE\_BITS}: 
     This will deceide the size of \code{value\_t}. 
     The default value is 64.
@@ -71,7 +71,7 @@ Important macros are:
     The default value is 32.
 \end{itemize}
 The most prominent structs are:
-\begin{itemize}
+\begin{itemize}\label{itemize:importantStructs}
     \item \code{RegAS}: 
     Represents a register holding an additive share of type \code{value\_t}.
     \item \code{RegXS}: 
