@@ -1,18 +1,22 @@
 \label{sec:GeneralLimitations}
 \subsection{AES and Label-Size}\label{sub:AESSizeLimitations}
-The given code by Vadapalli et al. is optimized for 64-bit values with 128-bit labels.
-These labels are represented by Intel's \code{\_\_m128i} SIMD-datatype (\ref{subsub:implementationAesni}).
-Keys for AES are represented using an array holding eleven \code{\_\_m128i} values, which means they are of type \code{\_\_m128i[11]}.
-Eleven values are necessary since AES for 128-bit values takes place in eleven rounds, thus eleven keys.
-Adjusting AES for 256 or 512 bits requires more implementations using different inputs and keys, since a higher number of rounds is needed.
+The given code by Vadapalli et al. \cite{vadapalli2023duoram} is optimized for 64-bit values with 128-bit labels as described in \ref{subsub:implementationAesni}.
+These labels are represented by Intel's SIMD-datatype \code{\_\_m128i}.
+AES keys are represented using an array holding eleven \code{\_\_m128i} values, which means a single AES key has type \code{\_\_m128i[11]}.
+Eleven values are necessary since AES for 128-bit values takes place in ten rounds, with each round being assigned a distinct key plus the initial input called \textit{seed} in the following.
+AES implementations as presented by Rijmen et al. \cite{rijmen2001advanced}, however, exist for no more than 256 bits.
 
-AES as used in the implementation keeps its secret-premises when concatenated.
-This means, executing AES multiple times and concatenating the results into a single word is still considered secure.
-Also, implementing arbitrarily scalable AES far exceeds this research's efforts.
-Due to this reasons, the author chose to scale AES by concatenating 128-bit inputs.
+Recall that the implementation does not use AES for secure encryption but for its deterministic and pseudorandom results given a fixed key and input.
+Thus, AES in \textit{Electronic Code Book Mode (ECB)} is used for simulating a \textit{Pseudorandom Number Generator (PRG)}.
+Note that AES keeps this deterministic properties when dividing an input into $n$ blocks and executing AES on each block independently \cite{gentry2012homomorphic}.
+This means, executing AES $n$ times and concatenating each output into a single result is still considered pseudorandom \cite{gentry2012homomorphic}.
 
-This results in the requirements that all inputs, or the labels of given inputs, must be a multiple of 128 bits.
-These inputs then can be splitted into 128-bit blocks, encrypted or decrypted using the 128-bit AES implementation, and finally concatenated to produce a single result.
+Implementing a new, arbitrarily scalable AES protocol for simulating a PRG exceeds the efforts of this research.
+Therefore, the author chose to reuse the existing implementation on 128-bit values and concatenate outputs leaving \code{AES\_KEY} (\ref{itemize:importantAliases}) untouched.
+This results in the requirements that all inputs, or the labels of given inputs, must be multiples of 128 bits.
+These inputs then can be split into 128-bit blocks, encrypted or decrypted using the 128-bit AES implementation on fixed keys, and finally concatenated to produce a single result.
 This result is then the same length as the input, which is the equivalent of executing AES on the complete input instead of the divided block structure.
 
-\subsection{WIDTH}\label{sub:WIDTH}
+\subsection{WIDTH and LWIDTH}\label{sub:LimitWIDTHandLWIDTH}
+% Hauptaussage: Ist generell kleiner als 5 (ist so implementiert und wird auch im kommenden Text immer so angenommen)
+\ref{subsub:WIDTHandLWIDTH}

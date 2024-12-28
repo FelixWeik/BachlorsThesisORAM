@@ -60,6 +60,9 @@ The most prominent type-aliases are:
     \item \code{value\_t}: 
     Deceides the datatype of values in the secret-shared memory.
     The default value is \code{uint64\_t}.
+    \item \code{AES\_KEY}:
+    Represents an AES-key for 128-bit AES.
+    More details on this alias are found in \ref{subsub:implementationAesni} and \ref{sub:AESSizeLimitations}.
 \end{itemize}
 Important macros are:
 \begin{itemize}\label{itemize:importantMacros}
@@ -81,19 +84,36 @@ The most prominent structs are:
 \end{itemize}
 
 \subsubsection*{Intel AES-NI} \label{subsub:implementationAesni}
-The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}.
+The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}\footnote{Intel's publication on AES-NI is published on their \hyperlink{https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf}{website} (https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf)}.
 As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
-These improvements come in form of the \code{wmmintrin.h} header file implementing AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode) core functions based on the \textit{AES-NI} instruction set.
+These improvements come in form of the \code{wmmintrin.h} header file implementing core functions of \textit{AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode)} based on \textit{AES-NI}.
+As this header file is included in the gcc-compiler, no additional installations for using \code{wmmintrin.h} are required.
 Since AES-ECB is of great use when generating DPFs, these optimizations will foster great performance improvements.
 Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} \textit{Single Instruction Multiple Data (SIMD)} datatype, representing a 128-bit vector.
-Therefore, datatypes used in any AES-context are stored in this format.
+Therefore, the implementation stores any data used in AES-contexts in this format.
 
-The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} values the client wants to store and retreive in the vanilla implementation.
+The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} type-alias \code{value\_t} (\ref{itemize:importantAliases}).
 This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF-trees.
-The code uses its security properties of being random to calculate new labels given a seed and key.
+The code uses its security properties of being computationally random to calculate new labels given a seed and key.
 Both parties use the same private key, thus AES-ECB becomes pseudorandom.
 Labels are stored as \code{\_\_m128i}, leafs as 64-bit vectors.
-Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simluates a length doubling pseudo random generator.
+Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simluates a length doubling pseudo random generator \cite{vadapalli2023duoram}.
+
+AES for 128-bit uses ten rounds \cite{rijmen2001advanced}, thus ten distinct keys are needed.
+As the implementation also stores the seed, in our case the input, keys are stored as \code{\_\_m128i[11]} arrays.
+It is represented as type-alias \code{AES\_KEY} which is equivalent to \code{\_\_m128i[11]} (\ref{itemize:importantAliases}).
+To simplify key-creation, \code{AES\_KEY} is wrapped in the struct \code{PRGKey}.
+It takes a single \code{\_\_m128i} value as constructor input and generates ten more distinct keys using the input as seed for AES-ECB.
+As the input and the key are set to the same value every time, one receives a pseudoranom number generator.
+For AES to be pseudorandom, keys need to be the same throughout instances.
+Thus, all instances use the same \code{PRGKey} instances for creating labels and leafs, called \code{prgkey} and \code{leafprgkeys[3]}.
+Note \code{leafprgkeys[3]} being an array holding three \code{PRGKey} structs.
+This distinction between keys for label and leaf generation is necessary as one needs to differentiate cases handling different values for \code{LWIDTH} (\ref{sub:WIDTHandLWIDTH}).
+A non-standard value of \code{LWIDTH}, which means any value $x\neq1$, will require multiple keys in the leaf layer.
+As this matter is only present in the leaf layer, using separate keys during generation will increase performance and readability of the code.
+The implementation uses the first 20 digits of $\pi$ for \code{prgkey} and 20 digits of $e$ for each instance of \code{leafprgkeys}.
+
+Requirements derived from this, along with further details on \code{WIDTH} and \code{LWIDTH} are described in \ref{sec:GeneralLimitations}.
 
 \subsubsection*{duoram} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
@@ -118,13 +138,15 @@ The implementation uses a hierarchy consisting of solely one shape called \code{
 It provides basic functions for reading and writing from the duoram.
 Since no other shape is used, no further explanations are necessary.
 
+\subsubsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
+%//TODO Begriffe erklären und was die tun sollen
+
 \subsubsection*{mpcio and Communication} \label{subsub:implementationMpcioAndCommunication}
 All three parties execute the same executable \code{prac} which can be generated by using the \code{MAKEFILE}.
 These executables communicate via TCP-sockets.
 When executed locally, which this research assumes to be the default, the peers addresses are all hosted on the \code{localhost}.
 Sockets, player information, sent and received messages and the functionality to send and receive are implemented in the \code{MPCPeerIO} struct.
 \code{MPCPeerIO} can be freely translated to "Input and Output Functionality for performing MCP communication with computational peers".
-Hence, this object is the heartpiece of the program.
 It is one of the first structs to instantiate and will be used to create most of the other objects.
 
 \code{MPCPeerIO} is the child of the \code{mpcio} struct which holds general io-attributes and also provides functionality for timing the communication process and timing of round-trip-trimes.
