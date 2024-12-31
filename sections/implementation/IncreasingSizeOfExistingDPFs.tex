@@ -1,9 +1,21 @@
 \label{sub:IncreasingTheSizeOfExistingDPFs}
-Another rather trivial approach is hardcoding larger datatypes replacing the original datatypes.
-The user chooses her preferred data-size before compilation and uses this specified size during exuction.
+Another approach is hardcoding larger datatypes or scaling existing datatypes replacing the originals.
+The user chooses her preferred data-size before compilation and uses this specified size during execution.
 This will commit each duoram to a single size which, however, can be chosen freely before compilation.
-The updated implementation supports 64, 128, and 256 bit values.
-It is located on branch \code{64ToUnlimited} in the \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{author's repository}.
+
+The updated version comes in two flavors:
+\begin{enumerate}
+    \item \code{64ToUnlimited}\footnote{Public on https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited} as found on the \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{branch of the same name in the author's repository}.
+    It uses a boilerplate-like approach of hardcoding the same functionality for multiple hardcoded datasizes.
+    The \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{updated implementation} supports 64, 128, and 256 bit values.
+    \item \code{UnlimitedGMP}\footnote{Public on https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/UnlimitedGMP} utilizes the \textit{GNU Multi Precision Arithmetic Library (GMP)}\footnote{More details can be found here: https://de.wikipedia.org/wiki/GNU\_Multiple\_Precision\_Arithmetic\_Library}.
+    In general, it allows for implementing integral datatypes like integers with arbitrary precision while supporting general bit-operations.
+    Thus, the updated code found on branch \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/UnlimitedGMP}{UnlimitedGMP} supports any size being a multiple of 128 bits (\ref{sec:GeneralLimitations}).
+    Further details are found in \ref{subsub:gmp} and \ref{subsub:applyingGMP}.
+\end{enumerate}
+
+Both approaches build upon the existing implementation and follow the same basic approach.
+Yet, they differ significantly taking a deeper look into their codebase.
 
 \subsubsection*{Locating necessary Changes} \label{subsub:necessaryChanges}
 Considering the source code's structure, the author chose a top-down approach for implementing this solution.
@@ -17,7 +29,7 @@ They specify the most general datatypes and thus their derivates, aliases.
 \begin{itemize}
     \item Type-alias \code{value\_t} by itself is used 258 times throughout the code.
     \code{VALUE\_BITS} calls the according cases.
-    Its most prominent usage is in the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
+    Its most prominent usage is in specifying the size of the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
     \item \code{ADDRESS\_MAX\_BITS} specifies the size of addresses.
     The derived type-alias \code{address\_t} is used 143 times throughout the base-implementation.
     It deceides the type of indexing into the database.
@@ -26,9 +38,8 @@ They specify the most general datatypes and thus their derivates, aliases.
 
 \subsubsection*{Bitmasks and Bitutils}\label{subsub:bitmasksAndBitutils}
 \code{bitutils.hpp} provides bitmasks and important functions for bit operations.
-
 These operations include \code{xor\_if()} and \code{get\_lsb()} which are used multiple times throughout the code.
-\code{xor\_if()} will execute a bitwise xor operation if a flag-bit is set, \code{get\_lsb()} retreives the least significant bit of a given \code{\_\_m128i} value.
+\code{xor\_if()} will execute a bitwise xor operation if a flag-bit is set, \code{get\_lsb()} retrieves the least significant bit of a given \code{\_\_m128i} value.
 
 Bitmasks like \code{bool128\_mask} and \code{if128\_mask} are utilised when generating and traversing DPF-trees, during bit-operations, or while blinding shares.
 In short, they increase bit-operations' performance by providing predefined values that will be used frequently during execution.
@@ -36,50 +47,73 @@ In short, they increase bit-operations' performance by providing predefined valu
 Since these bit-operations are executed primarily on \code{\_\_m128i} values, all function signatures and bitmasks are predefined for this specific datatype.
 If one wants to scale their size arbitrarily, three solutions exist:
 \begin{enumerate}
-    \item Hardcode multiple bitoperations for different datatypes:
+    \item Hardcode multiple bit-operations for different datatypes:
     This requires the developer to hardcode the same solution for any datatype.
-    Since this conflict collides with the goal of arbitrary scaling, this approach will not be pursued.
+    Since this conflict collides with the goal of arbitrary scaling, this approach will not be pursued further.
+    Yet, the author chose to implement this solution for 128 and 256 bit to receive a reference performance benchmark during testing (\ref{ch:Evaluation}).
     \item Cut larger values into 128-bit blocks:
     This requires the input-type to be a multiple of 128-bit, which is not always the case.
     Also, it requires each function call to cut the input into $N$ blocks, call the given function $n$ times and finally concatenate each result to receive the final result.
-    This too scales badely.
+    This too scales badly.
     \item Using GMP (\ref{subsub:gmp}):
-    By using GMP, one can create bitfields of arbitrary size.
+    By using GMP, one can create datatypes of arbitrary precision.
     Also, bit-operations are predefined for any \code{mpz} value.
-    Thus, the specialized bit-operations defined in the code will utilise the more general GMP bit-operations.
+    Thus, the specialized bit-operations defined in the code can be implemented to utilize the more general GMP bit-operations.
     Bitmasks can be left untouched, since the least significant bit or bit-inverses are not size-dependent.
     By using this library for bit-operations while leaving the bitmasks as they are, one achieves an arbitrarily scaled set of bit-utils.
     Therefore, the author further pursues this approach.
 \end{enumerate}
 
-\subsubsection*{Arbitrary large AES}\label{subsub:arbitraryLargeAES}
-Each label in a DPF tree is AES encrypted.
-This affects generation and traversion of such trees.
-The base implementation uses an approach based on Intel AES-NI (\ref{subsub:implementationAesni}).
-It is solely implemented for \code{\_\_m128i} vectors.
-This fits the base definition of 128-bit labels in a DPF-tree.
-
-Scaling the duoram requires the expansion to larger datatypes.
-Current Intel AES-NI implementations, however, are solely described for 128, and 256 bit values. %TODO hier vielleicht das tolle paper verlinken und stimmt das überhaupt?
-This contradicts the goal of scaling duoram arbitrarily.
-Therefore, the author chose a solution similar to the prior approach of combination while leaving AES' security premises untouched.
-By separating the base input in 128-bit blocks, encrypting each block independtly, and concatenating them after encryption makes AES scalable.
-Thus, by looping the encryption dependent on the size of the given input, one implements an arbitrarily scalable AES protocol.
-
 \subsubsection*{GNU Multi Precision Arithmetic Library (GMP)} \label{subsub:gmp}
+GMP allows implementing integral datatypes of arbitrary precision while supporting bit operations.
+This means, one can choose the amount of bits used to represent a given value.
+It is open source and scarcely documented, yet widely used due to its efficiency and general performance.
+These values highlight the crucial role of GMP in this approach.
+
+To use GMP in a project, one needs to install \code{libgmp\_dev} first.
+The author used \code{apt} for this step.
+Next, make sure to add the \code{-lgmp} flag during linking as it links the project with the GMP-library.
+Since the author's code compiles using a \code{MAKEFILE}, the flag is set there.
+Finally, include \code{gmp.h} in the files requiring GMP.
+In the author's case it is solely included in \code{types.hpp}.
+
+\subsubsection*{Applying GMP}\label{subsub:applyingGMP}
+Again, main types, aliases, and structs are defined in \code{types.hpp} (\ref{subsub:implementationTypeshpp}).
+\code{value\_t}, initially set as \code{uint64\_t}, is now replaced by a struct of the same name.
+Implementing the datatype with a struct is necessary since GMP-values are set, initialized, and deleted during runtime and not like integral datatypes during precompilation.
+Thus, one cannot directly use GMP-values as template arguments.
+Since this property is required throughout the code the most common workaround uses a wrapper class or struct taking care of the initialization and deletion when called.
+Then, one can use the struct for initializing templated structures in the code as required in, for example, \code{RDPFs}.
+
+\code{value\_t} (\ref{itemize:importantAliases}), being a type alias, is now replaced by a struct.
+This struct holds an attribute called \code{value} of type \code{mpz\_t}, which represents a signed integer.
+As GMP offers no distinct type to implement unsigned integers, one simply adjusts the desired bitsize accordingly.
+GMP adjusts the required bit-size by itself, so storing an equivalent of an \code{uint64\_t} still requires no more than 64-bits.
+Since operations now take place on a struct instead of an integral datatype, one must overload the operators.
+These operators call the already implemented GMP-operators on \code{value} and return the desired result.
+Also, casting is necessary, for example when requiring an unsigned integer instead of \code{mpz\_t}.
+Therefore, casting operators using GMP's built in casting functions are also required.
+Finally, the constructors and destructors are implemented not to leak any memory.
+In the following, the author will refer to structures of this type — which means structs that hold a single GMP-value and additionally implement overloaded operators, constructors, and destructors — as \textit{GMP-structs}.
+
+Type-alias \code{nbits\_t} (\ref{itemize:importantAliases}), too, is used for initializing templated structures throughout the code.
+Thus, in order to make it scalable, replacing it with a GMP-struct as above is necessary.
+Recall, however, that \code{nbits\_t} solely counts the amount of bits required to store a value of type \code{value\_t}.
+Leaving \code{nbits\_t} as is being \code{uint8\_t} would limit \code{value\_t} to a size of $2^8\text{ bits }\cong 32\text{ bytes}$.
+Altering \code{nbits\_t} to equal \code{uint64\_t} will enable the user to store values reaching $2^{64} \text{ bit }\cong 2^{51}\text{ Terrabytes}$.
+Of course, this value is far too big to achive testable and performant results.
+This leads to the conclusion that scaling \code{nbits\_t} is of no great use in this research since it will solely impact performance and general memory usage.
+Therefore, the author chose to set \code{nbits\_t} to \code{uint32\_t} in this approach which is the equivalent of storing a $512$ megabyte value.
+
+Contrary to the prior approach, \code{VALUE\_BITS} stays untouched.
+It defines the precision of the \code{mpz\_t} values.
+No additional macros are required.
 
 \subsubsection*{Adjusting Compilation}\label{subsub:adjustingCompilation}
-To switch the datatype before compilation one needs to set a flag bit.
-\code{-DVALUE\_BITS} is set in the \code{MAKEFILE}.
-It represents the length of data one wants to store and retreive.
-It will trigger the \code{VALUE\_BIT} macro and place the given value into it.
-\code{VALUE\_BIT} then automatically adjusts the other macros which then will change the used datatypes and protocols to match the given value.
-If nothing else is specified, \code{-DVALUE\_BITS} is set to $128$ by default which makes the code use \code{\_\_m128i} vectors for $M$.
-
-\subsubsection*{Difficulties} \label{subsub:IncreasingSizeOfExistingDPFsDifficulties}
-\begin{itemize}
-    \item CPP does not accept non-trivial datatypes (like structs) for template definitions
-    \item One needs to represent specific \code{\_\_128i} datatypes or shift them 
-\end{itemize}
+Both approaches require a flag bit to decide on which datatype or size to use during execution.
+A new compilation-flag \code{-DVALUE\_BITS} is set in the \code{MAKEFILE} and represents the length of data one wants to store and retrieve.
+It directly affects \code{VALUE\_BITS} and places the given value into it.
+\code{VALUE\_BITS} then triggers the desired trickle-down affect which further changes macros and datatypes.
+If nothing else is specified, \code{-DVALUE\_BITS} is set to $64$ by default which is similar to the base-implementation of Vadapalli et al.
 
 \subsubsection*{General Discussion}
