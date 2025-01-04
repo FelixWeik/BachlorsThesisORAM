@@ -17,6 +17,8 @@ This results in the requirements that all inputs, or the labels of given inputs,
 These inputs then can be split into 128-bit blocks, encrypted or decrypted using the 128-bit AES implementation on fixed keys, and finally concatenated to produce a single result.
 This result is then the same length as the input, which is the equivalent of executing AES on the complete input instead of the divided block structure.
 
+%//TODO beschreiben wo und wie die skalierung funktioniert (alle approaches sind gleich da immer gleiche lösung)
+
 \subsection{Limitations on WIDTH and LWIDTH}\label{sub:LimitWIDTHandLWIDTH}
 Recall the definition of \code{WIDTH} and \code{LWIDTH} from \ref{subsub:WIDTHandLWIDTH}.
 The codebase by Vadapalli et al. limits \code{WIDTH} to values reaching from $1$ up to $5$.

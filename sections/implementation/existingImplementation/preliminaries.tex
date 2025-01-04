@@ -86,7 +86,7 @@ The most prominent structs are:
 \subsubsection*{Intel AES-NI} \label{subsub:implementationAesni}
 The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}\footnote{Intel's publication on AES-NI is published on their \hyperlink{https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf}{website} (https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf)}.
 As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
-These improvements come in form of the \code{wmmintrin.h} header file implementing core functions of \textit{AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode)} based on \textit{AES-NI}.
+These improvements come in form of the \code{wmmintrin.h} and \code{emmintrin.h} header files implementing core functions of \textit{AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode)} based on \textit{AES-NI}.
 As this header file is included in the gcc-compiler, no additional installations for using \code{wmmintrin.h} are required.
 Since AES-ECB is of great use when generating DPFs, these optimizations will foster great performance improvements.
 Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} \textit{Single Instruction Multiple Data (SIMD)} datatype, representing a 128-bit vector.
