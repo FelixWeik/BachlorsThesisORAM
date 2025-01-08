@@ -1,13 +1,15 @@
 \chapter{Implementation}
 \label{ch:Implementation}
 
+%//TODO das lowword skaliert zum shifting vektor, die highwords skalieren zur message => ist das so auch in der restlichen ausarbeitung beschrieben?
+
 \label{sec:ImplementationTarget}
-This research aims to scale ORAMs, using \textit{3-Party DUORAM} as an example, arbitrarily.
+This research aims to scale ORAMs arbitrarily, using \textit{3-Party DUORAM} as an example.
 The already existing \textit{DUORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram} is optimized for 64-bit values.
 Larger values are not supported yet.
-After explaining the existing code, this chapter highlights and discusses the most promising approaches.
+After further expanding the theoretical foundations of the \textit{DUORAM} and explaining the existing code, this chapter highlights and discusses the most promising approaches.
 
-\section{Scaling Based on the Protocol}
+\section{Scaling in Theory}
 \input{sections/implementation/ScalingBasedOnProtocol.tex}
 
 \section{Existing Implementation}

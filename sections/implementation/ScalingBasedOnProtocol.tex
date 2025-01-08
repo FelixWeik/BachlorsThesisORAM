@@ -1,6 +1,6 @@
 \label{sec:ScalingInTheory}
-Having established a theoretical foundation of the DUORAM construction, this section further dives into the protocols involved in reading and writing.
-After taking a closer look into the protocols, this section conducts a theoretical analysis of how to arbitrarily scale DUORAM to fulfil the objective of this research.
+Having established a theoretical foundation of the \textit{DUORAM} construction in the previous section \ref{sec:3pDuoram}, we will now dive further into reading and writing.
+After taking a closer look into the protocols, this section conducts a theoretical analysis of how to arbitrarily scale \textit{DUORAM} to fulfil the objective of this research.
 All the mentioned protocols in this section are taken directly from Vadapalli et al. \cite{vadapalli2023duoram}.
 
 \subsection{Advanced Reading and Writing} \label{sub:advancedReadingAndWriting}
@@ -19,17 +19,18 @@ After executing this reading operation $P_0,P_1$ will return $\text{read}_0,\tex
 Advanced preprocessing does not extend the already introduced preprocessing phase (\ref{subsub:DuoramPreprocessing}).
 It, too, generates two XOR-shared RDPF-Triples $(\overline{k}_b^1,\overline{k}_b^2,\overline{k}_b^3) \text{ with } b\in\{0,1\}$.
 The distribution of triples between parties also stays the same.
-Fully evaluating both triples would each return three vectors $v_b^k,t_b^k,F_b^k \text{ with }b\in\{0,1\},k\in\{1,2,3\}$.
+Fully evaluating both triples would each return three XOR-shared vectors $\overline{v}_b^k,\overline{t}_b^k,F_b^k \text{ with }b\in\{0,1\},k\in\{1,2,3\}$.
+Note $F$ not being overlined as it stays XOR-shared and will not be converted to an additive share.
 Recall $t$ being the bit-vector holding the flagbit of leaf $i$ at position $i$, $v$ being the vector holding all leaf labels and $F$ being the final-correction-word (\ref{sub:BGIDPFConstruction}). %//TODO nochmal Final Correction Word nachschauen und bei bedarf weiter ausführen
 $t_b^k$ has the property of $e_{i^*}=t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3$ with $e_{i^*}$ being the shifting vector representing a unit vector holding a single $1$ at index $i^*$. 
 
 Due to these properties, advanced reading does not require the RDPF-Triples to be fully evaluated but only needs the six flagbit vectors $t_b^k$. 
 As evaluation on XOR-shared RDPF-Triples returns XOR-shared vectors, these need to be converted to additive shares using an (2+1)-MPC protocol (\ref{sec:3pDuoram}).
-This provides consistency throughout the implementation as the database itself, too, is additively shared and therefore does not need to be converted to XOR-shares.
+This provides consistency throughout the implementation as the database itself is additively shared and therefore does not need to be converted to XOR-shares.
 
 \paragraph{Online-Phase}\label{par:advancedReadingOnline}
 The online phase combines both cyclic shifting (\ref{sub:CyclicShiftingProtocol}) and the already introduced reading protocol (\ref{par:DuoramReading}).
-This means reading first executes cyclic shifting to decide where to read and then the basic reading protocol. 
+This means reading first executes cyclic shifting to decide where to read and then executes the basic reading protocol. 
 This will result in parties $P_0,P_1$ returning $\text{read}_0,\text{read}_1$ with $\text{read}_0+\text{read}_1=D[i^*_0+i^*_1]$
 
 \subsubsection*{Writing}\label{subsub:advancedWriting}
@@ -42,7 +43,7 @@ These triples can be generated in two separate preprocessing phases executed dir
 This means, after executing a single read, $P_0$ holds $(D_0,\xi_0,\widetilde{D}_1,i_0^*,M_0)$, $P_1$ holds $(D_1,\xi_1,\widetilde{D}_0,i^*_1,M_1)$, and $P_2$ holds $(\xi_0,\xi_1)$.
 After updating, which includes the refresh of the blinds, $P_0$ will get $(D'_0,\xi'_0,\widetilde{D}'_1)$ and $P_1$ gets $(D'_1,\xi'_1,\widetilde{D}'_0)$ such that $\widetilde{D}'_0=D'_0+\xi'_0$, $\widetilde{D}'_1=D'_1+\xi'_1$, and $D'_0+D'_1=D_0+D_1+(M_0+M_1)*e_{i^*_0+i^*_1}$.
 $P_2$ will get $(\xi_0,\xi_1)$ with the same properties as above.
-In short, message $M$ will be written at position $i^*$ into the shared database $D$ resulting in the new database $D'$ which, again, is shared among the peers.
+In short, message $M$ will be written at position $i^*$ into the shared database $D$ resulting in the new database $D'$ which, still, is shared additively among the peers.
 
 \paragraph{Preprocessing}\label{par:advancedWritingPreproc}
 Advanced preprocessing, too, does not extend the already defined preprocessing from \ref{subsub:DuoramPreprocessing}.
@@ -77,9 +78,18 @@ Combining these values for both peers at the target index $i^*$ will result in:
     = D[i^*]+M \\
     = D'[i^*] 
 \end{flalign*}
-and staying at the initial unchanged value of $D[i]$ at every other $i\neq i^*$.
 
-This means $P_2$ is not directly involved during updating but only updates the peers' blinds for the next read operation.
+Recall $t_0^k[i]+t_1^k[i]=e_{i^*}[i]=0$ for every $i\neq i^*$.
+Due to
+\begin{align*}
+    D_0[i]+D_1[i]+(v_0^1[i]+t_0^1[i]\cdot F^1)+(v_1^1[i]+t_1^1[i]\cdot F^1) \\
+    = D[i] + v_0^1[i]+v_1^1[i] = D + v^1[i] \\
+    = D[i] + (e_{i^*}[i]\cdot M) = D[i]
+\end{align*}
+for every index $i\neq i^*$ the value of $D[i]$ stays at the initial unchanged value.
+
+As only values of the peers are required $P_2$ will not be directly involved during updating. 
+It solely updates its own copy of the peers' blinds for data-consistency in the next read operation.
 
 \subsection{Scaling in Theory} \label{sub:ScalingInTheory}
 \subsubsection*{General Thoughts} \label{subsub:ScalingInTheoryGeneralThoughts}

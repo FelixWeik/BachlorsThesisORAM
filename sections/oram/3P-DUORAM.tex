@@ -1,9 +1,9 @@
 \label{sec:3pDuoram}
-\textit{DUORAM} is an ORAM-implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
+\textit{DUORAM} is an ORAM implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
 It can either be used as 3-party or 2-party protocol.
 This research will focus solely on the 3-party variant.
-\textit{DUORAM} uses (2,2)-DPFs (\ref{sub:DistributedPointFunctions}) to represent PIR and PIR-writing queries (\ref{sub:PrivateInformationRetreival}).
-All of the following protocols and notations are as described by Vadapalli et al. \cite{vadapalli2023duoram}.
+\textit{DUORAM} uses (2,2)-DPFs (\ref{sub:DistributedPointFunctions}) to represent \textit{Private Information Retrieval (PIR)} and PIR-Writing queries (\ref{sub:PrivateInformationRetreival}).
+All the following protocols and notations are as described by Vadapalli et al. \cite{vadapalli2023duoram}.
 
 At a high level, the database $D$ is additively secret shared among two non-colluding parties $P_0,P_1$.
 Both parties hold the additive shares of the target index $i^*=i_0+i_1$.
@@ -22,7 +22,7 @@ Each party holds three RDPFs in form of \textit{RDPF-Triples} (\ref{sub:RDPFTrip
 Evaluating them, either by using \code{EVALFULL} (\ref{sub:TraversingTheDPFTree}) or while generating both RDPF-Triples on target index $i^*$ (\ref{sub:BGIDPFConstruction}), returns six pairs of word vectors $(t_b^k,v_b^k), b\in\{0,1\}\text{ and }k\in\{1,2,3\}$ with the property that $t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3=e_{i^*}$ and $v_0^1+v_1^1=v_0^2+v_1^2=v_0^3+v_1^3=M\cdot e_{i^*}$.
 
 Also, each party carries a \textit{Blinding Factor ($\zeta$)} that will be used to mask its share of the database $D_i$.
-The blinded share of party $P_b, b\in\{0,1\}$ is be denoted by $\widetilde{D}_b\leftarrow D_b+\zeta_b$.
+The blinded share of party $P_b, b\in\{0,1\}$ is being denoted by $\widetilde{D}_b\leftarrow D_b+\zeta_b$.
 Each party carries the blinded database of the other party.
 This means party $P_b, b\in\{0,1\}$ holds $\widetilde{D}_{1-b}$.
 
@@ -79,7 +79,7 @@ Of course, these do not have to be equal.
 DUORAM uses a (2+1)-Party MPC protocol for generating their DPFs, which allows to replace the trusted source by a stateless third party $P_2$.
 Both parties $P_0,P_1$ choose a random index $\widetilde{ri}_0,\widetilde{ri}_1$ with $\widetilde{ri}_0\oplus\widetilde{ri}_1=ri$.
 The DPFs will be generated on these target indices using the BGI-construction (\ref{sub:BGIDPFConstruction}).
-This results in DPF-triples $(\overline{k}_0^1,\overline{k}_0^2,\overline{k}_0^3)$ and $(\overline{k}_1^1,\overline{k}_1^2,\overline{k}_1^3)$.
+This results in DPF-Triples $(\overline{k}_0^1,\overline{k}_0^2,\overline{k}_0^3)$ and $(\overline{k}_1^1,\overline{k}_1^2,\overline{k}_1^3)$.
 $P_0$ will then send $\overline{k}_0^2$ to $P_2$ and $P_1$ will send $\overline{k}_1^3$ to $P_2$.
 Note the usage of XOR shares here while the rest of DUORAM works on additive shares.
 Therefore, using a MPC share conversion procedure, the XOR shares are turned to additive shares $ri_0,ri_1$ with $ri_0+ri_1=ri$.
@@ -93,15 +93,15 @@ $P_2$ holds the DPFs $(\overline{k}_0^2, \overline{k}_1^3)$.
 \subsubsection*{Online-Phase}
 \label{subsub:DuoramOnlinePhase}
 This phase includes read and write operations executed by $P_0,P_1$.
-Both parties hold the DPF-Triples on random target-indices $ri_0,ri_1$.
+Both parties hold DPF-Triples on random target-indices $ri_0,ri_1$.
 To write or read from the non-random target index $i^*$ both parties need to execute the \textit{Cyclic-Shift Protocol} (\ref{sub:CyclicShiftingProtocol}).
 DUORAM uses cyclic shifting in two flavors to postpone decision that have not been made in the \textit{Preprocessing-Phase}:
 Namely postponing the decision of where to read/write or to postpone the decision of what to write.
 
 \paragraph{Postponing the decision of \textit{where} to read or write:}
 This protocol adjusts the shares of the shifting-vector $e_{ri}$ to the target index $e_{i^*}$.
-Thus, the target index changes from the random $ri$ to the actual target index $i^*=i^*_0+i^*_1$.
-Now, both parties need to get vectors $v_0+v_1=e_{i^*}$ to represent the shifting vector.
+This changes the target index from random $ri=ri_0+ri_1$ to the new target index $i^*=i^*_0+i^*_1$.
+Now, both parties need to obtain vectors $v_0+v_1=e_{i^*}$ to represent the shifting vector.
 
 They exchange $i^*_b-ri_b$, reconstruct $cs=(i_0^*+i_1^*-ri_0-ri_1)$ and cyclic right shift $v_b$ by $cs$.
 $P_2$ receives $i^*_b-ri_b$ from $P_b$ and can also compute $cs$.
