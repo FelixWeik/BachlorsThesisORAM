@@ -149,3 +149,7 @@ To conclude, adjusting the entry size of $D[i]$ results in $v_b^k,F^k_b,\text{ a
 Changing the size of these values will result in size-changes while generating DPFs and in the preprocessing phase in general.
 
 \subsubsection*{Online-Phase Scaling} \label{subsub:ScalingDuringOnlinePhase}
+The online-phase does not yield any new values but the indices $ri$ and $i$.
+They indicate which element of the database to retrieve, thus affecting the offset $S$ during cyclic shifting.
+This, however, is not dependent from the size of entry $D[b]$ but the amount of entries.
+If the datatype for the indices $i$ and $ri$ is large enough to uniquely identify each leaf, no changes are necessary. 
