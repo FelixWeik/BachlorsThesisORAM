@@ -6,30 +6,32 @@ Since this approach is too computational expensive for repetitive evaluations, D
 
 Therefore, the base class \code{dpf} stores the seed of the root node.
 Also, it stores a vector \code{cfbits} which holds all flag bits on the path to target index $\alpha$.
-Bit $i$ of this vector represents the bit of the ith node on the path to $\alpha$.
+Bit $i$ of this vector represents the bit of the i'th node on the path to $\alpha$.
 It also implements the functionality to descend a tree given a seed and a bool indicating which child to calculate.
-The code further distinguishes Distributed Point Functions for random memory accesses, called \textit{RDPF}, and Distributed Comparison Functions labelled as \textit{CDPF}.
+The code further defines special DPFs namely \textit{Distributed Point Functions for Memory Access (RDPF)} and \textit{Distributed Comparison Functions (CDPF)}.
 
+\paragraph{RDPFs}\label{par:preliminariesRDPFs}
 RDPFs inherit from the basic DPF implementation.
 It expands its parent with further attributes and the \code{LeafInfo} struct.
 \code{leaf\_cfbits} stores the correction-flag bits for the leaf level.
-This is equivalent to $t_b$ from the high-level duoram overview, which means bit $i$ holds the correction flag-bit of leaf $i$.
+Recall the correction-flag bits being the low words of the labels (\ref{sub:BGIDPFConstruction}).
+This is equivalent to $t_b$ from the high-level \textit{DUORAM} overview in \ref{sec:3pDuoram}, which means bit $i$ holds the correction flag-bit of leaf $i$.
 \code{li} is a vector holding \code{LeafInfo} structs.
 In normal RDPFs, which is the standard in this research, it will only hold a single \code{LeafInfo} struct.
-\code{LeafInfo} is essential for using the evaluated RDPF-result in a read or write operation.
+\code{LeafInfo} is essential for using the evaluated RDPF result in a read or write operation.
 It holds the correction word for the leaf level, which itself is a XOR-share, and all further attributes to easily convert it into an additive share.
 This is essential, since \code{duoram} is based on additive shares. 
-Thus converting from XOR-RDPF-shares to additive shares simplifies further evaluation processes a lot.
-Also, it holds the XOR- and additive-share $M_b$ of the message to write $M$, which, in combination with $t_b$, evaluates to $v_b = e_b\cdot M_b$.
-Combined with $P_{b'}$'s value of $v_{b'}$ it evaluates to $v=v_0\oplus v_1=(e_0\cdot M_0)\oplus(e_1\cdot M_1)=e_i\cdot M$.
+Thus converting from XOR RDPF-shares to additive shares simplifies further evaluation processes a lot.
+More information on \code{LeafInfo} and the concept of \code{DPFNode}s and \code{LeafLabel}s is given in \ref{subsub:DpfNodeAndLeafLabel}.
 
 The code stores RDPFs as triples, called \code{RDPFTriple} (\ref{sub:RDPFTriples}).
 As the name suggests, it holds three RDPFs, each with the same target, again, either XOR or additively shared.
-To generate a RDPF-triple including three rdpfs on a given target, one uses its constructor which itself calls the RDPF-constructor three times.
-All three RDPFs are stored in a vector, which is the \code{RDPFTriple}.
+To generate a RDPF-Triple including three RDPFs on a given target, one uses its constructor which itself calls the RDPF's constructor three times.
+All three RDPFs are stored in a vector, the \code{RDPFTriple}.
 The triple itself is stored in the \code{mpcio} class assigned to each player.
 This construction makes it easy to keep track of the used RDPFs.
 
+\paragraph{CDPFs}\label{par:preliminariesCDPFs}
 CDPFs too, inherit from the base structures predefined by \code{dpf}.
 They are, however, stored as tuples.
 One can choose whether to share the target additively via \code{as\_target} or distribute XOR-shares, called \code{xs\_target}.
@@ -53,10 +55,11 @@ The most prominent type-aliases are:
     Deceides the size of the addresses in the secret-shared memory.
     Is set to \code{uint32\_t}.
     \item \code{DPFnode}: 
-    Implements the datatype of a DPFnode.
+    Implements the datatype of a DPFnode and establishes the basis for defining Leaf nodes.
     It is of type \code{\_\_m128i}.
     Leafs are also implemented using this type.
-    Evaluation on leaf nodes, however, splits the vector in a lower and upper half which makes it two 64-bit vectors.
+    Evaluation on leaf nodes splits the vector in a lower and upper half which makes it two 64-bit vectors.
+    More information on this alias is provided in \ref{subsub:DpfNodeAndLeafLabel}.
     \item \code{value\_t}: 
     Deceides the datatype of values in the secret-shared memory.
     The default value is \code{uint64\_t}.
@@ -67,10 +70,10 @@ The most prominent type-aliases are:
 Important macros are:
 \begin{itemize}\label{itemize:importantMacros}
     \item {VALUE\_BITS}: 
-    This will deceide the size of \code{value\_t}. 
+    This will decide the size of \code{value\_t}. 
     The default value is 64.
     \item {ADDRESS\_MAX\_BITS}: 
-    Deceides the size of \code{address\_t}.
+    Decides the size of \code{address\_t}.
     The default value is 32.
 \end{itemize}
 The most prominent structs are:
@@ -87,29 +90,32 @@ The most prominent structs are:
 The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}\footnote{Intel's publication on AES-NI is published on their \hyperlink{https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf}{website} (https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf)}.
 As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
 These improvements come in form of the \code{wmmintrin.h} and \code{emmintrin.h} header files implementing core functions of \textit{AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode)} based on \textit{AES-NI}.
-As this header file is included in the gcc-compiler, no additional installations for using \code{wmmintrin.h} are required.
+As this header file is included in the gcc compiler, no additional installations for using both headers are required.
 Since AES-ECB is of great use when generating DPFs, these optimizations will foster great performance improvements.
 Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} \textit{Single Instruction Multiple Data (SIMD)} datatype, representing a 128-bit vector.
 Therefore, the implementation stores any data used in AES-contexts in this format.
 
 The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} type-alias \code{value\_t} (\ref{itemize:importantAliases}).
-This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF-trees.
+This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF trees.
 The code uses its security properties of being computationally random to calculate new labels given a seed and key.
 Both parties use the same private key, thus AES-ECB becomes pseudorandom.
 Labels are stored as \code{\_\_m128i}, leafs as 64-bit vectors.
-Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simluates a length doubling pseudo random generator \cite{vadapalli2023duoram}.
+Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simulates a length doubling pseudo random generator \cite{vadapalli2023duoram}.
 
-AES for 128-bit uses ten rounds \cite{rijmen2001advanced}, thus ten distinct keys are needed.
-As the implementation also stores the seed, in our case the input, keys are stored as \code{\_\_m128i[11]} arrays.
+AES for 128-bit uses ten encryption-rounds \cite{rijmen2001advanced}.
+Therefore, after inserting the seed which resembles the key of the AES operation, ten more sub-keys are generated starting from the seed.
+This structure is therefore stored in format of an \code{\_\_m128i[11]} array.
+The seed at index $0$, the ten sub-keys on the following indices.
 It is represented as type-alias \code{AES\_KEY} which is equivalent to \code{\_\_m128i[11]} (\ref{itemize:importantAliases}).
 To simplify key-creation, \code{AES\_KEY} is wrapped in the struct \code{PRGKey}.
-It takes a single \code{\_\_m128i} value as constructor input and generates ten more distinct keys using the input as seed for AES-ECB.
-As the input and the key are set to the same value every time, one receives a pseudoranom number generator.
+It takes a single \code{\_\_m128i} value as constructor input and generates ten more sub-keys using the input as seed for AES-ECB.
+As the input and the key are set to the same value every time, one receives a pseudorandom number generator.
+
 For AES to be pseudorandom, keys need to be the same throughout instances.
 Thus, all instances use the same \code{PRGKey} instances for creating labels and leafs, called \code{prgkey} and \code{leafprgkeys[3]}.
 Note \code{leafprgkeys[3]} being an array holding three \code{PRGKey} structs.
-This distinction between keys for label and leaf generation is necessary as one needs to differentiate cases handling different values for \code{LWIDTH} (\ref{sub:WIDTHandLWIDTH}).
-A non-standard value of \code{LWIDTH}, which means any value $x\neq1$, will require multiple keys in the leaf layer.
+This distinction between keys for label and leaf generation is necessary as one needs to differentiate cases handling different values for \code{LWIDTH} (\ref{subsub:WIDTHandLWIDTH}).
+A non-standard value of \code{LWIDTH}, which means any value $x\neq1$, will require multiple keys in the leaf layer as several Leaf labels need to be instantiated (\ref{subsub:DpfNodeAndLeafLabel}).
 As this matter is only present in the leaf layer, using separate keys during generation will increase performance and readability of the code.
 The implementation uses the first 20 digits of $\pi$ for \code{prgkey} and 20 digits of $e$ for each instance of \code{leafprgkeys}.
 
@@ -124,8 +130,8 @@ It holds the following information:
     0 or 1 for computational peers and 2 for the server.
     \item database: 
     Vector of registers representing the party's share of the database $D_b$.
-    It is either additively (RegAS) or XOR shared (RegXS).
-    RegAS is set by default and can be changed manually.
+    These entries are either additively (\code{RegAS}) or XOR shared (\code{RegXS}).
+    Entries are stored as \code{RegAS} by default and can be changed manually.
     \item blind: 
     The blinding factor $\zeta_b$ to blind its own database.
     \item {peer\_blinded\_db}:
@@ -136,14 +142,14 @@ It holds the following information:
 Each \code{duoram} can be accessed via a hierarchy of \textit{Shapes}.
 The implementation uses a hierarchy consisting of solely one shape called \code{Flat}.
 It provides basic functions for reading and writing from the duoram.
-Since no other shape is used, no further explanations are necessary.
+As no other shape is used, no further explanations are provided.
 
 \subsubsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
 RDPFs can be reused for reading.
 This, however, will leak the information that reads were executed on the same location multiple times.
 The location stays secret \cite{vadapalli2023duoram}.
 
-This process is similar for writing accesses, yet it requires a few code adjustments.
+This process is similar for writing, yet it requires a few code adjustments.
 Vadapalli et al. chose to template their \code{RDPF} struct with a property called \code{WIDTH} of type \code{nbits\_t} (\ref{itemize:importantAliases}).
 \code{WIDTH} is set to $1$ by default.
 This indicates one write access per RDPF, no reuse is possible.
