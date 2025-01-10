@@ -50,18 +50,29 @@ It generates $\text{INPUT\_PARTITION} - 1$ new indices beginning at the starting
 This represents \code{INPUT\_PARTITION} many continuous reads or writes using this constructor.
 An implementation example of \code{IndexAS} is given in appendix \ref{lst:indexas}.
 
-\subsubsection*{DPFNodes and LeafLabels}
-\ref{subsub:DpfNodeAndLeafLabel} introduced the concept and importance of \code{DPFNode} and \code{LeafNode}.
-
 \subsubsection*{Reading and Writing Operations using MemRefInd} \label{subsub:ReadingWritingUsingMemRefInd} 
 As introduced in \ref{subsub:implementationCyclicShifting}, reading and writing is done on memory-references.
 Reading will cast the reference into a register type, which is either \code{RegAS} or \code{RegXS}.
 This is specified by using a template type \code{T} which will be of either type.
 For larger registers of type \code{BigAS} and \code{BigXS} reading and writing is especially performed on type \code{MemRefInd}.
 It represents independent memory references which itself is a vector of explicit memory references.
-These references can be accessed indigently, reading and writing can be done in parallel.
+These references can be accessed independently, reading and writing can be done in parallel.
 Since the implemented larger register types and indices are not dependent themselves (unless they are part of a calculation), using independent memory references is the most performant option.
+It also guarantees correctness and security as refreshing of the shape is automatically taken care of when using \code{MemRefInd} (\ref{subsub:largerRegisterTypeDPFNodesAndLeafLabels}).
 The adapted operations using the new index types in context of reads and writes can be found in \ref{lst:bigDataAccess}.
+
+\subsubsection*{DPF-Nodes and Leaf-Nodes}\label{subsub:largerRegisterTypeDPFNodesAndLeafLabels}
+Recall the general concepts of \code{DPFNode} and \code{LeafNode} (\ref{itemize:importantAliases}).
+A main question is whether \code{DPFNode}, initially set as \code{\_\_m128i}, needs to be scaled too when using different values for \code{INPUT\_PARTITION}.
+Note that scaling \code{DPFNode} will automatically scale \code{LeafNode} as well.
+
+\ref{subsub:implementationDuoram} introduced the concepts of the \code{context} operation.
+It is utilized by shapes for refreshing their context while keeping the underlying database untouched.
+A single context is parametrized, for example, by the RDPF-Triple used for accessing a certain memory location.
+This means updating the context will also use a new set of RDPF-Triples.
+Therefore, for every new operation on the database, this approach will use a fresh set of RDPF-Triples.
+Every element of the large index acts like a single access operation.
+Thus, there is no need for scaling \code{DPFNode} and with that \code{LeafNode}.
 
 \subsubsection*{Introducing new Tests} \label{subsub:IntroducingNewTests}
 All implemented approaches are tested and benchmarked \ref{sub:testingAndBenchmarking}.

@@ -121,7 +121,10 @@ The implementation uses the first 20 digits of $\pi$ for \code{prgkey} and 20 di
 
 Requirements derived from this, along with further details on \code{WIDTH} and \code{LWIDTH} are described in \ref{sec:GeneralLimitations}.
 
-\subsubsection*{duoram} \label{subsub:implementationDuoram}
+\subsubsection*{DPFNode and LeafLabel}\label{subsub:DpfNodeAndLeafLabel}
+%//TODO hier gehts weiter lieber Felix, jetzt implementier mal ein wenig 
+
+\subsubsection*{Duoram and Shapes} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
 It holds the following information: 
 \begin{itemize}
@@ -139,10 +142,15 @@ It holds the following information:
     \item Party $P_2$ uses the attributes \code{p0\_blind}, \code{p1\_blind} to represent the blinded databases of both parties $P_0,P_1$.
 \end{itemize}
 
-Each \code{duoram} can be accessed via a hierarchy of \textit{Shapes}.
-The implementation uses a hierarchy consisting of solely one shape called \code{Flat}.
+Each \code{duoram} must be accessed via a hierarchy of \textit{Shapes}.
+The implementation uses a hierarchy consisting of solely a single shape called \code{Flat}.
 It provides basic functions for reading and writing from the duoram.
-As no other shape is used, no further explanations are provided.
+This has the great advantage of updating accessing contexts while keeping the underlying database consistent.
+For example, when executing multiple database accesses multiple RDPF-Triples and thus separate contexts are needed.
+Instead of assigning these contexts to the same database introducing a great overhead by updating the database, assigning new RDPF-Triples and \code{mpcio} objects, one simply updates the underlying shape introducing a fresh context.
+The \code{context} operation updates the shape's context, generates a new shape of the same type with the same underlying database and returns the newly generated object.
+Only the \code{Flat} shape is used in the implementation.
+Therefore, no further descriptions on different shapes and shape hierarchies are provided.
 
 \subsubsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
 RDPFs can be reused for reading.
