@@ -32,6 +32,7 @@ This provides consistency throughout the implementation as the database itself i
 The online phase combines both cyclic shifting (\ref{sub:CyclicShiftingProtocol}) and the already introduced reading protocol (\ref{par:DuoramReading}).
 This means reading first executes cyclic shifting to decide where to read and then executes the basic reading protocol. 
 This will result in parties $P_0,P_1$ returning $\text{read}_0,\text{read}_1$ with $\text{read}_0+\text{read}_1=D[i^*_0+i^*_1]$
+Figure 5 in the research of Vadapalli et al. \cite{vadapalli2023duoram} provide a nice overview over the reading online protocol.
 
 \subsubsection*{Writing}\label{subsub:advancedWriting}
 Recall the fundamentals of the writing operation from section \ref{par:DuoramWriting}.
@@ -93,6 +94,8 @@ the value of $D[i]$ stays at the initial unchanged value for every index $i\neq 
 
 As only values of the peers are required $P_2$ is not directly involved during updating. 
 It solely updates its own copy of the peers' blinds for data-consistency in the next read operation.
+
+Figure 6 in the research of Vadapalli et al. \cite{vadapalli2023duoram} provides a great overview over the writing online-phase.
 
 \subsection{Scaling in Theory} \label{sub:ScalingInTheory}
 \subsubsection*{General Assumptions} \label{subsub:ScalingInTheoryGeneralAssumptions}

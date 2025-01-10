@@ -17,6 +17,30 @@
 %% Available modes: draft, final (see README)
 \documentclass[twoside, english]{sdqthesis}
 
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{green!70!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    breakatwhitespace=true,
+    captionpos=b,
+    frame=single,
+    xleftmargin=15pt,
+    xrightmargin=15pt
+}
+
 %% ---------------------------------
 %% | Information about the thesis  |
 %% ---------------------------------

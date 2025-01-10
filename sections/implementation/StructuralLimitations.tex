@@ -1,5 +1,5 @@
 \label{sec:GeneralLimitations}
-\subsection{AES and Label-Size}\label{sub:AESSizeLimitations}
+\subsection{AES and Input-Size}\label{sub:AESSizeLimitations}
 The given code by Vadapalli et al. \cite{vadapalli2023duoram} is optimized for 64-bit values with 128-bit labels as described in \ref{subsub:implementationAesni}.
 These labels are represented by Intel's SIMD-datatype \code{\_\_m128i}.
 AES keys are represented using an array holding eleven \code{\_\_m128i} values, which means a single AES key has type \code{\_\_m128i[11]}.

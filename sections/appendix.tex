@@ -1,3 +1,188 @@
-\iflanguage{english}
-{\chapter{Appendix}}
-\label{chap:appendix}
+\chapter{Appendix}\label{chap:appendix}
+\section{LargerRegisterType Code Snippets}
+\subsection*{IndexAS and BigAS}
+\begin{lstlisting}[caption={Code Snippets of BigAS Structures}, label={lst:bigas}]
+// Represents an INPUT_PARTITION multiple of RegAS
+struct BigAS {
+    RegAS ashares[INPUT_PARTITION];
+
+    BigAS() {
+        for (auto & i : ashares) {
+            i.set(0);
+        }
+    }
+
+    explicit BigAS(const RegAS input[]) {
+        for (size_t i=0;i<INPUT_PARTITION;++i) {
+            this->ashares[i] = input[i];
+        }
+    }
+
+    void set(size_t pos, RegAS &val) {
+        ashares[pos].set(val.ashare);
+    }
+
+    RegAS* share() {
+        return ashares;
+    }
+
+    void randomize(const size_t nbits = VALUE_BITS) {
+        for (RegAS& i : ashares) {
+            i.randomize(nbits);
+        }
+    }
+
+    // ...
+
+    BigAS &operator*=(const value_t &rhs) {
+        value_t carry = 0;
+        for (auto & i : this->ashares) {
+            value_t product = i.ashare * rhs + carry;
+
+            i.set(product & 0xFFFFFFFFFFFFFFFF);
+            carry = product >> 64;
+        }
+        return *this;
+    }
+
+    // ...
+
+    static BigAS mult(const BigAS &rhs, const BigAS &lhs) {
+        BigAS res;
+        std::array<value_t, 2 * INPUT_PARTITION> product_blocks = {0};
+
+        for (size_t i = 0; i < INPUT_PARTITION; ++i) {
+            for (size_t j = 0; j < INPUT_PARTITION; ++j) {
+                product_blocks[i + j] +=
+                    static_cast<value_t>(lhs.ashares[i].ashare) *
+                    static_cast<value_t>(rhs.ashares[j].ashare);
+
+                if (product_blocks[i + j] >= (1ULL << 64)) {
+                    product_blocks[i + j + 1] += product_blocks[i + j] >> 64;
+                    product_blocks[i + j] &= 0xFFFFFFFFFFFFFFFF;
+                }
+            }
+        }
+
+        for (size_t i = 0; i < INPUT_PARTITION; ++i) {
+            res.ashares[i].set(product_blocks[i]);
+        }
+
+        return res;
+    }
+
+    BigAS &operator<<=(nbits_t shift) {
+        if (shift == 0) return *this;
+        constexpr size_t BITS_PER_BLOCK = 64;
+        value_t carry = 0;
+
+        for (auto & i : ashares) {
+            const value_t current = i.ashare;
+            i.ashare = (current << shift) | carry;
+            carry = (current >> (BITS_PER_BLOCK - shift));
+        }
+        return *this;
+    }
+
+    BigAS operator<<(nbits_t shift) const {
+        BigAS res = *this;
+        res <<= shift;
+        return res;
+    }
+
+    // ...
+
+    [[nodiscard]] BigAS mulshare(const RegAS &rhs) const {
+        BigAS res = *this;
+        for (auto & i : res.ashares) {
+            i *= rhs.ashare;
+        }
+        return res;
+    }
+
+    // ...
+};
+
+inline value_t* combine(const BigAS &A, const BigAS &B, nbits_t nbits = VALUE_BITS) {
+    static value_t result[INPUT_PARTITION];
+    value_t mask = ~0;
+
+    if (nbits < VALUE_BITS) {
+        mask = (static_cast<value_t>(1) << nbits) - 1;
+    }
+
+    for (size_t i = 0; i < INPUT_PARTITION; ++i) {
+        result[i] = (A.ashares[i].ashare + B.ashares[i].ashare) & mask;
+    }
+
+    return result;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={IndexAS Structures}, label={lst:indexas}]
+    // Aims to represent a set of indices of size INPUT_PARTITION
+    struct IndexAS {
+        BigAS indexChain;
+
+        explicit IndexAS(RegAS start) {
+            indexChain = BigAS();
+            for (value_t i = 0;i<INPUT_PARTITION;i++) {
+                RegAS cur{};
+                cur.set(start.ashare + i);
+                indexChain[i] = cur;
+            }
+        }
+
+        // chain _must_ be of size INPUT_PARTITION
+        explicit IndexAS(BigAS chain): indexChain(chain) {}
+
+        explicit IndexAS() {
+            for (size_t i = 0; i < INPUT_PARTITION; i++) {
+                RegAS cur{};
+                cur.randomize();
+                indexChain[i] = cur;
+            }
+        }
+
+        [[nodiscard]] std::vector<RegAS> getVector() const {
+            std::vector<RegAS> res;
+            for (RegAS index : indexChain.ashares) {
+                res.push_back(index);
+            }
+            return res;
+        }
+
+        void dump() const {
+            std::cout << "==== IndexAS ====" << std::endl;
+            for (const RegAS i: indexChain.ashares) {
+                i.dump();
+            }
+            std::cout << "==== IndexAS ====" << std::endl;
+        }
+    };
+\end{lstlisting}
+
+\subsection*{Independent Data-Access with IndexAS and IndexXS}
+\begin{lstlisting}[caption={Data Access into the Flat Shape Returning Independent Memory-References}, label={lst:bigDataAccess}]
+    class Duoram<T>::Flat : public Duoram<T>::Shape {
+        // ...
+
+        Duoram<RegAS>::Shape::MemRefInd<RegAS, Flat>
+            operator[](const IndexAS &idx) {
+                std::vector<RegAS> i = idx.getVector();
+                Duoram<RegAS>::Shape::MemRefInd<RegAS, Flat>
+                res(*this, i);
+                return res;
+        }
+
+        Duoram<RegXS>::Shape::MemRefInd<RegXS, Flat>
+            operator[](const IndexXS &idx) {
+                std::vector<RegXS> i = idx.getVector();
+                Duoram<RegXS>::Shape::MemRefInd<RegXS, Flat>
+                res(*this, i);
+                return res;
+            }
+            
+        //...
+    }
+\end{lstlisting}
