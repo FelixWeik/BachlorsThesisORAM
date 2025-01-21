@@ -1,8 +1,55 @@
-\chapter{Introduction}
-\label{ch:Introduction}
+\chapter{Introduction}\label{ch:introduction}
+One heavily relies on publicly available data.
+In the context of e-commerce, for example, this can be data like competitor pricing, sales trends, or market statistics.
+Querying them directly may reveal sensitive information about interests and focus areas of the querying party.
+Competitors could evaluate these queries and deduct information about the party of interest.
+Solutions for hiding access patterns are required.
 
-\section{Roadmap}
-\input{sections/introduction/Roadmap.tex}
+The most trivial solution is to hide access patterns by accessing the database in its whole.
+This approach is known as \textit{Linear Scan} \cite{doerner2017scale}.
+Using this technique for large databases, however, is inefficient due to its high costs of bandwidth and storage.
 
-\section{Related Work}
-\input{sections/introduction/RelatedWork.tex}
+\textit{Oblivious Random Access Memory (ORAM)} has the primary objective of obfuscating memory access patterns \cite{vadapalli2023duoram} while providing linear or even sublinear runtime and communication.
+This research primarily focuses on \textit{DUORAM}, an \textit{ORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
+It, too, hides access patterns while implementing read and write operations.
+This is achieved by sharing the database either additively or via XOR between two non-colluding parties $P_0,P_1$. 
+Read and write accesses are then executed such that each server on its own cannot find out which element was retrieved or written to and what the element was.
+Combining both results, again via XOR or addition, returns the requested database entry.
+Protocols and implementations exist for two and three-parties.
+Introducing a third auxiliary party $P_2$, which does not hold any data but merely facilitates the communication, eliminates the need for a trusted party by enabling \textit{(2+1)-Party Multi Party Computation ((2+1)-Party MPC)} protocols.
+
+\textit{DUORAM} is characterized by its two phases.
+The \textit{Preprocessing Phase} generates \textit{Distributed Point Functions (DPFs)}, \textit{DUORAM}'s most important concept, on random target indices.
+These serve as accessing-tools in the \textit{Online-Phase}, which includes the database accesses and results in retrieving or writing to the desired element.
+Again, combining both shared databases held by $P_0$ and $P_1$ results in the initial database.
+
+Vadapalli et al. implemented a basic solution for \textit{DUORAM}.
+Their implementation offers functionality for storing, retrieving and updating 64-bit values.
+This research aims to extend this implementation for values of arbitrary size resulting in the following research questions:
+\begin{enumerate}
+    \item What approaches exist, and what are their distinctive features in terms of concepts and implementation?
+    \item How do these approaches perform in terms of general performance metrics such as communication-speed and storage-requirements?
+    \item Are there any general concepts or datatypes that prove particularly useful in terms of scalability?
+\end{enumerate}
+
+\section*{Roadmap}\label{sec:roadmap}
+To answer these questions, the research is structured as follows:
+\ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in \ref{ch:ORAM}.
+\ref{ch:Implementation} builds upon these theoretical introductions to further dive into the theoretical reading- and updating-protocols used in \textit{DUORAM}.
+Starting from there, an initial theoretical scaling-approach is outlined.
+The same chapter will then introduce the given implementation by Vadapalli et al. including first executions and scenarios.
+This implementation will then be expanded for each scaling-approach.
+Finally, \ref{ch:Evaluation} executes benchmarks on each approach while deriving performance metrics.
+These metrics are based on bandwidth, entry-size, communication efficiency, and storage-efficiency.
+Each approach is tested, benchmarked and compared with its fellow-approaches based on these metrics.
+The results are then used in \ref{ch:Conclusion} to answer the research questions and highlights unanswered questions as well as potential approaches for further research in the future.
+
+\section*{Related Work}\label{sec:relatedWorks}
+This section introduces further research the benevolent reader might be interested in.
+It is, however, not required to read all of it for understanding this research.
+
+\textit{DUORAM} extends the concept of \textit{FLORAM}, another \textit{ORAM} implementation, introduced by Doerner et al. \cite{doerner2017scale}.
+Main concepts such as protocols, the base-implementation, and definitions of \textit{DUORAM} are taken by Vadapalli et al. \cite{vadapalli2023duoram}.
+As already mentioned in the introduction and further extended in \ref{sub:DistributedPointFunctions}, both \textit{ORAM} approaches use \textit{DPFs} as their main tool for database accesses.
+These were initially introduced by Boyle et al. \cite{boyle2015function,boyle2021function,boyle2023information,boyle2016function} including definitions on \textit{Functions Secret Sharing (FSS)} and \textit{Multi Party Computation (MPC)}.
+\textit{FSS} and \textit{MPC} are further explained in \ref{sub:BeaverTriples} and \ref{ch_FunctionSecretSharing}.

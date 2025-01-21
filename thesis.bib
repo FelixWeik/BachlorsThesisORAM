@@ -242,3 +242,19 @@ numpages = {16}
   year={2012},
   organization={Springer}
 }
+@inproceedings{doerner2017scale,
+author = {Doerner, Jack and Shelat, Abhi},
+title = {Scaling ORAM for Secure Computation},
+year = {2017},
+isbn = {9781450349468},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3133956.3133967},
+doi = {10.1145/3133956.3133967},
+abstract = {We design and implement a Distributed Oblivious Random Access Memory (DORAM) data structure that is optimized for use in two-party secure computation protocols. We improve upon the access time of previous constructions by a factor of up to ten, their memory overhead by a factor of one hundred or more, and their initialization time by a factor of thousands. We are able to instantiate ORAMs that hold 234 bytes, and perform operations on them in seconds, which was not previously feasible with any implemented scheme.Unlike prior ORAM constructions based on hierarchical hashing, permutation, or trees, our Distributed ORAM is derived from the new Function Secret Sharing scheme introduced by Boyle, Gilboa and Ishai. This significantly reduces the amount of secure computation required to implement an ORAM access, albeit at the cost of O(n) efficient local memory operations.We implement our construction and find that, despite its poor O(n) asymptotic complexity, it still outperforms the fastest previously known constructions, Circuit ORAM and Square-root ORAM, for datasets that are 32 KiB or larger, and outperforms prior work on applications such as stable matching or binary search by factors of two to ten.},
+booktitle = {Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {523–535},
+numpages = {13},
+location = {Dallas, Texas, USA},
+series = {CCS '17}
+}
