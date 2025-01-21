@@ -25,19 +25,20 @@ f_{\alpha,1}(i) = \begin{cases}
    \end{cases}
 \]
 This implies that this special case $f_{\alpha,1}$ is a functional representation of a one-hot vector which has its only value unequal zero at index $\alpha$.
-Such representations will be necessarry for representing the target index of which element to retreive from the database lateron.
+Such representations will be necessary for representing the target index of which element to retrieve from the database later on.
 
-Note that Point Functions can be represented by using binary trees \cite{vadapalli2023duoram}.
-Figure //TODO FIGURE EINFÜGEN explains this. % Soll man hier noch weiter ausführen?
+Note that Point Functions can be represented by using binary trees.
+Figure 2 presented in the paper of Vadapalli et al. \cite{vadapalli2023duoram} descriptively describes this concept.
+It shows a binary tree having leafs holding $0$ everywhere but the leaf at the target index holding the value of the target index.
 
 \subsection{Distributed Point Functions}
 \label{sub:DistributedPointFunctions}
 \textit{Distributed Point Functions (DPFs)} are considered the simplest nontrivial special case of function secret sharing (\ref{sub:FunctionSecretSharingScheme}) \cite{boyle2016function}.
-Paralells between both concepts are clearly visible.
-DPFs was first introduced by Gilboa et al. \cite{gilboa2014distributed}.
+Parallels between both concepts are clearly visible.
+DPFs were introduced first by Gilboa et al. \cite{gilboa2014distributed}.
 
-The tuple of PPT algorithms $\Pi = (Gen, Eval_0, ..., Eval_{m-1})$ defines a m-DPF \cite{boyle2023information}.
-This means, $m$ parties are necessarry to reconstruct the secret point function.
+The tuple of PPT algorithms $\Pi = (Gen, Eval_0, ..., Eval_{m-1})$ defines an \textit{m-DPF} \cite{boyle2023information}.
+This means, $m$ parties are necessary to reconstruct the secret point function.
 The algorithms are designed as follows \cite{boyle2023information,gilboa2014distributed,vadapalli2023duoram}:
 \begin{itemize}
    \item $Gen(1^\lambda, f_{\alpha, \beta})\rightarrow(k_0,...,k_{m-1})$: Given a security parameter $\lambda\in N$ and the description of a point function $f_{\alpha, \beta}$, $Gen$ will return $m$ keys $k_i\in\{0,1\}^*$.
@@ -45,10 +46,11 @@ The algorithms are designed as follows \cite{boyle2023information,gilboa2014dist
 \end{itemize}
 
 $\Pi$ needs to fulfil the criteria of Correctness and Security \cite{boyle2023information}.
-Boyle et al. \cite{boyle2023information} define correctness is defined as follows: $$
+Boyle et al. \cite{boyle2023information} define correctness as follows: 
+$$
 \forall\lambda,f_{\alpha,\beta}=(N,G,\alpha,\beta),x\in [N]:(k_0,...,k_{m-1})\leftarrow Gen(1^\lambda, f_{\alpha,\beta})\Rightarrow PR[\sum_{i=0}^{m-1}Eval_i(k_i,x)=f_{\alpha,\beta}] = 1
 $$
-% Definition von Security auch noch einfügen?
+% //TODO Definition von Security auch noch einfügen?
 
 The most general DPF is a \textit{(m,t)-DPF}.
 It distributes a point function among $m$ parties, such that no coalition of fewer than $t$ parties can learn the target point or the target value \cite{vadapalli2023duoram}.
@@ -105,7 +107,7 @@ To tackle this issue, Boyle et al. \cite{boyle2016function} introduce \textit{Co
    A \textit{Final Correction Word ($F$)} is assigned to the leaf layer.
    It will change the random label of the leaf layer at the target index to reach the target value.
    Using $F$ on a non-target leaf will evaluate to a random value, which is equal for a leaf pair.
-   Therefore, each binary-DPF-tree of height $n$ holds a tuple of type $(cw_1, ..., cw_n, F)$.
+   Therefore, each binary DPF-tree of height $n$ holds a tuple of type $(cw_1, ..., cw_n, F)$.
    \item{Flag Bits (fb)}:
    Each label is assigned a single flag bit.
    It indicates, whether the cw will be XORed into the label or not.
