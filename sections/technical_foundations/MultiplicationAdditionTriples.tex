@@ -1,5 +1,5 @@
 \label{sub:MultiplicationAdditionTriples}
-AND Triples on vectors and Dot-Product Triples on additive shares, help facilitate computing (bitwise) AND and dot products on secret shares \cite{kyle2023grotto}.
+AND Triples on vectors and Dot-Product Triples on additive shares, help facilitate computing (bitwise) AND operations and dot products on secret shares in an MPC environment \cite{kyle2023grotto}.
 Due to their construction they are often called \textit{Beaver like triples}.
 
 This research will use both the definitions of AND Triples and Dot-Product Triples by Vadapalli et al. \cite{vadapalli2023duoram}.
@@ -22,8 +22,8 @@ This research will use both the definitions of AND Triples and Dot-Product Tripl
     \end{enumerate}
 \end{quote}
 
-Just like with Beaver Triples, performing an AND or dot-product operation will consume one triple.
-Therefore, again, one can precompute the communication expensive parts and perform the safe MPC operation on the real values lateron.
+Similar to Beaver Triples, performing one AND or dot-product operation will consume a single triple of each party.
+Therefore, again, one can precompute the communication expensive parts and perform the safe MPC operation on the real values later on.
 
 The implementation (\ref{ch:Implementation}) uses the \textit{Du-Atallah Protocol} \cite{ata01priv} to calculate its AND and dot-product triples.
 It is a \textit{(2+1)-MPC Protocol}, often called \textit{Server-Adided 2-MPC}, which describes a 2-party MPC protocol with a third party \cite{vadapalli2023duoram}.
