@@ -6,7 +6,7 @@ Since this approach is too computational expensive for repetitive evaluations, D
 
 Therefore, the base class \code{dpf} stores the seed of the root node.
 Also, it stores a vector \code{cfbits} which holds all flag bits on the path to target index $\alpha$.
-Bit $i$ of this vector represents the bit of the i'th node on the path to $\alpha$.
+Bit $i$ of this vector represents the bit of the $i$'th node on the path to $\alpha$.
 It also implements the functionality to descend a tree given a seed and a bool indicating which child to calculate.
 The code further defines special DPFs namely \textit{Distributed Point Functions for Memory Access (RDPF)} and \textit{Distributed Comparison Functions (CDPF)}.
 
@@ -22,14 +22,23 @@ In normal RDPFs, which is the standard in this research, it will only hold a sin
 It holds the correction word for the leaf level, which itself is a XOR-share, and all further attributes to easily convert it into an additive share.
 This is essential, since \code{duoram} is based on additive shares. 
 Thus converting from XOR RDPF-shares to additive shares simplifies further evaluation processes a lot.
-More information on \code{LeafInfo} and the concept of \code{DPFNode}s and \code{LeafLabel}s is given in \ref{subsub:DpfNodeAndLeafLabel}.
+More information on \code{LeafInfo} and the concept of \code{DPFNode}s and \code{LeafNode}s is given in \ref{subsub:DpfNodeAndLeafLabel}.
 
 The code stores RDPFs as triples, called \code{RDPFTriple} (\ref{sub:RDPFTriples}).
 As the name suggests, it holds three RDPFs, each with the same target, again, either XOR or additively shared.
 To generate a RDPF-Triple including three RDPFs on a given target, one uses its constructor which itself calls the RDPF's constructor three times.
 All three RDPFs are stored in a vector, the \code{RDPFTriple}.
 The triple itself is stored in the \code{mpcio} class assigned to each player.
+When generating these triples in the preprocessing phase, they are written to the background memory and called automatically when performing reads or updates in the online phase.
 This construction makes it easy to keep track of the used RDPFs.
+
+\paragraph*{Leaf Construction}\label{par:leafConstruction}
+Leafs are stored as concatenations of 64-bit vectors.
+A single leaf holds the functionality for both reading and writing.
+This means it holds 64-bit for writing, which will add up to $M_b$ at the target index, and 64-bit for reading, adding up to the shifting vector when combined with the other peer's shifting vector.
+Concatenating both 64-bit values in a single value results in a single 128-bit vector.
+Writing bits are placed at the upper 64-bits, the lower word represents shares of the shifting vector.
+Therefore, when executing a read and requiring the flag bits, one can simply add up (or XOR) the least significant bits of all the leafs without performing additional shifting operations.
 
 \paragraph{CDPFs}\label{par:preliminariesCDPFs}
 CDPFs too, inherit from the base structures predefined by \code{dpf}.
@@ -37,7 +46,7 @@ They are, however, stored as tuples.
 One can choose whether to share the target additively via \code{as\_target} or distribute XOR-shares, called \code{xs\_target}.
 This process is similar to RDPFs, since both CDPFs within a tuple hold the same target.
 Thus, combining the targets of $P_0,P_1$ results in the actual target index.
-A tuple of CDPFs allows the client to compare a given value to 0 as described in \ref{sub:CDPFConstruction}.
+A tuple of CDPFs allows the client to compare a given value to $0$ as described in \ref{sub:CDPFConstruction}.
 
 \subsubsection*{types.hpp} \label{subsub:implementationTypeshpp}
 This file defines basic macros, aliases, structs, and their operators.
@@ -97,16 +106,17 @@ Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m12
 Therefore, the implementation stores any data used in AES-contexts in this format.
 
 The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} type-alias \code{value\_t} (\ref{itemize:importantAliases}).
-This is due to AES-ECB being used as a pseudo random generator during creation and traversion of DPF trees.
+This is due to AES-ECB being used as a \textit{Pseudo Random Generator (PRG)} during creation and traversion of DPF trees.
 The code uses its security properties of being computationally random to calculate new labels given a seed and key.
 Both parties use the same private key, thus AES-ECB becomes pseudorandom.
-Labels are stored as \code{\_\_m128i}, leafs as 64-bit vectors.
+Labels are stored as \code{\_\_m128i}, leafs as concatenations of 64-bit values.
 Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simulates a length doubling pseudo random generator \cite{vadapalli2023duoram}.
+More on label and leaf construction can be found in the following sections.
 
 AES for 128-bit uses ten encryption-rounds \cite{rijmen2001advanced}.
 Therefore, after inserting the seed which resembles the key of the AES operation, ten more sub-keys are generated starting from the seed.
-This structure is therefore stored in format of an \code{\_\_m128i[11]} array.
-The seed at index $0$, the ten sub-keys on the following indices.
+This structure is stored in format of an \code{\_\_m128i[11]} array.
+The seed at index $0$, the ten sub-keys at the following indices.
 It is represented as type-alias \code{AES\_KEY} which is equivalent to \code{\_\_m128i[11]} (\ref{itemize:importantAliases}).
 To simplify key-creation, \code{AES\_KEY} is wrapped in the struct \code{PRGKey}.
 It takes a single \code{\_\_m128i} value as constructor input and generates ten more sub-keys using the input as seed for AES-ECB.
@@ -122,13 +132,10 @@ The implementation uses the first 20 digits of $\pi$ for \code{prgkey} and 20 di
 
 Requirements derived from this, along with further details on \code{WIDTH} and \code{LWIDTH} are described in \ref{sec:GeneralLimitations}.
 
-One practical drawback of using \code{\_\_m128i} vectors is its debugging incompatibility when using \textit{Valgrind}\footnote{More information can be found on their website and their documentations on https://valgrind.org/}.
+One practical drawback of using \code{\_\_m128i} vectors is its debugging incompatibility when using \textit{Valgrind}\footnote{More information can be found on their website and documentation at https://valgrind.org/}.
 \textit{Valgrind} is a debugging suite designed for spotting memory leakages in the code.
-It is, however, not compatible for using SIMD datatypes which triggers an error message and ultimately stopping the program.
-Thus, debugging becomes tedious and unnecessarily hard.
-
-\subsubsection*{DPFNode and LeafLabel}\label{subsub:DpfNodeAndLeafLabel}
-%//TODO hier gehts weiter lieber Felix, jetzt implementier mal ein wenig 
+It is, however, not compatible for using SIMD datatypes which triggers an error message and ultimately stops program execution.
+This makes debugging tedious and unnecessarily hard.
 
 \subsubsection*{Duoram and Shapes} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
@@ -150,13 +157,16 @@ It holds the following information:
 
 Each \code{duoram} must be accessed via a hierarchy of \textit{Shapes}.
 The implementation uses a hierarchy consisting of solely a single shape called \code{Flat}.
-It provides basic functions for reading and writing from the duoram.
+It provides basic functions for reading and updating the duoram.
 This has the great advantage of updating accessing contexts while keeping the underlying database consistent.
-For example, when executing multiple database accesses multiple RDPF-Triples and thus separate contexts are needed.
-Instead of assigning these contexts to the same database introducing a great overhead by updating the database, assigning new RDPF-Triples and \code{mpcio} objects, one simply updates the underlying shape introducing a fresh context.
-The \code{context} operation updates the shape's context, generates a new shape of the same type with the same underlying database and returns the newly generated object.
-Only the \code{Flat} shape is used in the implementation.
-Therefore, no further descriptions on different shapes and shape hierarchies are provided.
+For example, when executing multiple database accesses multiple RDPF-Triples and thus separate contexts are needed as keeping the context might leak accessing-information due to reusing the same RDPF-Triple.
+Instead of assigning these contexts to the same database introducing a great overhead one simply updates the underlying shape introducing a fresh context.
+Without a shape, one manually has to update the database, reassign new RDPF-Triples to each player and manipulate their \code{mpcio} objects.
+\code{context()} as defined in \code{Flat} generates a new shape including fresh RDPF-Triples and assigns it to each party.
+This reduces the overhead to a minimum.
+
+The base implementation uses the \code{Flat} shape only.
+Extensions on different shapes are not planned or necessary, thus no further descriptions on different shapes and shape hierarchies are required.
 
 \subsubsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
 RDPFs can be reused for reading.
@@ -164,6 +174,7 @@ This, however, will leak the information that reads were executed on the same lo
 The location stays secret \cite{vadapalli2023duoram}.
 
 This process is similar for writing, yet it requires a few code adjustments.
+In short, one simply extends the given leaf construction (\ref{par:leafConstruction}) by adding as many 64-bit values representing shares of $M$ as wanted.
 Vadapalli et al. chose to template their \code{RDPF} struct with a property called \code{WIDTH} of type \code{nbits\_t} (\ref{itemize:importantAliases}).
 \code{WIDTH} is set to $1$ by default.
 This indicates one write access per RDPF, no reuse is possible.
@@ -175,12 +186,28 @@ Therefore, by increasing \code{WIDTH} to a value of $n$, one can reuse a given R
 It is calculated by $1+\text{WIDTH}/2$.
 As it is of type \code{nbits\_t} (\ref{itemize:importantAliases}) resembling an unsigned integer, setting \code{WIDTH} to $1$ will set \code{LWIDTH} to $1$ too.
 Recall leaf nodes being stored as an array of \code{\_\_m128i} values, with 64-bit reserved for reading and 64-bit reserved for writing.
-Performing either a single read or write will only require the array to contain only a single \code{\_\_m128i} value. %//TODO nachprüfen ob das im restlichen Text auch so beschrieben wurde (bzw ob es überhaupt schonmal erwähnt wurde lol)
+Performing either a single read or write will only require the array to contain only a single \code{\_\_m128i} value.
 Increasing \code{WIDTH} to $n$ will lead to $n$ 64-bit values being needed for $n$ writes.
 Therefore, the array representing leaf nodes must be adjusted to hold $n$ \code{\_\_m128i} values.
 \code{LWIDTH} represents the number of \code{\_\_m128i} values necessary to accommodate \code{WIDTH} many writes per instance.
 
-Limitations on these values are listed in \ref{sub:LimitWIDTHandLWIDTH}.
+Limitations on these values are listed in \ref{sub:LimitWIDTHandLWIDTH}, more information on this construction is given in the following section.
+
+\subsubsection*{DPFNode and LeafNode}\label{subsub:DpfNodeAndLeafLabel}
+The concepts of DPF nodes, leafs, \code{WIDTH}, and \code{\_\_m128i} vectors are closely intertwined.
+
+As already mentioned, DPF trees are generated using AES-ECB (\ref{subsub:implementationAesni}).
+For the goal of storing 64-bit values in the base implementation, one needs to simulate a length-doubling PRG.
+This can be done by using AES-ECB on vectors twice as large as the actual label, which means 128-bits.
+Therefore, a single node for a particular DPF tree storing values of size 64 has nodes of size 128.
+Vadapalli et al. consequently drew the logical conclusion to use \code{DPFnode} as type alias for \code{\_\_m128i}.
+As Intel's AES-ECB implementation (\ref{subsub:implementationAesni}) directly uses \code{\_\_m128i} vectors as input and output, \code{DPFnode} can be used for AES operations without conversion.
+
+Recall the definition and usage of \code{WIDTH} and \code{LWIDTH} from \ref{subsub:WIDTHandLWIDTH}.
+In short, each leaf can be divided into $2n*$\code{LWDITH} blocks of size 64, which makes it reusable for \code{WIDTH} many updates.
+This means, to implement a DPF tree with a certain value of \code{WIDTH}, one needs a leaf label of size $\code{LWIDTH}*128$.
+Thus, a \code{LeafNode} is chosen to be a type alias for a vector holding \code{LWIDTH} many \code{\_\_m128i} values, or \code{DPFnode}s respectively.
+This results in the type definition \code{using LeafNode = std::vector<DPFNode, LWIDTH>}. 
 
 \subsubsection*{mpcio and Communication} \label{subsub:implementationMpcioAndCommunication}
 All three parties execute the same executable \code{prac} which can be generated by using the \code{MAKEFILE}.
