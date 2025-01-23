@@ -1,0 +1,74 @@
+\label{sub:approachGMP}
+
+The \textit{GNU Multi Precision Arithmetic Library (GMP)} allows implementing integral datatypes of arbitrary precision while supporting bit operations.
+This means, one can choose the amount of bits used to represent a given value or directly assert a value of arbitrary size.
+It is open source and scarcely documented, yet widely used due to its efficiency and general performance.
+These values highlight the crucial role of GMP in this approach.
+
+To use GMP in a project, one needs to install \code{libgmp\_dev} first.
+The author used \code{apt} for this step.
+Next, make sure to add the \code{-lgmp} flag during linking as it links the project with the GMP-library.
+If the project is written in C++ also include GMP's C++ wrapper \code{-lgmpxx} as it provides overloaded operators frequently used in C++.
+Since the author's code compiles using a \code{MAKEFILE}, the flag is set there.
+Finally, include \code{gmp.h} in the files requiring GMP.
+In the author's case it is solely included in \code{types.hpp}.
+
+The following sections will use \code{mpz\_t} attributes frequently, which represent an integer of arbitrary size.
+\code{mpz\_class} represent a class holding a single \code{mpz\_t} value providing the most common operators.
+They, too, will be used rather frequently in the following subsections.
+
+\subsubsection*{Approaches}\label{subsub:gmpApproaches}
+When implementing this approach, two possible solutions were considered.
+\begin{enumerate}
+    \item Implement a wrapper struct for a single \code{mpz\_t} value.
+    This struct can then be templated to match a certain bitsize.
+    Assuming this struct is called \code{value\_wrapper<BIT\_SIZE>} this will result in \code{DPFnode} and \code{value\_t} being called \code{DPFnode = value\_wrapper<2*VALUE\_BITS>} and \code{value\_t = value\_wrapper<VALUE\_BITS>}.
+    Then, however, one needs to take care of memory management manually, overload all operators for different datatypes and still is bound to the restrictions from \ref{sec:GeneralLimitations}.
+    Also, drawbacks like communication issues between parties when using these structs from the second approach still exist.
+    Therefore, this approach will not be pursued further\footnote{A basic implementation of this approach, however, can be found on the author's github at https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/UnlimitedGMP}.
+    \item Use the built-in \code{mpz\_class}.
+    It takes care of memory management, initialization, and destruction automatically.
+    One, however, cannot template its predefined bitsize.
+    This means sizes will be arbitrarily chosen when, for example, a random value is chosen.
+    Therefore, one can either choose if he limits the interval a number can be generated in or accept the arbitrary size of numbers.
+    As this research is all about using values of arbitrary size, the author chose to go with the latter one.
+    This makes this approach almost independent of macros like \code{VALUE\_BITS} (\ref{itemize:importantMacros}) as \code{\_\_m128i} vectors and sizes for communication-buffers can be generated at runtime.
+    One can simply insert any value, the program will ultimately take care of it.
+    Therefore, the author chose to further pursue and implement this approach\footnote{The implementation is located at https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/gmp\_mpz\_class}.
+\end{enumerate}
+
+\subsubsection*{Applying GMP}\label{subsub:applyingGMP}
+Again, main types, aliases, and structs are defined in \code{types.hpp} (\ref{subsub:implementationTypeshpp}).
+\code{value\_t}, initially set as \code{uint64\_t}, is now replaced by a struct of the same name.
+Implementing the datatype with a struct is necessary since GMP-values are set, initialized, and deleted during runtime and not like integral datatypes during precompilation.
+Thus, one cannot directly use GMP-values as template arguments.
+Since this property is required throughout the code the most common workaround uses a wrapper class or struct taking care of the initialization and deletion when called.
+Then, one can use the struct for initializing templated structures in the code as required in, for example, \code{RDPFs}.
+
+\code{value\_t} (\ref{itemize:importantAliases}), being a type alias, is now replaced by a struct.
+This struct holds an attribute called \code{value} of type \code{mpz\_t}, which represents a signed integer.
+As GMP offers no distinct type to implement unsigned integers, one simply adjusts the desired bitsize accordingly.
+GMP adjusts the required bit-size by itself, so storing an equivalent of an \code{uint64\_t} still requires no more than 64-bits.
+Since operations now take place on a struct instead of an integral datatype, one must overload the operators.
+These operators call the already implemented GMP-operators on \code{value} and return the desired result.
+Also, casting is necessary, for example when requiring an unsigned integer instead of \code{mpz\_t}.
+Therefore, casting operators using GMP's built in casting functions are also required.
+Finally, the constructors and destructors are implemented not to leak any memory.
+In the following, the author will refer to structures of this type — which means structs that hold a single GMP-value and additionally implement overloaded operators, constructors, and destructors — as \textit{GMP-structs}.
+
+Type-alias \code{nbits\_t} (\ref{itemize:importantAliases}), too, is used for initializing templated structures throughout the code.
+Thus, in order to make it scalable, replacing it with a GMP-struct as above is necessary.
+Recall, however, that \code{nbits\_t} solely counts the amount of bits required to store a value of type \code{value\_t}.
+Leaving \code{nbits\_t} as is being \code{uint8\_t} would limit \code{value\_t} to a size of $2^8\text{ bits }\cong 32\text{ bytes}$.
+Altering \code{nbits\_t} to equal \code{uint64\_t} will enable the user to store values reaching $2^{64} \text{ bit }\cong 2^{51}\text{ Terrabytes}$.
+Of course, this value is far too big to achive testable and performant results.
+This leads to the conclusion that scaling \code{nbits\_t} is of no great use in this research since it will solely impact performance and general memory usage.
+Therefore, the author chose to set \code{nbits\_t} to \code{uint32\_t} in this approach which is the equivalent of storing a $512$ megabyte value.
+
+Contrary to the prior approach, \code{VALUE\_BITS} stays untouched.
+It defines the precision of the \code{mpz\_t} values.
+No additional macros are required.
+
+\paragraph{DPF-Nodes and Leaf-Nodes}\label{par:gmpDPFNodesAndLeafNodes}
+\subsubsection*{Communication with GMP}\label{sub:CommunicationWithGMP}
+\paragraph{Serialization and Deserialization}\label{par:gmpSerializationAndDeserialization}

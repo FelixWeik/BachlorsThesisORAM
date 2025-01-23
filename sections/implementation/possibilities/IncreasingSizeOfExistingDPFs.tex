@@ -45,17 +45,13 @@ Bitmasks like \code{bool128\_mask} and \code{if128\_mask} are utilised when gene
 In short, they increase bit-operations' performance by providing predefined values that will be used frequently during execution.
 
 Since these bit-operations are executed primarily on \code{\_\_m128i} values, all function signatures and bitmasks are predefined for this specific datatype.
-If one wants to scale their size arbitrarily, three solutions exist:
+If one wants to scale their size arbitrarily, two solutions exist:
 \begin{enumerate}
-    \item Hardcode multiple bit-operations for different datatypes:
-    This requires the developer to hardcode the same solution for any datatype.
-    Since this conflict collides with the goal of arbitrary scaling, this approach will not be pursued further.
-    Yet, the author chose to implement this solution for 128 and 256 bit to receive a reference performance benchmark during testing (\ref{ch:Evaluation}).
     \item Cut larger values into 128-bit blocks:
     This requires the input-type to be a multiple of 128-bit, which is not always the case.
     Also, it requires each function call to cut the input into $N$ blocks, call the given function $n$ times and finally concatenate each result to receive the final result.
     This too scales badly.
-    \item Using GMP (\ref{subsub:gmp}):
+    \item Using GMP (\ref{sub:approachGMP}):
     By using GMP, one can create datatypes of arbitrary precision.
     Also, bit-operations are predefined for any \code{mpz} value.
     Thus, the specialized bit-operations defined in the code can be implemented to utilize the more general GMP bit-operations.
@@ -64,50 +60,7 @@ If one wants to scale their size arbitrarily, three solutions exist:
     Therefore, the author further pursues this approach.
 \end{enumerate}
 
-\subsubsection*{GNU Multi Precision Arithmetic Library (GMP)} \label{subsub:gmp}
-GMP allows implementing integral datatypes of arbitrary precision while supporting bit operations.
-This means, one can choose the amount of bits used to represent a given value.
-It is open source and scarcely documented, yet widely used due to its efficiency and general performance.
-These values highlight the crucial role of GMP in this approach.
-
-To use GMP in a project, one needs to install \code{libgmp\_dev} first.
-The author used \code{apt} for this step.
-Next, make sure to add the \code{-lgmp} flag during linking as it links the project with the GMP-library.
-Since the author's code compiles using a \code{MAKEFILE}, the flag is set there.
-Finally, include \code{gmp.h} in the files requiring GMP.
-In the author's case it is solely included in \code{types.hpp}.
-
-\subsubsection*{Applying GMP}\label{subsub:applyingGMP}
-Again, main types, aliases, and structs are defined in \code{types.hpp} (\ref{subsub:implementationTypeshpp}).
-\code{value\_t}, initially set as \code{uint64\_t}, is now replaced by a struct of the same name.
-Implementing the datatype with a struct is necessary since GMP-values are set, initialized, and deleted during runtime and not like integral datatypes during precompilation.
-Thus, one cannot directly use GMP-values as template arguments.
-Since this property is required throughout the code the most common workaround uses a wrapper class or struct taking care of the initialization and deletion when called.
-Then, one can use the struct for initializing templated structures in the code as required in, for example, \code{RDPFs}.
-
-\code{value\_t} (\ref{itemize:importantAliases}), being a type alias, is now replaced by a struct.
-This struct holds an attribute called \code{value} of type \code{mpz\_t}, which represents a signed integer.
-As GMP offers no distinct type to implement unsigned integers, one simply adjusts the desired bitsize accordingly.
-GMP adjusts the required bit-size by itself, so storing an equivalent of an \code{uint64\_t} still requires no more than 64-bits.
-Since operations now take place on a struct instead of an integral datatype, one must overload the operators.
-These operators call the already implemented GMP-operators on \code{value} and return the desired result.
-Also, casting is necessary, for example when requiring an unsigned integer instead of \code{mpz\_t}.
-Therefore, casting operators using GMP's built in casting functions are also required.
-Finally, the constructors and destructors are implemented not to leak any memory.
-In the following, the author will refer to structures of this type — which means structs that hold a single GMP-value and additionally implement overloaded operators, constructors, and destructors — as \textit{GMP-structs}.
-
-Type-alias \code{nbits\_t} (\ref{itemize:importantAliases}), too, is used for initializing templated structures throughout the code.
-Thus, in order to make it scalable, replacing it with a GMP-struct as above is necessary.
-Recall, however, that \code{nbits\_t} solely counts the amount of bits required to store a value of type \code{value\_t}.
-Leaving \code{nbits\_t} as is being \code{uint8\_t} would limit \code{value\_t} to a size of $2^8\text{ bits }\cong 32\text{ bytes}$.
-Altering \code{nbits\_t} to equal \code{uint64\_t} will enable the user to store values reaching $2^{64} \text{ bit }\cong 2^{51}\text{ Terrabytes}$.
-Of course, this value is far too big to achive testable and performant results.
-This leads to the conclusion that scaling \code{nbits\_t} is of no great use in this research since it will solely impact performance and general memory usage.
-Therefore, the author chose to set \code{nbits\_t} to \code{uint32\_t} in this approach which is the equivalent of storing a $512$ megabyte value.
-
-Contrary to the prior approach, \code{VALUE\_BITS} stays untouched.
-It defines the precision of the \code{mpz\_t} values.
-No additional macros are required.
+The approach on GMP will be further discussed in the following section \ref{sub:approachGMP}.
 
 \subsubsection*{Adjusting Compilation}\label{subsub:adjustingCompilation}
 Both approaches require a flag bit to decide on which datatype or size to use during execution.
