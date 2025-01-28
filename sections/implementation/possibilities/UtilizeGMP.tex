@@ -8,14 +8,13 @@ These values highlight the crucial role of GMP in this approach.
 To use GMP in a project, one needs to install \code{libgmp\_dev} first.
 The author used \code{apt} for this step.
 Next, make sure to add the \code{-lgmp} flag during linking as it links the project with the GMP-library.
-If the project is written in C++ also include GMP's C++ wrapper \code{-lgmpxx} as it provides overloaded operators frequently used in C++.
+If the project is written in C++ also include GMP's C++ wrapper \code{-lgmpxx} as it provides overloaded operators and simpler memory management.
 Since the author's code compiles using a \code{MAKEFILE}, the flag is set there.
 Finally, include \code{gmp.h} in the files requiring GMP.
-In the author's case it is solely included in \code{types.hpp}.
 
 The following sections will use \code{mpz\_t} attributes frequently, which represent an integer of arbitrary size.
 \code{mpz\_class} represent a class holding a single \code{mpz\_t} value providing the most common operators.
-They, too, will be used rather frequently in the following subsections.
+This type, too, will be used rather frequently in the following subsections.
 
 \subsubsection*{Approaches}\label{subsub:gmpApproaches}
 When implementing this approach, two possible solutions were considered.
@@ -29,8 +28,8 @@ When implementing this approach, two possible solutions were considered.
     \item Use the built-in \code{mpz\_class}.
     It takes care of memory management, initialization, and destruction automatically.
     One, however, cannot template its predefined bitsize.
-    This means sizes will have a size fitting the given value.
-    These sizes adapt automatically to changes of the value.
+    This means sizes adjust automatically to the given value.
+    These sizes adapt automatically if the value changes.
     Therefore, one can either choose if he limits the interval a number can be generated in or accept the arbitrary size of numbers.
     As this research is all about using values of arbitrary size, the author chose to go with the latter one.
     This makes this approach almost independent of macros like \code{VALUE\_BITS} (\ref{itemize:importantMacros}) as \code{\_\_m128i} vectors and sizes for communication-buffers can be generated at runtime.
@@ -41,14 +40,59 @@ When implementing this approach, two possible solutions were considered.
 \end{enumerate}
 
 \subsubsection*{Basic Changes}\label{subsub:gmpBasicChanges}
+To avoid cyclic dependencies, a new file \code{types.tcc} is introduced.
+It declares \code{value\_t} and \code{DPFnode} as type alias for \code{mpz\_class}.
+It also defines \code{VALUE\_BITS} (\ref{itemize:importantMacros}).
 
+Next, bit-utils and bit-masks need to be adjusted for the new datatype.
+Bit operations like \code{XOR} and the logical \code{AND} are already defined by \code{mpz\_class}.
+No changes in the calls are required.
+
+Adjusting bit-masks, however, needs more changes.
+As they are now independent of size and are not fixed to \code{VALUE\_BITS} many bits, bit-masks need to be instantiated at runtime.
+It should also keep its existing syntax of indexing into a given bit-mask as this minimizes syntax changes in the code.
+For this, a helper function \code{create\_bitmask} is created.
+It takes the size and the general shape of the mask as input and creates a bit-mask of the given size.
+Each invocation of different bit-masks calls the helper function with different arguments, the size is generated at runtime according to the size of the calling value.
+Therefore, no syntax changes need to take place as only the base class itself changes.
 
 \subsubsection*{Memory Management}\label{subsub:gmpMemoryManagement}
+Changing \code{DPFnode} and \code{value\_t} to \code{mpz\_class} resulted primarily in \textit{Double Free} and \textit{unaligned fastbin junk} errors.
+These errors are results of wrong allocations and deletions of memory locations. 
 
-\subsubsection*{Overloading Bit-Shifts}\label{subsub:OverloadingBitShifts}
+\paragraph{Double Free Error}\label{par:doubleFree}
+A double free error occurs when the destructor of an object is called twice.
+As it is called the second time the garbage collector tries to free an invalid memory reference which will result in a segmentation fault.
+This is primarily the case when assigning an object of type \code{mpz\_class} to another temporary object.
+This will not copy the \code{mpz\_class} but only the pointer.
+Once the temporary object is freed, freeing the \code{mpz\_class} results in a double free error.
+
+Two primary solutions exist:
+When pushing the \code{mpz\_class} object to a vector use \code{emplace\_back} rather than \code{push\_back} as it does not copy the pointer but creates a new object resulting in new pointers.
+Freeing the objects separately will avoid the double free error.
+When assigning the \code{mpz\_class} to another temporary object use \code{std::move}.
+It reassigns the \code{mpz\_class} to the temporary object, leaving the \code{mpz\_class} in a valid state.
+Freeing both objects separately will, too, avoid the double free error.
+Keep in mind, however, that the \code{mpz\_class} will be zero then not holding the initial value anymore.
+
+\paragraph{References and Return Values}\label{par:referencesAndReturnValues}
+When passing a \code{mpz\_class} into a function, use references rather than copying the object.
+Not referencing the object might not directly result in a segmentation fault, yet it will most likely crash the program due to uninitialized values.
+Also, reassigning the return values to an object in the calling class will most likely result in a double free error (\ref{par:doubleFree}).
+Passing objects as references will often render return values unnecessary as changes can be executed directly on the given object.
+Alternatively, pass an empty \code{mpz\_class} into the function and let the function initialize the object itself.
+
+\paragraph{Explicit and Implicit Casts}\label{par:mpzExplicitAndImplicitCasts}
+Casting \code{mpz\_class} objects is not possible without using built-in functions.
+This means, no implicit casts are possible.
+One can, however, use built-in functions like \code{mpz\_get\_ui} to receive a representation of the stored \code{mpz\_t} value without losing information.
+The size of the returned value is also adapted to the size of the stored value.
+Another possibility for casting values comes in especially useful when storing \code{mpz\_class} objects or using them during communication:
+Serialization and deserialization.
+More details on these functions are given in the following section \ref{subsub:gmpCommunication}.
 
 \subsubsection*{Communication}\label{subsub:gmpCommunication}
-Communication operations are primarily based upon TCP-sockets.
+Communication operations use TCP-sockets.
 Each party holds two sockets which are each linked to one of the other parties.
 Also, compound functions exist.
 The server, for example, can utilize \code{queue\_peer()} to send the given char pointer to both peers at once.
@@ -129,38 +173,3 @@ This means, three calls of \code{write\_maybe\_expanded} and two additional send
 To receive an RDPF-Triple, call \code{p0 << trp} with \code{trp} being assigned to an empty RDPF-Triple.
 It will call \code{read\_maybe\_expaded} once for each DPF and deserialize the target.
 It then reassembles the given RDPF-Triple.
-
-\subsubsection*{Applying GMP}\label{subsub:applyingGMP}
-Again, main types, aliases, and structs are defined in \code{types.hpp} (\ref{subsub:implementationTypeshpp}).
-\code{value\_t}, initially set as \code{uint64\_t}, is now replaced by a struct of the same name.
-Implementing the datatype with a struct is necessary since GMP-values are set, initialized, and deleted during runtime and not like integral datatypes during precompilation.
-Thus, one cannot directly use GMP-values as template arguments.
-Since this property is required throughout the code the most common workaround uses a wrapper class or struct taking care of the initialization and deletion when called.
-Then, one can use the struct for initializing templated structures in the code as required in, for example, \code{RDPFs}.
-
-\code{value\_t} (\ref{itemize:importantAliases}), being a type alias, is now replaced by a struct.
-This struct holds an attribute called \code{value} of type \code{mpz\_t}, which represents a signed integer.
-As GMP offers no distinct type to implement unsigned integers, one simply adjusts the desired bitsize accordingly.
-GMP adjusts the required bit-size by itself, so storing an equivalent of an \code{uint64\_t} still requires no more than 64-bits.
-Since operations now take place on a struct instead of an integral datatype, one must overload the operators.
-These operators call the already implemented GMP-operators on \code{value} and return the desired result.
-Also, casting is necessary, for example when requiring an unsigned integer instead of \code{mpz\_t}.
-Therefore, casting operators using GMP's built in casting functions are also required.
-Finally, the constructors and destructors are implemented not to leak any memory.
-In the following, the author will refer to structures of this type — which means structs that hold a single GMP-value and additionally implement overloaded operators, constructors, and destructors — as \textit{GMP-structs}.
-
-Type-alias \code{nbits\_t} (\ref{itemize:importantAliases}), too, is used for initializing templated structures throughout the code.
-Thus, in order to make it scalable, replacing it with a GMP-struct as above is necessary.
-Recall, however, that \code{nbits\_t} solely counts the amount of bits required to store a value of type \code{value\_t}.
-Leaving \code{nbits\_t} as is being \code{uint8\_t} would limit \code{value\_t} to a size of $2^8\text{ bits }\cong 32\text{ bytes}$.
-Altering \code{nbits\_t} to equal \code{uint64\_t} will enable the user to store values reaching $2^{64} \text{ bit }\cong 2^{51}\text{ Terrabytes}$.
-Of course, this value is far too big to achive testable and performant results.
-This leads to the conclusion that scaling \code{nbits\_t} is of no great use in this research since it will solely impact performance and general memory usage.
-Therefore, the author chose to set \code{nbits\_t} to \code{uint32\_t} in this approach which is the equivalent of storing a $512$ megabyte value.
-
-Contrary to the prior approach, \code{VALUE\_BITS} stays untouched.
-It defines the precision of the \code{mpz\_t} values.
-No additional macros are required.
-
-\paragraph{DPF-Nodes and Leaf-Nodes}\label{par:gmpDPFNodesAndLeafNodes}
-\subsubsection*{Communication with GMP}\label{sub:CommunicationWithGMP}
