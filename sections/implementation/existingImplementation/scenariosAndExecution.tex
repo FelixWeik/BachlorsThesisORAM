@@ -1,7 +1,8 @@
 As specified in the previous paragraph \ref{subsub:implementationMpcioAndCommunication}, \code{prac} is executed three times simultaneously.
 Hence, assuming one executes locally without using docker, one needs to run \code{prac} in three terminals at once.
-Calling \code{prac} requires several arguments: player number, which mode to execute (-p, -o, or blank), number of threads for faster execution (-t), and for the server $P_2$ the type, amount and depth of functions to calculate.
-\code{r} will represent RDPFs (\ref{sub:RDPFTriples}).
+Calling \code{prac} requires several arguments: player number, which mode to execute (-p, -o, or blank), number of threads for faster execution (-t).
+The server $P_2$ additionally requires the type, amount and depth of functions to calculate.
+\code{r} will represent RDPFs.
 
 Thus, the function calls for preprocessing will look as follows:
 \begin{enumerate}
@@ -16,33 +17,34 @@ This will execute the precomputation generating 20 RDPF-triples, each of depth 2
     \item \code{./prac -t 3 1 localhost duoram 20 5}
     \item \code{./prac -t 3 2 localhost localhost duoram 20 5}
 \end{enumerate}
-Will execute the online phase, again with three threads each.
-Specifying \code{duoram} will execute the tests as described in \ref{sub:testingAndBenchmarking} with 5 messages using RDPFs of depth 20 for each subtest.
+Will execute the online phase, again with three threads each sending 5 messages using RDPFs of depth 20.
 
 \subsubsection*{General Execution}
-The following sections denotes the computational peers $P_0,P_1$ as "player", $P_2$ is called "server".
-All executions start in \code{prac.cpp} which accomodates the \code{main} method.
+The following sections denote the computational peers $P_0,P_1$ as "player", $P_2$ is called "server".
+All executions start in \code{prac.cpp} which accommodates the \code{main} method.
 This includes the starting points for both the players' and the server's computations.
-If parses the given arguments, sets the adresses of the other parties, and deceides whether the current execution is a player's or server's computation.
+If parses the given arguments, sets the adresses of the other parties, and decides whether the current execution is a player's or server's computation.
 That means it calls \code{comp\_player\_main} or \code{server\_player\_main}.
 
 \code{comp\_player\_main} represents the players' computation.
-It is, again, separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the onlien phase.
+It is, again, separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the online phase.
 
 \code{server\_player\_main} represents the server's computations.
-It too is separated into its phases \code{preprocessing\_server} and \code{online\_main}.
+It, too, is separated into its phases \code{preprocessing\_server} and \code{online\_main}.
 
 The careful reader notices both the server and the player calling \code{comp\_main} albeit the previous text assumed these computations to be implemented separately.
 Notice that this too is only a starting point for more specialized calculations.
-Thus, \code{online\_main} too further specifies its computations given the number of the computational peer.
+Thus, \code{online\_main} further specifies its computations given the number assigned to the party.
 
 \subsubsection*{Preprocessing} \label{subsub:implementationPreprocessing}
 This phase generates messages and its contents as defined in \ref{subsub:implementationMpcioAndCommunication}.
 
 \code{preproc.cpp} handles these computations for both the server and the players.
 Given the current type, which equals the address inside the current message, the code calls the specific constructor.
-Each type is assigned a certain file \code{<type><amount>.<party>.t0}.
-For example generating 20 RDPFs will result in three files \code{rdpf20.<party\_name>.t0} which are used in the next phase.
+Each type is assigned a certain file \code{<type><amount>.<party>.t<n>}.
+For example generating 20 RDPFs will result in three files \code{rdpf20.<party\_name>.t<n>} which are used in the next phase.
+Number $n$ assigned to t increments for each execution.
+This means t starts at 0 and increases after every execution thus avoiding naming conflicts.
 
 \subsubsection*{Reading, Writing, and Cyclic Shifts} \label{subsub:implementationCyclicShifting}
 \code{duoram.tcc} accomodates both oblivious read and write operations.

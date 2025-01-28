@@ -24,7 +24,7 @@ This is essential, since \code{duoram} is based on additive shares.
 Thus converting from XOR RDPF-shares to additive shares simplifies further evaluation processes a lot.
 More information on \code{LeafInfo} and the concept of \code{DPFNode}s and \code{LeafNode}s is given in \ref{subsub:DpfNodeAndLeafLabel}.
 
-The code stores RDPFs as triples, called \code{RDPFTriple} (\ref{sub:RDPFTriples}).
+The code stores RDPFs as triples, called \code{RDPFTriple}.
 As the name suggests, it holds three RDPFs, each with the same target, again, either XOR or additively shared.
 To generate a RDPF-Triple including three RDPFs on a given target, one uses its constructor which itself calls the RDPF's constructor three times.
 All three RDPFs are stored in a vector, the \code{RDPFTriple}.
@@ -39,6 +39,7 @@ This means it holds 64-bit for writing, which will add up to $M_b$ at the target
 Concatenating both 64-bit values in a single value results in a single 128-bit vector.
 Writing bits are placed at the upper 64-bits, the lower word represents shares of the shifting vector.
 Therefore, when executing a read and requiring the flag bits, one can simply add up (or XOR) the least significant bits of all the leafs without performing additional shifting operations.
+This means a tree of depth $d$ holds $2^d$ leafs, each of size 128.
 
 \paragraph{CDPFs}\label{par:preliminariesCDPFs}
 CDPFs too, inherit from the base structures predefined by \code{dpf}.
@@ -61,7 +62,7 @@ The most prominent type-aliases are:
     Chooses how a single bit is represented, usually in the \code{RegBS} struct.
     The default datatype for this alias is \code{bool}.
     \item \code{address\_t}: 
-    Deceides the size of the addresses in the secret-shared memory.
+    Decides the size of the addresses in the secret-shared memory.
     Is set to \code{uint32\_t}.
     \item \code{DPFnode}: 
     Implements the datatype of a DPFnode and establishes the basis for defining Leaf nodes.
@@ -70,7 +71,7 @@ The most prominent type-aliases are:
     Evaluation on leaf nodes splits the vector in a lower and upper half which makes it two 64-bit vectors.
     More information on this alias is provided in \ref{subsub:DpfNodeAndLeafLabel}.
     \item \code{value\_t}: 
-    Deceides the datatype of values in the secret-shared memory.
+    Decides the datatype of values in the secret-shared memory.
     The default value is \code{uint64\_t}.
     \item \code{AES\_KEY}:
     Represents an AES-key for 128-bit AES.
@@ -107,10 +108,10 @@ Therefore, the implementation stores any data used in AES-contexts in this forma
 
 The careful reader notices \code{\_\_m128i} vectors being twice as large as the \code{uint64\_t} type-alias \code{value\_t} (\ref{itemize:importantAliases}).
 This is due to AES-ECB being used as a \textit{Pseudo Random Generator (PRG)} during creation and traversion of DPF trees.
-The code uses its security properties of being computationally random to calculate new labels given a seed and key.
+The code uses its security properties of being computationally random \cite{rijmen2001advanced} to calculate new labels given a seed and key.
 Both parties use the same private key, thus AES-ECB becomes pseudorandom.
-Labels are stored as \code{\_\_m128i}, leafs as concatenations of 64-bit values.
-Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simulates a length doubling pseudo random generator \cite{vadapalli2023duoram}.
+Labels are stored as \code{\_\_m128i}, leafs as explained in the previous section \ref{par:leafConstruction}.
+Therefore, by using a \code{\_\_m128i} seed and labels encrypting each label using AES-ECB recursively, one simulates a length doubling pseudo random generator \cite{vadapalli2023duoram} as required to run the BGI-DPF-Construction (\ref{sub:BGIDPFConstruction}).
 More on label and leaf construction can be found in the following sections.
 
 AES for 128-bit uses ten encryption-rounds \cite{rijmen2001advanced}.
@@ -134,8 +135,7 @@ Requirements derived from this, along with further details on \code{WIDTH} and \
 
 One practical drawback of using \code{\_\_m128i} vectors is its debugging incompatibility when using \textit{Valgrind}\footnote{More information can be found on their website and documentation at https://valgrind.org/}.
 \textit{Valgrind} is a debugging suite designed for spotting memory leakages in the code.
-It is, however, not compatible for using SIMD datatypes which triggers an error message and ultimately stops program execution.
-This makes debugging tedious and unnecessarily hard.
+It is, however, not compatible for using SIMD datatypes which triggers an error and ultimately stops program execution.
 
 \subsubsection*{Duoram and Shapes} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
@@ -148,22 +148,26 @@ It holds the following information:
     Vector of registers representing the party's share of the database $D_b$.
     These entries are either additively (\code{RegAS}) or XOR shared (\code{RegXS}).
     Entries are stored as \code{RegAS} by default and can be changed manually.
+    This means the database is a vector holding $n$ register entries.
     \item blind: 
     The blinding factor $\zeta_b$ to blind its own database.
+    As the blinding factor is continuous, it has the same size as the database.
     \item {peer\_blinded\_db}:
-    This is the blinded database of party $P_b, b\in\{0,1\}$ the other party $P_b, {b-1}\in\{0,1\}$.
+    This is the blinded database of party $P_b\text{ with }b\in\{0,1\}$ the other party $P_{b'}\text{ with }{b'-1}\in\{0,1\}$.
     \item Party $P_2$ uses the attributes \code{p0\_blind}, \code{p1\_blind} to represent the blinded databases of both parties $P_0,P_1$.
+    The size is, again, the same as the database.
 \end{itemize}
 
 Each \code{duoram} must be accessed via a hierarchy of \textit{Shapes}.
 The implementation uses a hierarchy consisting of solely a single shape called \code{Flat}.
-It provides basic functions for reading and updating the duoram.
+A shape provides basic functions for reading and updating the duoram.
+This is primarily the index operator \code{[]} for reading and the \code{+=} operator for updating.
 This has the great advantage of updating accessing contexts while keeping the underlying database consistent.
 For example, when executing multiple database accesses multiple RDPF-Triples and thus separate contexts are needed as keeping the context might leak accessing-information due to reusing the same RDPF-Triple.
 Instead of assigning these contexts to the same database introducing a great overhead one simply updates the underlying shape introducing a fresh context.
 Without a shape, one manually has to update the database, reassign new RDPF-Triples to each player and manipulate their \code{mpcio} objects.
 \code{context()} as defined in \code{Flat} generates a new shape including fresh RDPF-Triples and assigns it to each party.
-This reduces the overhead to a minimum.
+This reduces the overhead to a minimum and introduces independent reads and writes.
 
 The base implementation uses the \code{Flat} shape only.
 Extensions on different shapes are not planned or necessary, thus no further descriptions on different shapes and shape hierarchies are required.
@@ -184,7 +188,7 @@ Therefore, by increasing \code{WIDTH} to a value of $n$, one can reuse a given R
 
 \code{LWIDTH} is directly derived from \code{WIDTH}.
 It is calculated by $1+\text{WIDTH}/2$.
-As it is of type \code{nbits\_t} (\ref{itemize:importantAliases}) resembling an unsigned integer, setting \code{WIDTH} to $1$ will set \code{LWIDTH} to $1$ too.
+As it is of type \code{nbits\_t} (\ref{itemize:importantAliases}) setting \code{WIDTH} to $1$ will set \code{LWIDTH} to $1$ too.
 Recall leaf nodes being stored as an array of \code{\_\_m128i} values, with 64-bit reserved for reading and 64-bit reserved for writing.
 Performing either a single read or write will only require the array to contain only a single \code{\_\_m128i} value.
 Increasing \code{WIDTH} to $n$ will lead to $n$ 64-bit values being needed for $n$ writes.
@@ -206,7 +210,7 @@ As Intel's AES-ECB implementation (\ref{subsub:implementationAesni}) directly us
 Recall the definition and usage of \code{WIDTH} and \code{LWIDTH} from \ref{subsub:WIDTHandLWIDTH}.
 In short, each leaf can be divided into $2n*$\code{LWDITH} blocks of size 64, which makes it reusable for \code{WIDTH} many updates.
 This means, to implement a DPF tree with a certain value of \code{WIDTH}, one needs a leaf label of size $\code{LWIDTH}*128$.
-Thus, a \code{LeafNode} is chosen to be a type alias for a vector holding \code{LWIDTH} many \code{\_\_m128i} values, or \code{DPFnode}s respectively.
+Thus, a \code{LeafNode} is chosen to be a type alias for a vector holding \code{LWIDTH} many \code{\_\_m128i} values or \code{DPFnode}s respectively.
 This results in the type definition \code{using LeafNode = std::vector<DPFNode, LWIDTH>}. 
 
 \subsubsection*{mpcio and Communication} \label{subsub:implementationMpcioAndCommunication}
@@ -214,7 +218,7 @@ All three parties execute the same executable \code{prac} which can be generated
 These executables communicate asynchronously via TCP-sockets.
 When executed locally, which this research assumes to be the default, the peers addresses are all hosted on the \code{localhost}.
 Sockets, player information, sent and received messages and the functionality to send and receive are implemented in the \code{MPCPeerIO} struct.
-\code{MPCPeerIO} can be freely translated to "Input and Output Functionality for performing MCP communication with computational peers".
+\code{MPCPeerIO} can be freely translated to \textit{"Input and Output Functionality for performing MCP communication with computational peers"}.
 It is one of the first structs to instantiate and will be used to create most of the other objects.
 
 \code{MPCPeerIO} is the child of the \code{mpcio} struct which holds general io-attributes and also provides functionality for timing the communication process and timing of round-trip-trimes.
@@ -252,3 +256,5 @@ It separates a message into byte-segments with each segment accomodating a speci
     \item One extra byte is reserved for \code{subtype}.
     More details about this byte can be found in \ref{sub:LimitWIDTHandLWIDTH}.
 \end{itemize}
+
+More detailed information about the TCP-sockets and the underlying functions is given in \ref{subsub:gmpCommunication}.
