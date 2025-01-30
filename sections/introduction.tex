@@ -1,15 +1,32 @@
 \chapter{Introduction}\label{ch:introduction}
-One heavily relies on publicly available data.
-In the context of e-commerce, for example, this can be data like competitor pricing, sales trends, or market statistics.
-Querying them directly may reveal sensitive information about interests and focus areas of the querying party.
-Competitors could evaluate these queries and deduct information about the party of interest.
-Solutions for hiding access patterns are required.
+Consider a ticketing system as used in public transport.
+A client checks into the train by scanning his ticket while entering.
+When needed, a conductor can additionally check whether a given ticket is valid.
+The underlying system therefore stores the clients' tickets in a database to allow the conductor to check whether a single ticket is valid.
+This database is queried in a client-server environment.
+If the database is not trusted, however, it might leak information and sensitive passenger data.
+Encryption only hides the data.
+Yet, reading and writing accesses itself can still be tracked.
+The server can observe values changing and track which data element was retrieved or written to.
+Therefore, it can track down which data structure was used, which data elements are requested, and use this knowledge to deduct sensitive information.
+In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a certain sequence of ticket-entries.
+Also, considering checking into the train changes the according ticket element in the database, the server could also deduct which passengers are sitting in which train even without a conductor checking the tickets.
+Thus, access patterns need to be hidden as well.
 
-The most trivial solution is to hide access patterns by accessing the database in its whole.
-This approach is known as \textit{Linear Scan} \cite{doerner2017scale}.
-Using this technique for large databases, however, is inefficient due to its high costs of bandwidth and storage.
+The most trivial solution is to access the database in its whole for each query.
+This is known as \textit{Linear Scan} \cite{doerner2017scale}.
+This technique, however, is inefficient due to its high costs of bandwidth and storage.
+Also, increasing the size of the database scales extremely badly in terms of general performance.
 
-\textit{Oblivious Random Access Memory (ORAM)} has the primary objective of obfuscating memory access patterns \cite{vadapalli2023duoram} while providing linear or even sublinear runtime and communication.
+\textit{Oblivious Random Access Memory (ORAM)} to the rescue! 
+ORAM hides access patterns such that tracking them reveals no information about the given input, the stored data, and the general structure of the database.
+Asharov et al. \cite{asharov2022oopram} define this property as "\textit{[...] the observed access pattern should essentially be uncorrelated with the inputs of [the ORAM]}".
+Multiple flavors of ORAM exist, separated in its construction and query types.
+Yet, all they all implement read and write operations in sublinear runtime while obfuscating access patterns.
+The two major construction types are further introduced in \ref{sec:relatedWorks}.
+
+\textit{Distributed Oblivious Random Access Memory (DORAM)} has the primary objective of obfuscating memory access patterns \cite{vadapalli2023duoram} while providing sublinear efficiency.
+Distributed here means the database is secretly shared among multiple parties.
 This research primarily focuses on \textit{DUORAM}, an \textit{ORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
 It, too, hides access patterns while implementing read and write operations.
 This is achieved by sharing the database either additively or via XOR between two non-colluding parties $P_0,P_1$. 
@@ -22,7 +39,6 @@ Introducing a third auxiliary party $P_2$, which does not hold any data but mere
 The \textit{Preprocessing Phase} generates \textit{Distributed Point Functions (DPFs)}, \textit{DUORAM}'s most important concept, on random target indices \cite{vadapalli2023duoram}.
 These serve as accessing-tools in the \textit{Online-Phase}, which includes the database accesses and results in retrieving or writing to the desired element.
 Again, combining both shared databases held by $P_0$ and $P_1$ results in the initial database.
-
 
 Vadapalli et al. implemented a basic solution for \textit{DUORAM}.
 Their implementation offers functionality for storing, retrieving and updating 64-bit values.
