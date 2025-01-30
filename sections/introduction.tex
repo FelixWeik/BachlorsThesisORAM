@@ -19,9 +19,10 @@ Protocols and implementations exist for two and three-parties.
 Introducing a third auxiliary party $P_2$, which does not hold any data but merely facilitates the communication, eliminates the need for a trusted party by enabling \textit{(2+1)-Party Multi Party Computation ((2+1)-Party MPC)} protocols.
 
 \textit{DUORAM} is characterized by its two phases.
-The \textit{Preprocessing Phase} generates \textit{Distributed Point Functions (DPFs)}, \textit{DUORAM}'s most important concept, on random target indices.
+The \textit{Preprocessing Phase} generates \textit{Distributed Point Functions (DPFs)}, \textit{DUORAM}'s most important concept, on random target indices \cite{vadapalli2023duoram}.
 These serve as accessing-tools in the \textit{Online-Phase}, which includes the database accesses and results in retrieving or writing to the desired element.
 Again, combining both shared databases held by $P_0$ and $P_1$ results in the initial database.
+
 
 Vadapalli et al. implemented a basic solution for \textit{DUORAM}.
 Their implementation offers functionality for storing, retrieving and updating 64-bit values.
@@ -44,12 +45,62 @@ These metrics are based on bandwidth, entry-size, communication efficiency, and 
 Each approach is tested, benchmarked and compared with its fellow-approaches based on these metrics.
 The results are then used in \ref{ch:Conclusion} to answer the research questions and highlights unanswered questions as well as potential approaches for further research in the future.
 
-\section*{Related Work}\label{sec:relatedWorks}
+\section*{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
 This section introduces further research the benevolent reader might be interested in.
 It is, however, not required to read all of it for understanding this research.
 
-\textit{DUORAM} extends the concept of \textit{FLORAM}, another \textit{ORAM} implementation, introduced by Doerner et al. \cite{doerner2017scale}.
-Main concepts such as protocols, the base-implementation, and definitions of \textit{DUORAM} are taken by Vadapalli et al. \cite{vadapalli2023duoram}.
-As already mentioned in the introduction and further extended in \ref{sub:DistributedPointFunctions}, both \textit{ORAM} approaches use \textit{DPFs} as their main tool for database accesses.
-These were initially introduced by Boyle et al. \cite{boyle2015function,boyle2021function,boyle2023information,boyle2016function} including definitions on \textit{Functions Secret Sharing (FSS)} and \textit{Multi Party Computation (MPC)}.
-\textit{FSS} and \textit{MPC} are further explained in \ref{sub:BeaverTriples} and \ref{ch_FunctionSecretSharing}.
+\textit{ORAM}s can be separated into two general groups regarding their construction:
+\paragraph{ORAMs with Function Secret Sharing}\label{par:oramsWithFSS}
+This concept considers ORAMs that use \textit{Function Secret Sharing (FSS)} and Multi \textit{Party Computations (MPC)} for hiding access patterns.
+It is primarily used in \textit{Distributed ORAM (DORAM)} which secretly shares its database between multiple parties.
+To reconstruct a read or write operation to the database, one needs to secret share her index or data element.
+The servers then execute the operation on their shares.
+Combining both return values results in the requested data element or in writing the given element to the requested index.
+Both concepts of FSS and MPC are further defined and extended by Boyle et al. \cite{boyle2015function,boyle2016function,boyle2021function,boyle2023information}.
+
+To reconstruct the data element, the parties involved in the computation need to exchange functions and data elements.
+Bandwidth here is the bottleneck of the DORAM.
+Therefore, general efficiency of DORAMs is measured in its communication complexity per queue.
+This means, in order to make DORAMs using FSS more efficient, one needs to reduce the number of communication rounds and the size of messages exchanged.
+As these numbers are highly dependent upon the size of each element in the database and the number of entries stored, expanding the database negatively impacts the DORAM's performance.
+
+\textit{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram} is a prime example.
+It is an extension of \textit{FLORAM} by Doerner et al. \cite{doerner2017scale}.
+Vadapalli et al. chose to reduce the communication complexity by generating DPFs locally.
+As no communication takes place, both parties generate their DPF on a random target indices.
+For read and write operations, both parties require a share of a common target index.
+Both DPFs are therefore shifted after exchanging the target index shares.
+This significantly reduces communication complexity to a sublinear $O(m log n)$ with $n$ being the number of elements in the database.
+$m$ is the number of words exchanged per query.
+As it has an upper bound of $O(m)$ the number of exchanged messages per query is constant.
+This research primarily focuses on \textit{DUORAM}.
+
+\paragraph{Hierarchical ORAM}\label{par:hierarchicalORAM}
+Hierarchical ORAM, too, is executed in a client-server setting.
+The server holds the database, which is divided into a hierarchy of tables.
+These tables grow in their size when climbing the hierarchy upwards.
+To access a data element, one either recursively searches the tables and layers or utilizes \textit{Pseudo Random Function (PRF)}.
+
+\textbf{\textit{Optimal Oblivious Parallel RAM (OOPRAM)}} was introduced by Asharov et al. \cite{asharov2022oopram}.
+Its database is constructed as a hierarchy of hash-tables.
+It provides read and write accesses in a sublinear runtime of $O(log n)$ with $n$ being the size of the database.
+The elements and tables are shuffled in a first step.
+Retrieving elements is then executed via One-Time-Keys.
+This key is then searched recursively in the hash-tables on shared memory using high-level multithreading.
+Retrieved elements are then moved up in the hierarchy to provide faster execution when retrieving the item for a second time.
+
+\textbf{\textit{GigaDORAM}} \cite{falk2023gigadoram} implements a \textit{DORAM} for three parties while using a hierarchical database. 
+It is therefore considered a mixture of both construction forms.
+This means, each party holds a database constructed as a set of tables while each table is secret shared.
+In short, this mixture provides an efficiency improvement of more than $100x$ due to reducing the communication complexity \footnote{GigaDORAM is implemented in the paper and can be found here: https://github.com/jacob14916/GigaDORAM-USENIX23-Artifact/tree/main}.
+
+%//TODO vllt noch einbauen, dass DUORAM eine communication complexity von O(mlgn) mit m wörter pro kommunikation (sind konstant) und n Größe der Datenbank
+% MEEEEEHR ruhig eine ganze Seite (das soll schon fast eine literaturrecherche werden)
+% andere Orams zum beispiel (gigadoram) so aktueller stand von orams
+% duoram overview state of the art
+% es gibt hierarchy based und dpf based orams
+% wenn man das auf datenbankgröße erweitert wie man das vergleichen kann
+% Absatz zu DPFs
+% privacy preserving datenbanken sind related (schnell nachrecherchieren vllt gibts da bessere begriffe lol) privacy preserving data collection 
+
+% privat set intersection weglassen
