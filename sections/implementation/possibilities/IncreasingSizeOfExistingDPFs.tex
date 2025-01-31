@@ -70,7 +70,13 @@ It directly affects \code{VALUE\_BITS} and places the given value into it.
 \code{VALUE\_BITS} then triggers the desired trickle-down effect which further changes macros and datatypes.
 Leaving the flag blank sets \code{-DVALUE\_BITS} to 64 by default.
 
-\subsubsection*{Introducing new Tests}
-%//TODO hier gehts weiter lieber Felix
+\subsubsection*{Introducing new Tests}\label{subsub:incNewTests}
+Vadapalli et al. introduced a wide range of testing functions in their base implementation.
+The most comprehensive testing method covers all the newly implemented or extended functionalities.
+This means reading and writing, both dependently and independently.
+\textit{duoram} located in \code{online.cpp} covers these functionalities, prints the number of sent messages and bits and executes reads and writes along the way.
+The number of items to read and write can be specified in the prompt.
+As no modification to the reading and writing process itself took place implementing this approach, the test \code{duoram} was used for testing.
 
-\subsubsection*{General Discussion}
+Note that \code{duoram} solely tests the online phase.
+To run the test, one must run the preprocessing beforehand,

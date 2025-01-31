@@ -173,3 +173,8 @@ This means, three calls of \code{write\_maybe\_expanded} and two additional send
 To receive an RDPF-Triple, call \code{p0 << trp} with \code{trp} being assigned to an empty RDPF-Triple.
 It will call \code{read\_maybe\_expaded} once for each DPF and deserialize the target.
 It then reassembles the given RDPF-Triple.
+
+\subsubsection*{Introducing new Tests}\label{subsub:gmpTests}
+No new tests were introduced.
+To test this approach, the already introduced \code{duoram} test functionality (\ref{subsub:incNewTests}) was reused.
+Reusing test functionality enables the comparison of approaches.
