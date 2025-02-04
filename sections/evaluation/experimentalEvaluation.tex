@@ -1,3 +1,39 @@
 \label{sec:experimentalEvaluation}
+The author implemented \textit{gmp\_mpz\_class} (\ref{sub:approachGMP}) for 64, 128, and 256 bits.
+512 bits and above are also possible in theory yet exceed the storage limitations of the author's machine.
+Testing larger bit-sizes is therefore left for future research given a more performant machine.
+
+\textit{new\_input\_type} (\ref{sub:PossibilityLargerRegisterType}) has similar properties for bit-sizes.
+It, too, is tested for 64, 128, and 256 bits.
+
+The base implementation by Vadapalli et al. (\ref{sec:ExistingImplementation}) is defined for 64 bits only.
+Yet, it will partake in the benchmarks for 64 bits serving as a reference.
+
 \subsection{Construction}\label{sub:expEvaConstruction}
+The author chose to use \textit{Docker} and \textit{Docker Compose} for uniform testing results.
+Each approach consists out of three containers, each resembling a single party $P_b$.
+These containers are then strapped together via \code{Docker Compose}, providing networking and a uniform interface for setting testing parameters.
+
+\paragraph{Communication and Linux Traffic Control}\label{sub:dockerCommunication}
+All approaches use \textit{Boost.Asio v1.18.1} for asynchronous communication.
+As each party now has its own container, messages need to be exchanged over a network.
+For this purpose, a docker network using the bridge driver is used.
+It allows referencing other containers by specifying their name.
+As the executable requires the addresses of the other parties as input, one now simply inserts the other containers' names to reference the other parties.
+
+Using docker compose networks yields the great advantage of network manipulation via \textit{Linux Traffic Control (tc)}.
+tc sets fundamental network properties such as bandwidth, latency, jitter, and burst-size.
+Specifying these properties in the \code{docker-compose.yaml} or in an \code{.env} file respectively simulates different network conditions.
+For testing purposes, the author chose to manipulate the bandwidth of the network and the latency of each party.
+If not specified differently latency is set to 1ms, bandwidth to 100mbits.
+
+\paragraph{Result}
+These changes result in a single Dockerfile that can be reused for all implemented approaches.
+It will generate a fitting Docker-Image given the source code and generate the \code{prac} executable.
+Each image is tagged with the name of the approach.
+This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach.
+The compose-file itself uses an \code{.env} file to set its environment variables, such as the depth of the RDPF-Triples or the number of elements to retrieve from the database.
+Each compose-file will then run the tests of the chosen approach returning the given performance numbers.
+These numbers are further specified in the following chapter.
+
 \subsection{Benchmarks}\label{sub:expEvalBenchmarks}
