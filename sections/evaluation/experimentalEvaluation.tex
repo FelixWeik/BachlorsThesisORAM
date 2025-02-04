@@ -27,13 +27,66 @@ Specifying these properties in the \code{docker-compose.yaml} or in an \code{.en
 For testing purposes, the author chose to manipulate the bandwidth of the network and the latency of each party.
 If not specified differently latency is set to 1ms, bandwidth to 100mbits.
 
-\paragraph{Result}
+\paragraph{Resulting Construction}\label{par:dockerConstruction}
 These changes result in a single Dockerfile that can be reused for all implemented approaches.
 It will generate a fitting Docker-Image given the source code and generate the \code{prac} executable.
 Each image is tagged with the name of the approach.
 This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach.
 The compose-file itself uses an \code{.env} file to set its environment variables, such as the depth of the RDPF-Triples or the number of elements to retrieve from the database.
 Each compose-file will then run the tests of the chosen approach returning the given performance numbers.
-These numbers are further specified in the following chapter.
+The following section describes these numbers in more detail.
+
+\subsection{Test Metrics and Types}\label{sub:testMetricsAndTypes}
+This section describes the tests executed and the measured performance metrics.
+Each party logs its own test results.
+Note that these results vary between parties, as, for example, the server sends fewer messages during reading as the peers.
+These results can be further separated into preprocessing and online phase.
+Therefore, different tests and benchmarks are executed for preprocessing and writing.
+
+\paragraph{Logs and Operations}\label{par:expOutputs}
+Logs in general show the following information:
+\begin{itemize}
+    \item The number of messages sent 
+    \item The Number of message bytes sent 
+    \item The number of latencies which is equivalent to the Lamport clock of each party
+    \item Number of local AES operations
+    \item Summarized wall clock time for both the user and the system
+    \item Occupied memory
+\end{itemize}
+The preprocessing output additionally shows the number and depth of generated RDPF-Triples.
+\code{r10:50}, for example, means 50 RDPF-Triples of depth 10.
+An exemplary preprocessing log of party $P_0$ is shown in \ref{lst:examplePreprocOutput}.
+
+Online testing results additionally print the type of operation.
+In general, reads and writes can be further categorized into \textit{dependent} and \textit{independent} operations.
+Executing several dependent operations can only be done in sequence, as each operation requires the information from the previous read or write.
+Dependent reads, for example, require the result from the previous read to receive the index for the upcoming read.
+Independent operations, however, can be executed in parallel.
+All required information is known in advance.
+The last type of operation, \textit{Interleaved Operations}, is a combination of executing a read followed by an update operation.
+Note that this results in executing two reads in sequence before writing, as updating consists out of both reading and writing (\ref{par:DuoramWriting}). 
+An exemplary online output of party $P_0$ is shown in \ref{lst:exampleOnlineOutput}.
+
+\paragraph{Preprocessing Benchmarks}\label{par:preprocBenchmarksNumbers}
+Benchmarks in the preprocessing phase will test for the following metrics:
+\begin{itemize}
+    \item Storage requirements, Lamport clock, and wall clock time for increasing depth and constant number of RDPF-Triples
+    \item Storage requirements, Lamport clock, and wall clock time for constant depth and increasing number of RDPF-Triples
+    \item Lamport clock and wall clock time for increasing latency and consistent bandwidth
+    \item Lamport clock and wall clock time for decreasing bandwidth and constant latency
+\end{itemize}
+
+Recall that the implementation of the approaches does not change to the underlying algorithms fundamentally.
+Therefore, the number of AES operations is expected to stay at a constant level throughout the different approaches.
+It will not be benchmarked.
+
+\paragraph{Online Benchmarks}\label{par:onlineBenchmarksNumbers}
+Online benchmarks will check the following metrics:
+\begin{itemize}
+    \item Storage requirements, Lamport clock, and wall clock time for increasing database size and constant number of elements retrieved
+    \item Storage requirements, Lamport clock, and wall clock time for increasing number of retrieved elements and constant database size
+    \item Lamport clock and wall clock time for increasing latency and constant bandwidth
+    \item Lamport clock and wall clock time for decreasing bandwidth and constant latency
+\end{itemize}
 
 \subsection{Benchmarks}\label{sub:expEvalBenchmarks}
