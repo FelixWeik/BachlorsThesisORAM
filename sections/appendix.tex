@@ -1,7 +1,12 @@
 \chapter{Appendix}\label{chap:appendix}
 \section{LargerRegisterType Code Snippets}
 \subsection*{IndexAS and BigAS}
-\begin{lstlisting}[caption={Code Snippets of BigAS Structures}, label={lst:bigas}]
+\begin{lstlisting}[
+    caption={Code Snippets of BigAS Structures. 
+    It demonstrates the reuse of the underlying \code{RegAS} Structure, calling its Operators when necesarry.
+    Some Operations, such as Shifting Operators, require a more specific Implementation as Results need to be carried across List Elements.
+    Not overloading these Operators yields wrong Results and Overflows.}, 
+    label={lst:bigas}]
 // Represents an INPUT_PARTITION multiple of RegAS
 struct BigAS {
     RegAS ashares[INPUT_PARTITION];
@@ -119,7 +124,11 @@ inline value_t* combine(const BigAS &A, const BigAS &B, nbits_t nbits = VALUE_BI
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={IndexAS Structures}, label={lst:indexas}]
+\begin{lstlisting}[
+    caption={IndexAS Struct. The Operators are implemented similarly as in BigAS above, yet the Constructors are changed.
+    The Constructor occupies \code{INPUT\_PARTITION} many continuous Indices given a Starting Element or \code{INPUT\_PARTITION} many Indices given a Chain of RegAS Structs.
+    The default Constructor returns an Index-Chain of \code{INPUT\_PARTITION} many random Indices.}, 
+    label={lst:indexas}]
     // Aims to represent a set of indices of size INPUT_PARTITION
     struct IndexAS {
         BigAS indexChain;
@@ -163,7 +172,9 @@ inline value_t* combine(const BigAS &A, const BigAS &B, nbits_t nbits = VALUE_BI
 \end{lstlisting}
 
 \subsection*{Independent Data-Access with IndexAS and IndexXS}
-\begin{lstlisting}[caption={Data Access into the Flat Shape Returning Independent Memory-References}, label={lst:bigDataAccess}]
+\begin{lstlisting}[
+    caption={Data Access into the Flat Shape Returning Independent Memory-References}, 
+    label={lst:bigDataAccess}]
     class Duoram<T>::Flat : public Duoram<T>::Shape {
         // ...
 
@@ -185,4 +196,80 @@ inline value_t* combine(const BigAS &A, const BigAS &B, nbits_t nbits = VALUE_BI
             
         //...
     }
+\end{lstlisting}
+\section{Example Test Outputs}
+\subsection{Preprocessing Output P0}
+\begin{lstlisting}[
+    caption={Example Output for Party $P_0$ when executing the Preprocessing Phase for depth 10 and 50 generated RDPF-Triples.
+    The general Output Structure is similar for both other Parties.},
+    label={lst:examplePreprocOutput}]
+    103 messages sent
+    13376 message bytes sent
+    103 Lamport clock (latencies)
+    306900 local AES operations
+    5857 milliseconds wall clock time
+    {5860000000;2820000000;330000000} nanoseconds {real;user;system}
+    Mem: 225576 KiB
+    Precomputed values used: T0 r10:50
+\end{lstlisting}
+
+\subsection{Online Output P0}
+\begin{lstlisting}[
+    caption={Example Output for Party $P_0$ when executing the \code{duoram} Test retrieving or writing a single Element per Operation.},
+    label={lst:exampleOnlineOutput}
+    ]
+        ===== DEPENDENT UPDATES =====
+    3 messages sent
+    12 message bytes sent
+    1 Lamport clock (latencies)
+    6165 local AES operations
+    270 milliseconds wall clock time
+    {270000000;250000000;20000000} nanoseconds {real;user;system}
+    Mem: 26532 KiB
+
+    ===== DEPENDENT READS =====
+    1 messages sent
+    4 message bytes sent
+    2 Lamport clock (latencies)
+    4092 local AES operations
+    278 milliseconds wall clock time
+    {280000000;160000000;10000000} nanoseconds {real;user;system}
+    Mem: 31264 KiB
+
+    ===== INDEPENDENT READS =====
+    2 messages sent
+    4 message bytes sent
+    2 Lamport clock (latencies)
+    4092 local AES operations
+    257 milliseconds wall clock time
+    {260000000;180000000;0} nanoseconds {real;user;system}
+    Mem: 34920 KiB
+
+    ===== INDEPENDENT UPDATES =====
+    3 messages sent
+    12 message bytes sent
+    1 Lamport clock (latencies)
+    6138 local AES operations
+    319 milliseconds wall clock time
+    {320000000;280000000;30000000} nanoseconds {real;user;system}
+    Mem: 42064 KiB
+
+    ===== DEPENDENT WRITES =====
+    5 messages sent
+    16 message bytes sent
+    2 Lamport clock (latencies)
+    10230 local AES operations
+    537 milliseconds wall clock time
+    {530000000;450000000;20000000} nanoseconds {real;user;system}
+    Mem: 52484 KiB
+
+    ===== DEPENDENT INTERLEAVED =====
+    6 messages sent
+    10 message bytes sent
+    4 Lamport clock (latencies)
+    14322 local AES operations
+    778 milliseconds wall clock time
+    {770000000;650000000;40000000} nanoseconds {real;user;system}
+    Mem: 66708 KiB
+    Precomputed values used: T0 r10:7
 \end{lstlisting}
