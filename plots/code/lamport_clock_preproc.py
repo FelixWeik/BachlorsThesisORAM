@@ -1,0 +1,44 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+x1 = 3
+x2 = 5
+x3 = 10
+x4 = 15
+x5 = 20
+
+# Lamport Clocks
+
+df7 = pd.DataFrame({
+    "x":[x1,x2,x3,x4,x5],
+    "y":[8,12,22,32,42],
+    "Approach":"new_input_type"
+})
+
+df8 = pd.DataFrame({
+    "x": [x1,x2,x3,x4,x5],
+    "y":[33,53,103,153,203],
+    "Approach": "gmp_mpz_class"
+})
+
+df9 = pd.DataFrame({
+    "x":[x1,x2,x3,x4,x5],
+    "y":[8,12,22,32,42],
+    "Approach":"base"
+})
+
+plt.figure(figsize=(8, 5))
+sns.lineplot(data=df7, x="x", y="y", hue="Approach", marker="o", linestyle="dashed", palette=["Blue"])
+sns.lineplot(data=df8, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["Red"])
+sns.lineplot(data=df9, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["Red"])
+
+
+sns.set_style("ticks")
+plt.grid(axis="y")
+plt.grid(axis="x")
+plt.xticks(range(3, 21, 1))
+plt.xlabel("Depth")
+plt.ylabel("Lamport Clock")
+plt.savefig("lamport_clock_preproc.png")
