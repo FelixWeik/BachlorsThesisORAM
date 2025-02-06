@@ -1,0 +1,68 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+x1 = 3
+x2 = 5
+x3 = 10
+x4 = 15
+x5 = 20
+
+# Wall Clock Time Preproc
+y1 = 1.579
+y2 = 1.6966
+y3 = 1.7308
+y4 = 1.8307
+y5 = 3.58326
+
+df0 = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[y1,y2,y3,y4, y5],
+    "Approach": "new_input_type"
+})
+
+y1 = 1.5568
+y2 = 1.5957
+y3 = 1.6233
+y4 = 2.1463
+y5 = 4.0214
+
+df3 = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[y1,y2,y3,y4, y5],
+    "Approach": "gmp_mpz_class 64 bit"
+})
+
+y1 = 1.9621
+y2 = 1.98335
+y3 = 2.33319
+y4 = 2.495239
+y5 = 4.96041
+
+df4 = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[y1,y2,y3,y4, y5],
+    "Approach": "gmp_mpz_class 128 bit"
+})
+
+y1 = 2.4118
+y2 = 2.4395
+y3 = 2.675159
+y4 = 2.833388
+y5 = 5.321
+
+df5 = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[y1,y2,y3,y4, y5],
+    "Approach": "gmp_mpz_class 256 bit"
+})
+
+plt.figure(figsize=(8, 5))
+
+sns.set_style("ticks")
+plt.grid(axis="y")
+plt.grid(axis="x")
+plt.xticks(range(3, 21, 1))
+plt.xlabel("Depth")
+plt.ylabel("Wall Clock Time (s)")
+plt.savefig("time_preproc.png")
