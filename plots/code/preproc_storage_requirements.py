@@ -74,10 +74,11 @@ sns.lineplot(data=df5, x="x", y="y", hue="Approach", marker="*", linestyle="dash
 
 sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="dotted", palette=["Green"])
 
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 sns.set_style("ticks")
 plt.grid(axis="y")
 plt.grid(axis="x")
 plt.xticks(range(3, 21, 1))
 plt.xlabel("Depth")
 plt.ylabel("Storage Requirement (GiB)")
-plt.savefig("storage_requirements_preproc.png")
+plt.savefig("storage_requirements_preproc.png", bbox_inches="tight")

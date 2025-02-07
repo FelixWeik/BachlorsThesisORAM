@@ -34,11 +34,11 @@ sns.lineplot(data=df_new_input_type, x="x", y="y", hue="Approach", marker="o", l
 sns.lineplot(data=df_gmp_mpz_class, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["Red"])
 sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="dotted", palette=["Green"])
 
-
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 sns.set_style("ticks")
 plt.grid(axis="y")
 plt.grid(axis="x")
 plt.xticks(range(3, 21, 1))
 plt.xlabel("Depth")
 plt.ylabel("Lamport Clock")
-plt.savefig("lamport_clock_preproc.png")
+plt.savefig("lamport_clock_preproc.png", bbox_inches="tight")

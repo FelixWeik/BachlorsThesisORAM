@@ -55,9 +55,10 @@ sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="
 
 sns.lineplot(data=df_new_input_type, x="x", y="y", hue="Approach", marker="o", linestyle="dashed", palette=["#66b3ff"])
 
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 sns.set_style("ticks")
 plt.grid(axis="y")
 plt.grid(axis="x")
 plt.xlabel("Bandwidth (kbit/s)")
 plt.ylabel("Wall Clock Time (s)")
-plt.savefig("time_decreasing_bandwidth_preproc.png")
+plt.savefig("time_decreasing_bandwidth_preproc.png", bbox_inches="tight")
