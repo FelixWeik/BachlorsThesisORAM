@@ -23,7 +23,7 @@ df8 = pd.DataFrame({
     "Approach": "gmp_mpz_class"
 })
 
-df9 = pd.DataFrame({
+df_base = pd.DataFrame({
     "x":[x1,x2,x3,x4,x5],
     "y":[8,12,22,32,42],
     "Approach":"base"
@@ -32,7 +32,7 @@ df9 = pd.DataFrame({
 plt.figure(figsize=(8, 5))
 sns.lineplot(data=df7, x="x", y="y", hue="Approach", marker="o", linestyle="dashed", palette=["Blue"])
 sns.lineplot(data=df8, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["Red"])
-sns.lineplot(data=df9, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["Red"])
+sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="dotted", palette=["Green"])
 
 
 sns.set_style("ticks")

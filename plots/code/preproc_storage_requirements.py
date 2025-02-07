@@ -23,6 +23,12 @@ df0 = pd.DataFrame({
     "Approach": "new_input_type"
 })
 
+df_base = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[y1,y2,y3,y4, y5],
+    "Approach": "base"
+})
+
 y1 = 1.5568
 y2 = 1.5957
 y3 = 1.6233
@@ -65,6 +71,8 @@ sns.lineplot(data=df0, x="x", y="y", hue="Approach", marker="o", linestyle="dash
 sns.lineplot(data=df3, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["#ff6666"])
 sns.lineplot(data=df4, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["#cc0000"])
 sns.lineplot(data=df5, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["#800000"])
+
+sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="dotted", palette=["Green"])
 
 sns.set_style("ticks")
 plt.grid(axis="y")
