@@ -10,18 +10,17 @@ x3 = 10
 x4 = 15
 x5 = 20
 
+df0 = pd.DataFrame({
+    "x":[x1,x2,x3,x4, x5],
+    "y":[1.9,2.007,2.01,2.03,14.093],
+    "Approach": "new_input_type (200 RDPF-Triples)"
+})
+
 y1 = 1.579
 y2 = 1.6966
 y3 = 1.7308
 y4 = 1.8307
 y5 = 3.58326
-
-
-df0 = pd.DataFrame({
-    "x":[x1,x2,x3,x4, x5],
-    "y":[y1,y2,y3,y4, y5],
-    "Approach": "new_input_type"
-})
 
 df_base = pd.DataFrame({
     "x":[x1,x2,x3,x4, x5],

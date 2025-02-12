@@ -35,8 +35,8 @@ df_mpz_256 = pd.DataFrame({
 
 df_nit = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [2100,9300,306900,9830100,314572500],
-    "Approach": "new_input_type"
+    "y": [8100,12300,506900,39320400,1258290000],
+    "Approach": "new_input_type (200 RDPF-Triples)"
 })
 
 sns.lineplot(data=df_mpz_64, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["#ff6666"])
