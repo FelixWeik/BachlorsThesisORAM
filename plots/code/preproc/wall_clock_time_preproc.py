@@ -12,8 +12,8 @@ x5 = 20
 
 df_new_input_type = pd.DataFrame({
     "x":[x1,x2,x3,x4, x5],
-    "y":[0.1,0.1,0.124,0.225,0.421],
-    "Approach": "new_input_type"
+    "y":[0.1,0.215,0.324,0.521,2.221],
+    "Approach": "new_input_type (200 RDPF-Triples)"
 })
 
 df_base = pd.DataFrame({
