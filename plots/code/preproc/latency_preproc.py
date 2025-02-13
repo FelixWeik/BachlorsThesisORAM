@@ -34,14 +34,14 @@ df_mpz_256 = pd.DataFrame({
 
 df_base = pd.DataFrame({
     "x":[x1,x2,x3,x4,x5, x6, x7, x8],
-    "y":[0.07,0.162,0.260,0.374,0.504,4.923,12.265,24.522],
+    "y":[0.07,0.162,0.260,0.374,0.504,4.923,6.265,7.522],
     "Approach":"base"
 })
 
 df_new_input_type = pd.DataFrame({
     "x":[x1,x2,x3,x4,x5, x6, x7, x8],
-    "y":[0.08,0.123,0.330,0.352,0.408,4.493,11.984,27.188],
-    "Approach":"new_input_type"
+    "y":[8.594,8.625,8.638,8.646,8.680,9.953,11.101,12.491],
+    "Approach":"new_input_type (200 RDPF-Triples)"
 })
 
 plt.figure(figsize=(8,5))

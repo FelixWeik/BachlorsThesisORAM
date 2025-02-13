@@ -8,11 +8,12 @@ It, too, is tested for 64, 128, and 256 bits.
 
 The base implementation by Vadapalli et al. (\ref{sec:ExistingImplementation}) is defined for 64 bits only.
 Yet, it will partake in the benchmarks for 64 bits serving as a reference.
+It is called \textit{base} in the following.
 
 \subsection{Construction}\label{sub:expEvaConstruction}
-The author chose to use \textit{Docker} and \textit{Docker Compose} for uniform testing results.
-Each approach consists out of three containers, each resembling a single party $P_b$.
-These containers are then strapped together via \code{Docker Compose}, providing networking and a uniform interface for setting testing parameters.
+The author uses \textit{Docker} and \textit{Docker Compose} to create a uniform testing environment.
+Each test runs three containers with each container resembling a single party $P_b$.
+These containers are then strapped together via \textit{Docker Compose} providing networking and a uniform interface for setting testing parameters.
 
 \paragraph{Communication and Linux Traffic Control}\label{sub:dockerCommunication}
 All approaches use \textit{Boost.Asio v1.18.1} for asynchronous communication.
@@ -20,34 +21,37 @@ As each party now has its own container, messages need to be exchanged over a ne
 For this purpose, a docker network using the bridge driver is used.
 It allows referencing other containers by specifying their name.
 As the executable requires the addresses of the other parties as input, one now simply inserts the other containers' names to reference the other parties.
+The container of party $P_0$ is called \code{p0}, $P_1$'s container \code{p1}, and $P_2$'s container \code{p2}.
 
 Using docker compose networks yields the great advantage of network manipulation via \textit{Linux Traffic Control (tc)}.
 tc sets fundamental network properties such as bandwidth, latency, jitter, and burst-size.
 Specifying these properties in the \code{docker-compose.yaml} or in an \code{.env} file respectively simulates different network conditions.
 For testing purposes, the author chose to manipulate the bandwidth of the network and the latency of each party.
-If not specified differently latency is set to 1ms, bandwidth to 100mbits.
+If not explicitly specified latency is set to 1ms, bandwidth to 100mbits.
 
 \paragraph{Resulting Construction}\label{par:dockerConstruction}
 These changes result in a single Dockerfile that can be reused for all implemented approaches.
 It will generate a fitting Docker-Image given the source code and generate the \code{prac} executable.
 Each image is tagged with the name of the approach.
-This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach.
+This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach as different images are referenced.
 The compose-file itself uses an \code{.env} file to set its environment variables, such as the depth of the RDPF-Triples or the number of elements to retrieve from the database.
 Each compose-file will then run the tests of the chosen approach returning the given performance numbers.
-The following section describes these numbers in more detail.
+The following section describes these numbers in greater detail.
 
 \subsection{Test Metrics and Types}\label{sub:testMetricsAndTypes}
 This section describes the tests executed and the measured performance metrics.
 Each party logs its own test results.
-Note that these results vary between parties, as, for example, the server sends fewer messages during reading as the peers.
+These logs show slight variations between the parties.
+However, these differences are very small and occur by definition of the protocol.
+Therefore, all evaluated results are based on the logs of $P_0$, or container \code{p0} respectively.
 These results can be further separated into preprocessing and online phase.
-Therefore, different tests and benchmarks are executed for preprocessing and writing.
+Different tests and benchmarks are executed for preprocessing and writing.
 
 \paragraph{Logs and Operations}\label{par:expOutputs}
 Logs in general show the following information:
 \begin{itemize}
     \item The number of messages sent 
-    \item The Number of message bytes sent 
+    \item The number of message bytes sent 
     \item The number of latencies which is equivalent to the Lamport clock of each party
     \item Number of local AES operations
     \item Summarized wall clock time for both the user and the system
@@ -67,26 +71,52 @@ The last type of operation, \textit{Interleaved Operations}, is a combination of
 Note that this results in executing two reads in sequence before writing, as updating consists out of both reading and writing (\ref{par:DuoramWriting}). 
 An exemplary online output of party $P_0$ is shown in \ref{lst:exampleOnlineOutput}.
 
-\paragraph{Preprocessing Benchmarks}\label{par:preprocBenchmarksNumbers}
+\paragraph{Preprocessing Benchmarks and Default Values}\label{par:preprocBenchmarksNumbers}
 Benchmarks in the preprocessing phase will test for the following metrics:
 \begin{itemize}
-    \item Storage requirements, Lamport clock, and wall clock time for increasing depth and constant number of RDPF-Triples
-    \item Storage requirements, Lamport clock, and wall clock time for constant depth and increasing number of RDPF-Triples
-    \item Lamport clock and wall clock time for increasing latency and consistent bandwidth
-    \item Lamport clock and wall clock time for decreasing bandwidth and constant latency
+    \item Storage requirements for increasing depth, a constant number of generated RDPF-Triples, constant bandwidth, and constant latency
+    \item Wall-Clock time for increasing depth, constant number of generated RDPF-Triples, constant latency, and constant bandwidth 
+    \item Number of local AES operations
+    \item Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth 
+    \item Wall-Clock time for decreasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency 
 \end{itemize}
 
-Recall that the implementation of the approaches does not change to the underlying algorithms fundamentally.
-Therefore, the number of AES operations is expected to stay at a constant level throughout the different approaches.
-It will not be benchmarked.
+These benchmarks cover the most significant characteristics of each approach.
+\textit{Constant} value means the standard values are used.
+The standard values for bandwidth (100mbits) and latency (1ms) as defined above remain valid.
+If not specified explicitly, \textit{gmp\_mpz\_class} and \textit{base} generate 50 RDPF-Triples each.
+Recall the behavior of \textit{new\_input\_type} in the online phase of aggregating multiple database entries into a single entry (\ref{sub:PossibilityLargerRegisterType}).
+This means, for our bit testing range, up to four times the amount of RDPF-Triples are required.
+Therefore, the standard value of generated RDPF-Triples for \textit{new\_input\_type} is 200.
+The standard value for depth is 15 resulting in a database holding up to $2^{15}$ entries.
 
-\paragraph{Online Benchmarks}\label{par:onlineBenchmarksNumbers}
+\paragraph{Online Benchmarks and Default Values}\label{par:onlineBenchmarksNumbers}
 Online benchmarks will check the following metrics:
 \begin{itemize}
-    \item Storage requirements, Lamport clock, and wall clock time for increasing database size and constant number of elements retrieved
-    \item Storage requirements, Lamport clock, and wall clock time for increasing number of retrieved elements and constant database size
-    \item Lamport clock and wall clock time for increasing latency and constant bandwidth
-    \item Lamport clock and wall clock time for decreasing bandwidth and constant latency
+    \item Wall-Clock time for increasing latency, constant number of elements retrieved or updated, and constant bandwidth
+    \item Wall-Clock time for decreasing bandwidth, constant number of elements retrieved or updated, and constant latency 
+    \item Number of sent messages for increasing number of retrieved or updated items, constant bandwidth, and constant latency 
+    \item Amount of message bytes sent for increasing number of retrieved or updated items, constant bandwidth, and constant latency
 \end{itemize}
 
+All the benchmarks are executed separately for reading and updating.
+Executing these tests requires the preprocessing to be executed in advance.
+This means 50 RDPF-Triples of depth 15 for both \textit{gmp\_mpz\_class} and \textit{base}, 200 RDPF-Triples of depth 15 for \code{new\_input\_type}.
+It will, however, not be included in the online results as the preprocessing phase in benchmarked separately.
+
+The standard values of bandwidth (100mbits) and latency (1ms) from above remain valid.
+If not given explicitly, the number of retrieved or updated items per operation is set to 5.
+Next, the size of the used database in these benchmarks is set to $2^{15}$.
+This means, 
+
+All the described benchmarking parameters for both the online and preprocessing phase are collected for all implemented bit-sizes.
+
 \subsection{Benchmarks}\label{sub:expEvalBenchmarks}
+The tests are executed on a Surface Laptop Studio with 16 GB of RAM and an Intel i5 9th generation running Ubuntu 24.04.1 LTS.
+Recall each party running in its own container.
+These containers, too, run the latest Ubuntu release.
+The results are collected and plotted using seaborn.
+
+\subsubsection*{Preprocessing}\label{subsub:expPreprocBenchmarks}
+
+\subsubsection*{Online}\label{subsub:expOnlineBenchmarks}
