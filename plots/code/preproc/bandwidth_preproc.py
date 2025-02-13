@@ -41,8 +41,8 @@ df_base = pd.DataFrame({
 
 df_new_input_type = pd.DataFrame({
     "x":[x1,x2,x3,x4,x5,x6,x7],
-    "y":[0.912,1.012,0.874,1.382,14.021,198.539,301.211],
-    "Approach":"new_input_type"
+    "y":[2.912,3.012,4.874,15.382,83.788,859.363,1775.243],
+    "Approach":"new_input_type (200 RDPF-Triples)"
 })
 
 plt.figure(figsize=(8,5))

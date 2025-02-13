@@ -14,7 +14,7 @@ x5 = 20
 df_new_input_type = pd.DataFrame({
     "x":[x1,x2,x3,x4,x5],
     "y":[8,12,22,32,42],
-    "Approach":"new_input_type"
+    "Approach":"new_input_type (200 RDPF-Triples)"
 })
 
 df_gmp_mpz_class = pd.DataFrame({
