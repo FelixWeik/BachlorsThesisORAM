@@ -9,8 +9,8 @@ Encryption only hides the data.
 Yet, reading and writing accesses itself can still be tracked.
 The server can observe values changing and track which data element was retrieved or written to.
 Therefore, it can track down which data structure was used, which data elements are requested, and use this knowledge to deduct sensitive information.
-In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a certain sequence of ticket-entries.
-Also, considering checking into the train changes the according ticket element in the database, the server could also deduct which passengers are sitting in which train even without a conductor checking the tickets.
+In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a sequence of ticket-entries.
+Also, considering checking into the train changes the according ticket element in the database, the server could deduct which passengers are sitting in which train even without a conductor checking the tickets.
 Thus, access patterns need to be hidden as well.
 
 The most trivial solution is to access the database in its whole for each query.
@@ -22,7 +22,7 @@ Also, increasing the size of the database scales extremely badly in terms of gen
 ORAM hides access patterns such that tracking them reveals no information about the given input, the stored data, and the general structure of the database.
 Asharov et al. \cite{asharov2022oopram} define this property as "\textit{[...] the observed access pattern should essentially be uncorrelated with the inputs of [the ORAM]}".
 Multiple flavors of ORAM exist, separated in its construction and query types.
-Yet, all they all implement read and write operations in sublinear runtime while obfuscating access patterns.
+Yet, they all implement read and write operations in sublinear runtime while obfuscating access patterns.
 The two major construction types are further introduced in \ref{sec:relatedWorks}.
 
 \textit{Distributed Oblivious Random Access Memory (DORAM)} has the primary objective of obfuscating memory access patterns \cite{vadapalli2023duoram} while providing sublinear efficiency.
@@ -32,7 +32,7 @@ It, too, hides access patterns while implementing read and write operations.
 This is achieved by sharing the database either additively or via XOR between two non-colluding parties $P_0,P_1$. 
 Read and write accesses are then executed such that each server on its own cannot find out which element was retrieved or written to and what the element was.
 Combining both results, again via XOR or addition, returns the requested database entry.
-Protocols and implementations exist for two and three-parties.
+Protocols and implementations exist for two and three parties.
 Introducing a third auxiliary party $P_2$, which does not hold any data but merely facilitates the communication, eliminates the need for a trusted party by enabling \textit{(2+1)-Party Multi Party Computation ((2+1)-Party MPC)} protocols.
 
 \textit{DUORAM} is characterized by its two phases.
@@ -45,7 +45,7 @@ Their implementation offers functionality for storing, retrieving and updating 6
 This research aims to extend this implementation for values of arbitrary size resulting in the following research questions:
 \begin{enumerate}
     \item What approaches exist, and what are their distinctive features in terms of concepts and implementation?
-    \item How do these approaches perform in terms of general performance metrics such as communication-speed and storage-requirements?
+    \item How do these approaches perform in terms of general performance metrics such as communication speed and storage requirements?
     \item Are there any general concepts or datatypes that prove particularly useful in terms of scalability?
 \end{enumerate}
 
@@ -83,8 +83,8 @@ As these numbers are highly dependent upon the size of each element in the datab
 \textit{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram} is a prime example.
 It is an extension of \textit{FLORAM} by Doerner et al. \cite{doerner2017scale}.
 Vadapalli et al. chose to reduce the communication complexity by generating DPFs locally.
-As no communication takes place, both parties generate their DPF on a random target indices.
-For read and write operations, both parties require a share of a common target index.
+As little communication as possible is used during generation of the DPFs on random target indices.
+For read and write operations, both parties require a share of a common target index.   
 Both DPFs are therefore shifted after exchanging the target index shares.
 This significantly reduces communication complexity to a sublinear $O(m log n)$ with $n$ being the number of elements in the database.
 $m$ is the number of words exchanged per query.
@@ -94,7 +94,7 @@ This research primarily focuses on \textit{DUORAM}.
 \paragraph{Hierarchical ORAM}\label{par:hierarchicalORAM}
 Hierarchical ORAM, too, is executed in a client-server setting.
 The server holds the database, which is divided into a hierarchy of tables.
-These tables grow in their size when climbing the hierarchy upwards.
+The tables are of progressively larger size \cite{peserico2023hierarchical}.
 To access a data element, one either recursively searches the tables and layers or utilizes \textit{Pseudo Random Function (PRF)}.
 
 \textbf{\textit{Optimal Oblivious Parallel RAM (OOPRAM)}} was introduced by Asharov et al. \cite{asharov2022oopram}.
