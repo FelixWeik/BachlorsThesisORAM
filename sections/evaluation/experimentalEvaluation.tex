@@ -78,7 +78,7 @@ Benchmarks in the preprocessing phase will test for the following metrics:
     \item Wall-Clock time for increasing depth, constant number of generated RDPF-Triples, constant latency, and constant bandwidth 
     \item Number of local AES operations
     \item Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth 
-    \item Wall-Clock time for decreasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency 
+    \item Wall-Clock time for increasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency 
 \end{itemize}
 
 These benchmarks cover the most significant characteristics of each approach.
@@ -94,7 +94,7 @@ The standard value for depth is 15 resulting in a database holding up to $2^{15}
 Online benchmarks will check the following metrics:
 \begin{itemize}
     \item Wall-Clock time for increasing latency, constant number of elements retrieved or updated, and constant bandwidth
-    \item Wall-Clock time for decreasing bandwidth, constant number of elements retrieved or updated, and constant latency 
+    \item Wall-Clock time for increasing bandwidth, constant number of elements retrieved or updated, and constant latency 
     \item Number of sent messages for increasing number of retrieved or updated items, constant bandwidth, and constant latency 
     \item Amount of message bytes sent for increasing number of retrieved or updated items, constant bandwidth, and constant latency
 \end{itemize}
@@ -107,9 +107,7 @@ It will, however, not be included in the online results as the preprocessing pha
 The standard values of bandwidth (100mbits) and latency (1ms) from above remain valid.
 If not given explicitly, the number of retrieved or updated items per operation is set to 5.
 Next, the size of the used database in these benchmarks is set to $2^{15}$.
-This means, 
-
-All the described benchmarking parameters for both the online and preprocessing phase are collected for all implemented bit-sizes.
+Thus, RDPF-Triples of depth 15 are used.
 
 \subsection{Benchmarks}\label{sub:expEvalBenchmarks}
 The tests are executed on a Surface Laptop Studio with 16 GB of RAM and an Intel i5 9th generation running Ubuntu 24.04.1 LTS.
@@ -118,5 +116,52 @@ These containers, too, run the latest Ubuntu release.
 The results are collected and plotted using seaborn.
 
 \subsubsection*{Preprocessing}\label{subsub:expPreprocBenchmarks}
+\begin{figure}
+    \centering 
+    \includegraphics[width=\textwidth]{plots/plots/preproc/wall_clock_preproc.png}
+    \caption{Wall-Clock time for increasing depth and constant number of generated RDPF-Triples}
+    \label{fig:wallClockDepthPreproc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/wall_clock_incnum_preproc.png}
+    \caption{Wall-Clock time for constant depth and increasing number of generated RDPF-Triples.}
+    \label{fig:wallClockIncNumPreproc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/storage_requirements_preproc.png}
+    \caption{Storage Requirements for constant number of generated RDPF-Triples and increasing depth.}
+    \label{fig:storageReqDepthPreproc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/aes_ops_preproc.png}
+    \caption{Number of local AES operations for constant number of generated RDPF-Triples and increasing depth.}
+    \label{fig:aesOpsDepthPreproc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/time_decreasing_bandwidth_preproc.png}
+    \caption{Wall-Clock time for increasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency.}
+    \label{fig:wallClockDecreasingBandwidthPreproc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/time_decreasing_latency_preproc.png}
+    \caption{Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth.}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/plots/preproc/sent_messages_preproc.png}
+    \caption{Number of sent messages for constant number of generated RDPF-Triples and increasing depth.}
+    \label{fig:numSentMessagesIncDepthPreproc}
+\end{figure}
 
 \subsubsection*{Online}\label{subsub:expOnlineBenchmarks}
