@@ -1,12 +1,5 @@
 \label{subsub:expPreprocBenchmarks}
 
-\begin{figure}
-    \centering 
-    \includegraphics[width=\textwidth]{plots/plots/preproc/wall_clock_preproc.png}
-    \caption{Wall-Clock time for increasing depth and constant number of generated RDPF-Triples}
-    \label{fig:wallClockDepthPreproc}
-\end{figure}
-
 \ref{fig:wallClockDepthPreproc} shows the general runtime for party $P_0$.
 Since all parties start and end the execution at the same time, runtimes between the parties are nearly the same.
 One notes big differences in runtime beginning at depth 15.
@@ -78,8 +71,15 @@ This, however, is reversed when latency fluctuates while bandwidth remains const
 Therefore, preprocessing in \textit{gmp\_mpz\_class} can be preferred for larger bit sizes when depth and latency is small compared to \textit{new\_input\_type}.
 
 \begin{figure}
+    \centering 
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/wall_clock_preproc.png}
+    \caption{Wall-Clock time for increasing depth and constant number of generated RDPF-Triples}
+    \label{fig:wallClockDepthPreproc}
+\end{figure}
+
+\begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/wall_clock_incnum_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/wall_clock_incnum_preproc.png}
     \caption{Wall-Clock time for constant depth and increasing number of generated RDPF-Triples.
     Note here that \textit{new\_input\_type} is left out as it uses the same RDPF generation algorithm as \textit{base}.
     Therefore, both \textit{base} and \textit{new\_input\_type} have the exact same wall clock time for generating the same amount of RDPF-Triples of the same depth.
@@ -89,35 +89,35 @@ Therefore, preprocessing in \textit{gmp\_mpz\_class} can be preferred for larger
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/storage_requirements_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/storage_requirements_preproc.png}
     \caption{Storage Requirements for constant number of generated RDPF-Triples and increasing depth.}
     \label{fig:storageReqDepthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/aes_ops_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/aes_ops_preproc.png}
     \caption{Number of local AES operations for constant number of generated RDPF-Triples and increasing depth.}
     \label{fig:aesOpsDepthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/time_decreasing_bandwidth_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/time_decreasing_bandwidth_preproc.png}
     \caption{Wall-Clock time for increasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency.}
     \label{fig:wallClockDecreasingBandwidthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/time_decreasing_latency_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/time_decreasing_latency_preproc.png}
     \caption{Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth.}
     \label{fig:wallClockIncLatencyPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{plots/plots/preproc/sent_messages_preproc.png}
+    \includegraphics[width=0.8\textwidth]{plots/plots/preproc/sent_messages_preproc.png}
     \caption{Number of sent messages for constant number of generated RDPF-Triples and increasing depth.}
     \label{fig:numSentMessagesIncDepthPreproc}
 \end{figure}

@@ -10,7 +10,7 @@ The base implementation by Vadapalli et al. (\ref{sec:ExistingImplementation}) i
 Yet, it will partake in the benchmarks for 64 bits serving as a reference.
 It is called \textit{base} in the following.
 
-\subsection{Construction}\label{sub:expEvaConstruction}
+\section{Construction}\label{sub:expEvaConstruction}
 The author uses \textit{Docker} and \textit{Docker Compose} to create a uniform testing environment.
 Each test runs three containers with each container resembling a single party $P_b$.
 These containers are then strapped together via \textit{Docker Compose} providing networking and a uniform interface for setting testing parameters.
@@ -38,7 +38,7 @@ The compose-file itself uses an \code{.env} file to set its environment variable
 Each compose-file will then run the tests of the chosen approach returning the given performance numbers.
 The following section describes these numbers in greater detail.
 
-\subsection{Test Metrics and Types}\label{sub:testMetricsAndTypes}
+\section{Test Metrics and Types}\label{sub:testMetricsAndTypes}
 This section describes the tests executed and the measured performance metrics.
 Each party logs its own test results.
 These logs show slight variations between the parties.
@@ -116,14 +116,14 @@ If not given explicitly, the number of retrieved or updated items per operation 
 Next, the size of the used database in these benchmarks is set to $2^{15}$.
 Thus, RDPF-Triples of depth 15 are used.
 
-\subsection{Benchmarks}\label{sub:expEvalBenchmarks}
+\section{Benchmarks}\label{sub:expEvalBenchmarks}
 The tests are executed on a Surface Laptop Studio with 16 GB of RAM and an Intel i5 9th generation running Ubuntu 24.04.1 LTS.
 Recall each party being executed in its own container.
 These containers, too, run the latest Ubuntu release.
 The results are collected and plotted using seaborn.
 
-\subsubsection*{Preprocessing}
+\subsection{Preprocessing}
 \input{sections/evaluation/preprocBenchmarks.tex}
 
-\subsubsection*{Online}
+\subsection{Online}
 \input{sections/evaluation/onlineBenchmarks.tex}
