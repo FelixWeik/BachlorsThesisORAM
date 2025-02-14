@@ -274,3 +274,51 @@ inline value_t* combine(const BigAS &A, const BigAS &B, nbits_t nbits = VALUE_BI
     Mem: 66708 KiB
     Precomputed values used: T0 r10:7
 \end{lstlisting}
+
+\section{Benchmarking XOR mpz\_class vs uint64\_t}
+\begin{lstlisting}[
+    caption={Testing programm for comparing XOR operations on \code{uint64\_t} and \code{mpz\_class}}, 
+    label={lst:xorMpzVs64t}]
+    // compile using g++ -o xor_benchmark xor_benchmark.cpp -lgmp -lgmpxx
+    #include <iostream>
+    #include <chrono>
+    #include <gmp.h>
+    #include <gmpxx.h>
+
+    #define NUM_ITERATIONS 1000000
+
+    void benchmark_uint64_t() {
+        uint64_t a = 0x1234567890ABCDEF;
+        uint64_t b = 0xFEDCBA0987654321;
+        for (int i = 0; i < NUM_ITERATIONS; ++i) {
+            a ^= b;
+        }
+    }
+
+    void benchmark_mpz_class() {
+        mpz_class a("1234567890ABCDEF", 16); 
+        mpz_class b("FEDCBA0987654321", 16);
+        for (int i = 0; i < NUM_ITERATIONS; ++i) {
+            a ^= b;
+        }
+    }
+
+    int main() {
+        auto start = std::chrono::high_resolution_clock::now();
+        benchmark_uint64_t();
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> uint64_t_duration = end - start;
+        std::cout << "uint64\_t xor: " 
+                << uint64_t_duration.count() << " seconds\n";
+
+        start = std::chrono::high_resolution_clock::now();
+        benchmark_mpz_class();
+        end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> mpz_duration = end - start;
+        std::cout << "mpz\_class xor: " 
+                << mpz_duration.count() << " seconds\n";
+
+        return 0;
+    }
+
+\end{lstlisting}
