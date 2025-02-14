@@ -36,11 +36,6 @@ df_base = pd.DataFrame({
     "Approach":"base"
 })
 
-df_new_input_type = pd.DataFrame({
-    "x":[x1,x2,x3,x4,x5,x6,x7],
-    "y":[0.05,0.049,0.061,0.063,0.11,0.28,0.25],
-    "Approach":"new_input_type"
-})
 
 plt.figure(figsize=(8,5))
 
@@ -49,8 +44,6 @@ sns.lineplot(data=df_mpz_128, x="x", y="y", hue="Approach", marker="*", linestyl
 sns.lineplot(data=df_mpz_256, x="x", y="y", hue="Approach", marker="*", linestyle="dashed", palette=["#800000"])
 
 sns.lineplot(data=df_base, x="x", y="y", hue="Approach", marker=".", linestyle="dotted", palette=["Green"])
-
-sns.lineplot(data=df_new_input_type, x="x", y="y", hue="Approach", marker="o", linestyle="dashed", palette=["#66b3ff"])
 
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 sns.set_style("ticks")
