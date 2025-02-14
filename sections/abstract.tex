@@ -1,17 +1,25 @@
-%% LaTeX2e class for student theses
-%% sections/abstract_en.tex
-%% 
-%% Karlsruhe Institute of Technology
-%% Institute of Information Security and Dependability
-%% Software Design and Quality (SDQ)
-%%
-%% Dr.-Ing. Erik Burger
-%% burger@kit.edu
-%%
-%% Version 1.5, 2024-02-12
-
 \Abstract
-English abstract.
+\textit{Oblivious Random Access Memory (ORAM)} enables secure access to storage, primarily in the context of databases, by obfuscating access patterns.
+An attacker cannot infer any information from these access patterns.
+\textit{Distributed ORAM (DORAM)} considers the partitioning of storage among multiple parties such that no single party can reconstruct the data by itself.
+A fixed number of cooperating parties is required to reconstruct the secret, which means the stored data.
+This research focuses on \textit{DUORAM}, a \textit{DORAM} implementation by Vadapalli et al.
+While \textit{DUORAM} supports efficient read and write operations for 64-bit values, scaling it to arbitrary element sizes remains a challenge.
+This research discusses and implements possible extensions of \textit{DUORAM} to support elements of arbitrary size.
+Various approaches to scaling are discussed, along with all necessary technical foundations.
+The proposed approaches have been implemented and benchmarked.
+Tests regarding efficiency in terms of bandwidth, communication overhead, and storage requirements are executed.
+The results provide insights into the trade-offs between computational complexity and practical feasibility, highlighting key limitations and potential optimizations for future research.
 
-\Abstract 
-German abstract.
+\section*{Abstract}
+\textit{Oblivious Random Access Memory (ORAM)} ermöglicht sicheren Zugriff auf Speicher, meist im Kontext von Datenbanken, indem Zugriffssequenzen verborgen werden.
+Einem Angreifer ist es nicht möglich Rückschlüsse auf die gespeicherten Daten oder zugrundeliegenden Datenstrukturen aus den Zugriffssequenzen zu ziehen.
+\textit{Distributed ORAM (DORAM)} betrachtet die Aufteilung eines Speichers zwischen mehreren Parteien, sodass keine Partei alleine die Daten rekonstruieren kann.
+Es benötigt eine feste Anzahl kooperierender Parteien um das Geheimnis, beziehungsweiße die Daten, wiederherzustellen.
+Diese Research betrachtet \textit{DUORAM}, eine \textit{DORAM} Implementierung von Vadapalli et al.
+Während \textit{DUORAM} effiziente Lese- und Schreiboperationen für 64 bit Werte unterstützt, bleibt die Skalierung auf beliebige Elementgrößen eine Herausforderung.
+Diese Research erweitert und implementiert \textit{DUORAM}, um Elemente beliebiger Größe zu unterstützen.
+Es werden verschiedene Ansätze zur Skalierung diskutiert, einschließich aller benötigten technischen Grundlagen.
+Die Ansätze wurden implementiert und gebenchmarked.
+Tests bezüglich Effizienz in Bezug auf Bandbreite, Kommunikationseffizienz und Speicherbedarf werden analysiert.
+Die Ergebnisse liefern Einblicke in die Abwägungen zwischen Rechenkomplexität und praktischer Umsetzbarkeit und zeigen wesentliche Einschränkungen sowie mögliche weitere Optimierungen für künftige Forschung auf.
