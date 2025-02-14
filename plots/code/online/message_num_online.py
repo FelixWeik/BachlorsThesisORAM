@@ -22,19 +22,19 @@ df_base = pd.DataFrame({
 
 df_mpz_64 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [1,3,5,7,9],
+    "y": [12,18,22,26,30],
     "Approach": "gmp_mpz_class 64 bit"
 })
 
 df_mpz_128 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [2,6,10,14,18],
+    "y": [26,30,34,38,42],
     "Approach": "gmp_mpz_class 128 bit"
 })
 
 df_mpz_256 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [4,12,20,28,36],
+    "y": [54,58,62,66,70],
     "Approach": "gmp_mpz_class 256 bit"
 })
 
@@ -46,13 +46,13 @@ df_nit_64 = pd.DataFrame({
 
 df_nit_128 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [8,12,16,20,24],
+    "y": [8,10,12,14,16],
     "Approach": "new_input_type 128 bit"
 })
 
 df_nit_256 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [16,24,32,40,48],
+    "y": [16,18,20,22,24],
     "Approach": "new_input_type 256 bit"
 })
 
@@ -87,19 +87,19 @@ df_base = pd.DataFrame({
 
 df_mpz_64 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [3,6,9,12,15],
+    "y": [12,16,20,24,28],
     "Approach": "gmp_mpz_class 64 bit"
 })
 
 df_mpz_128 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [6,12,18,24,30],
+    "y": [20, 24, 28, 32, 36],
     "Approach" : "gmp_mpz_class 128 bit"
 })
 
 df_mpz_256 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [12,24,36,48,60],
+    "y": [38,42,46,50,54],
     "Approach": "gmp_mpz_class 256 bit"
 })
 
@@ -111,13 +111,13 @@ df_nit_64 = pd.DataFrame({
 
 df_nit_128 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [8,12,16,20,24],
+    "y": [8,10,12,14,16],
     "Approach": "new_input_type 128 bit"
 })
 
 df_nit_256 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [16,24,32,40,48],
+    "y": [16,18,20,22,24],
     "Approach": "new_input_type 256 bit"
 })
 

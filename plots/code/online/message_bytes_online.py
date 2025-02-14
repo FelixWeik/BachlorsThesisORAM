@@ -22,19 +22,19 @@ df_base = pd.DataFrame({
 
 df_mpz_64 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [4,8,12,16,20],
+    "y": [8,16,24,32,40],
     "Approach": "gmp_mpz_class 64 bit"
 })
 
 df_mpz_128 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [8,16,24,32,40],
+    "y": [16,32,48,64,80],
     "Approach": "gmp_mpz_class 128 bit"
 })
 
 df_mpz_256 = pd.DataFrame({
     "x": [x1,x2,x3,x4,x5],
-    "y": [16,32,48,64,80],
+    "y": [32,64,96,128,160],
     "Approach": "gmp_mpz_class 256 bit"
 })
 
