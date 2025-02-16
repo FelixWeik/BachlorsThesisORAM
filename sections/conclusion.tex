@@ -1,15 +1,15 @@
 \chapter{Conclusion}
 \label{ch:Conclusion}
 This researched analyzed \textit{Oblivious Random Access Memories (ORAMs)} with arbitrary element size.
-It introduced ORAM including its general concepts, technical foundations and goals.
+It introduced \textit{ORAM} including its general concepts, technical foundations and goals.
 \textit{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram}, was taken as an example.
 
 Using the implementation from Vadapalli et al. as foundation, this research developed and implemented two approaches on how to scale DUORAM to arbitrary element sizes.
-\textit{new\_input\_type} executes multiple reads or updates and aggregates its result to a single entry.
+\textit{new\_input\_type} executes multiple reads or updates and aggregates the results to a single entry.
 This is done by executing the already implemented operations multiple times.
 \textit{gmp\_mpz\_class} uses the \textit{GNU Multi Precision Arithmetic Library (GMP)} to scale not just the entries but also the RDPFs.
-This enables the user to store and retrieve elements of arbitrary size into a single entry.
-Both approaches require the user to commit to a fixed entry size before compilation.
+This allows the user to store and retrieve elements of arbitrary size with a single operation.
+Both approaches require the user to commit to a maximum entry size before compilation.
 
 Both approaches are tested on 64, 128, and 256 bit.
 Larger bit sizes cannot be executed due to technical restrictions of the author's machine.
@@ -43,11 +43,27 @@ Another practical drawback is its characteristics during compilation.
 Since both \code{mpz\_t} and \code{mpz\_class} are evaluated during runtime they cannot be set as template parameters which needs the properties' arguments during preprocessing.
 However, as \code{mpz\_t} and \code{mpz\_class} provide arbitrarily scalable integers, bit operations of acceptable performance and a usable documentation they proved the most useful for this research.
 
-The author recommends further research.
+\paragraph{Future Research}\label{par:futureResearch}
+This work leaves open some interesting directions for future research.
+
 First, one can test the existing implementation on more performant machines.
 This includes testing for larger bit sizes, larger numbers of preprocessed RDPF-triples, RDPF-triples of greater depth, and more items retrieved or updated during the online phase.
+
 Second, the existing approaches can be tested for different datatypes.
 Possible alternatives are \textit{Boost.Multiprecision} or \textit{Fast Library for Number Theory (FLINT)}.
-Finally, other approaches can be analyzed that could not be implemented or described for time reasons.
+These libraries might provide faster bit operations or more storage friendly ways of working with arbitrarily scalable unsigned integers.
+
+Next, other approaches can be analyzed that could not be implemented or described for time reasons.
 One approach of this type could use two DCFs (\ref{cha:DistributedComparisonFunctions}) per operation.
 These DCFs define an interval in the database in which one reads or updates her entries.
+This is similar to the introduced \textit{new\_input\_type} approach (\ref{sub:PossibilityLargerRegisterType}).
+It might, however, reduce the variable RDPF consumption dependent from the chosen data size to a constant amount of CDPF pairs.
+This reduces not just storage requirements in the preprocessing phase, but might also heavily increase reading and writing performance.
+
+Boyle et al. \cite{boyle2025non} presented the concept of \textit{Non-Interactive Distributed Point Functions (NIDPF)}.
+NIDPFs eliminate the need for a trusted dealer by reading a key from a public bulletin.
+Parties $P_0,P_1$ then negotiate their DPF-keys together without sharing the actual key.
+Instead of using binary trees (\ref{sub:BGIDPFConstruction}) they use matrices for DPF representation.
+Also, instead of using synchronous, round-based communication for every DPF level, messages are shared asynchronously and in a single round.
+This might not just speed up the preprocessing phase, but might also decrease the RDPF-triple's storage requirements.
+Moreover, sending fewer and presumably smaller messages could reduce the susceptibility of preprocessing to lower bandwidth or higher latencies.
