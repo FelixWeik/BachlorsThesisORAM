@@ -2,7 +2,7 @@
 \textit{DUORAM} is an ORAM implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
 It can either be used as 3-party or 2-party protocol.
 This research will focus solely on the 3-party variant.
-\textit{DUORAM} uses (2,2)-DPFs (\ref{sub:DistributedPointFunctions}) to represent \textit{Private Information Retrieval (PIR)} and PIR-Writing queries (\ref{sub:PrivateInformationRetreival}).
+\textit{DUORAM} uses (2,2)-DPFs to represent \textit{Private Information Retrieval (PIR)} and PIR-Writing queries (\ref{sub:PrivateInformationRetreival}).
 All the following protocols and notations are as described by Vadapalli et al. \cite{vadapalli2023duoram}.
 
 At a high level, the database $D$ is additively secret shared among two non-colluding parties $P_0,P_1$.
@@ -18,7 +18,7 @@ This index $i^*$ is represented by the shifting vector $e_i = e_{i_0+i_1}$ repre
 
 For writing accesses both parties additionally hold additive shares $M_0,M_1$ of the target value $M=M_0+M_1$.
 
-Each party holds three RDPFs in form of \textit{RDPF-Triples} (\ref{sub:RDPFTriples}).
+Each party holds three RDPFs in form of \textit{RDPF-Triples}.
 Evaluating them, either by using \code{EVALFULL} (\ref{sub:TraversingTheDPFTree}) or while generating both RDPF-Triples on target index $i^*$ (\ref{sub:BGIDPFConstruction}), returns six pairs of word vectors $(t_b^k,v_b^k), b\in\{0,1\}\text{ and }k\in\{1,2,3\}$ with the property that $t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3=e_{i^*}$ and $v_0^1+v_1^1=v_0^2+v_1^2=v_0^3+v_1^3=M\cdot e_{i^*}$.
 
 Also, each party carries a \textit{Blinding Factor ($\zeta$)} that will be used to mask its share of the database $D_i$.
@@ -51,7 +51,7 @@ Both parties want to obtain shares of a new Database $D'$, whose $i^*$-th value 
 This is equivalent to updating the read value $r=D[i^*]$ by $M-r$ or completely overwriting $r$ by $M$ at position $i$.
 Recall the word-vectors $v_b^k$ with $v_0^k+v_1^k=e_{i^*}\cdot M$.
 This implies, parties $P_0,P_1$ locally set $D'_b\leftarrow D_b+v_b^1\text{ for }b\in\{0,1\}$.
-Since writing is a combination of reading and updating, one needs two RDPF-Triples (\ref{sub:RDPFTriples}) for executing a single write operation.
+Since writing is a combination of reading and updating, one needs two RDPF-Triples for executing a single write operation.
 
 \paragraph{Refresh Blinds:}
 \label{par:RefreshBlinds}
@@ -73,7 +73,7 @@ The intention is to shift the calculation and communication expensive part to th
 \label{subsub:DuoramPreprocessing}
 Preprocessing generates RDPF-Triples (\ref{sub:DistributedPointFunctions}).
 Depending on the parameters given, one can also generate distributed comparison functions (\ref{sub:DistributedComparisonFunctions}), multiplication triples, and addition triples (\ref{sub:BeaverTriples}).
-Each RDPF-Triple (\ref{sub:RDPFTriples}) is generated on the same share, thus all three DPFs by $P_0$ have the same index, and all DPFs held by $P_1$ share the same index too.
+Each RDPF-Triple is generated on the same share, thus all three DPFs by $P_0$ have the same index, and all DPFs held by $P_1$ share the same index too.
 Of course, these do not have to be equal.
 
 DUORAM uses a (2+1)-Party MPC protocol for generating their DPFs, which allows to replace the trusted source by a stateless third party $P_2$.
@@ -114,4 +114,4 @@ Therefore, one must set the final correction word $F$ to change the random resul
 $P_0,P_1$ exchange $M_b+F_b$ (with $F$ being the final correction word).
 This allows both parties to reconstruct $M-(v_0[i^*]+v_1[i^*])$ which will serve as the new final correction word $F'$ to write $M$ in the desired location.
 The cyclic shift results in the shifted vectors $\tilde{t}_b^i,\tilde{v}_b^i, (i\in\{1,2,3\},b\in\{0,1\})$ with the final properties described in \ref{sec:3pDuoram}.
-Finally, all three parties execute the write or read protocol from \ref{sub:DuoramReadingAndWriting}.
+Finally, all three parties execute the writing or reading protocol from \ref{sub:DuoramReadingAndWriting}.

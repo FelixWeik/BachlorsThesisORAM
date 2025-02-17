@@ -1,17 +1,16 @@
 \label{sub:IncreasingTheSizeOfExistingDPFs}
-Another approach is hardcoding larger datatypes or scaling existing datatypes replacing the originals.
-The user chooses her preferred data-size before compilation and uses this specified size during execution.
-This will commit each duoram to a single size which, however, can be chosen freely before compilation.
+Another approach scales existing datatypes.
+The user chooses her preferred entry-size before compilation and uses this specified size during execution.
+This commits each duoram to a maximum entry-size which, however, can be chosen freely before compilation.
 
 The updated version comes in two flavors:
 \begin{enumerate}
     \item \code{64ToUnlimited}\footnote{Public on https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited} as found on the \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{branch of the same name in the author's repository}.
     It uses a boilerplate-like approach of hardcoding the same functionality for multiple hardcoded datasizes.
     The \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/64ToUnlimited}{updated implementation} supports 64 and 128 bit values.
-    \item \code{UnlimitedGMP}\footnote{Public on https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/UnlimitedGMP} utilizes the \textit{GNU Multi Precision Arithmetic Library (GMP)}\footnote{More details can be found here: https://de.wikipedia.org/wiki/GNU\_Multiple\_Precision\_Arithmetic\_Library}.
+    \item \code{gmp\_mpz\_class}\footnote{Public on https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/safety\_gmp} uses the \textit{GNU Multi Precision Arithmetic Library (GMP)}\footnote{More details can be found here: https://de.wikipedia.org/wiki/GNU\_Multiple\_Precision\_Arithmetic\_Library}.
     In general, it allows for implementing integral datatypes like integers with arbitrary precision while supporting general bit-operations.
     Thus, the updated code found on branch \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/UnlimitedGMP}{UnlimitedGMP} supports any size being a multiple of 128 bits (\ref{sec:GeneralLimitations}).
-    Further details are found in \ref{subsub:applyingGMP}.
 \end{enumerate}
 
 Both approaches build upon the existing implementation and follow the same basic approach.
@@ -25,24 +24,24 @@ Therefore, the required efforts of achieving the optimal solution for this appro
 
 The topmost elements in  this datatype-top-to-bottom structure are macros (\ref{subsub:implementationTypeshpp}).
 These are specified in \code{types.hpp}.
-They specify the most general datatypes and thus their derivates, aliases.
+They specify the most general datatypes and thus their derived aliases.
 \begin{itemize}
-    \item \code{VALUE\_BITS} decided the value for \code{value\_t}.
+    \item \code{VALUE\_BITS} decides the value for \code{value\_t}.
     Its most prominent usage is in specifying the size of the register types \code{RegAS} and \code{RegXS}, and the size of DPF-leafs.
     \item \code{ADDRESS\_MAX\_BITS} specifies the size of addresses.
     The derived type-alias \code{address\_t} decides the address-sizes for indexing operations.
-    As the database is of size $2^\text{INPUT\_BITS}$ at least \code{INPUT\_BITS} many bits are needed for formatting addresses correctly.
+    As the database is of size $2^\text{INPUT\_BITS}$ at least \code{INPUT\_BITS} many bits are necessary for formatting addresses correctly.
 \end{itemize}
 
 \subsubsection*{Bitmasks and Bitutils}\label{subsub:bitmasksAndBitutils}
 \code{bitutils.hpp} provides bitmasks and important functions for bit operations.
 These operations include \code{xor\_if()} and \code{get\_lsb()} which are used multiple times throughout the code.
-\code{xor\_if()} will execute a bitwise xor operation if a flag-bit is set, \code{get\_lsb()} retrieves the least significant bit of a given \code{\_\_m128i} value.
+\code{xor\_if()} executes a bitwise xor operation if a flag-bit is set, \code{get\_lsb()} retrieves the least significant bit of a given \code{\_\_m128i} value.
 
-Bitmasks like \code{bool128\_mask} and \code{if128\_mask} are utilized when generating and traversing DPF-trees, during bit-operations, or while blinding shares.
-In short, they increase bit-operations' performance by providing predefined values that will be used frequently during execution.
+Bitmasks like \code{bool128\_mask} and \code{if128\_mask} are utilized when generating and traversing DPF trees, during bit-operations, or while blinding shares.
+In short, they increase bit-operations' performance by providing predefined values.
 
-Since these bit-operations are executed primarily on \code{\_\_m128i} values, all function signatures and bitmasks are predefined for this specific datatype.
+Bit-operations are executed primarily on \code{\_\_m128i} values, all function signatures and bitmasks are predefined for this specific datatype.
 If one wants to scale their size arbitrarily, two solutions exist:
 \begin{enumerate}
     \item Cut larger values into 128-bit blocks:
@@ -56,7 +55,7 @@ If one wants to scale their size arbitrarily, two solutions exist:
     Therefore, the author further pursues this approach.
 \end{enumerate}
 
-The approach on GMP will be further discussed in the following section \ref{sub:approachGMP}.
+The approach on GMP is further discussed in \ref{sub:approachGMP}.
 
 \subsubsection*{Communication Methods for Larger Datatypes}\label{subsub:communicationMethodsForLargerDatatypes}
 For parties to communicate and retrieve data from their background storage, one needs to implement new operations or overload existing operations.
@@ -64,11 +63,12 @@ Communication in general casts the given datatype into a char array and vice ver
 As this approach solely uses trivial datatypes, no change but increasing the buffer size to fit the given type is required.
 
 \subsubsection*{Adjusting Compilation}\label{subsub:adjustingCompilation}
-The author extended compilation with a flag bit to decide on which datatype to use without changing the source code.
-A new compilation-flag \code{-DVALUE\_BITS} is set in the \code{MAKEFILE} and represents the length of data one wants to store and retrieve.
+The author extends compilation with a flag bit to decide on which datatype to use without changing the source code.
+A new compilation-flag \code{-DVALUE\_BITS} is set in the \code{MAKEFILE}.
+It defines the maximum entry size.
 It directly affects \code{VALUE\_BITS} and places the given value into it.
 \code{VALUE\_BITS} then triggers the desired trickle-down effect which further changes macros and datatypes.
-Leaving the flag blank sets \code{-DVALUE\_BITS} to 64 by default.
+Leaving the flag blank sets \code{-DVALUE\_BITS} to 64.
 
 \subsubsection*{Introducing new Tests}\label{subsub:incNewTests}
 Vadapalli et al. introduced a wide range of testing functions in their base implementation.
@@ -76,7 +76,8 @@ The most comprehensive testing method covers all the newly implemented or extend
 This means reading and writing, both dependently and independently.
 \textit{duoram} located in \code{online.cpp} covers these functionalities, prints the number of sent messages and bits and executes reads and writes along the way.
 The number of items to read and write can be specified in the prompt.
-As no modification to the reading and writing process itself took place implementing this approach, the test \code{duoram} was used for testing.
+Reading and writing algorithms are left untouched.
+Therefore, \code{duoram()} remains valid.
 
 Note that \code{duoram} solely tests the online phase.
 To run the test, one must run the preprocessing beforehand,

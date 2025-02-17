@@ -1,17 +1,17 @@
 \chapter{Conclusion}
 \label{ch:Conclusion}
-This researched analyzed \textit{Oblivious Random Access Memories (ORAMs)} with arbitrary element size.
+This research analyzed \textit{Oblivious Random Access Memories (ORAMs)} with arbitrary element size.
 It introduced \textit{ORAM} including its general concepts, technical foundations and goals.
 \textit{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram}, was taken as an example.
 
-Using the implementation from Vadapalli et al. as foundation, this research developed and implemented two approaches on how to scale DUORAM to arbitrary element sizes.
+Using the implementation from Vadapalli et al. \cite{vadapalli2023duoram} as foundation, this research developed and implemented two approaches on how to scale \textit{DUORAM} to arbitrary element sizes.
 \textit{new\_input\_type} executes multiple reads or updates and aggregates the results to a single entry.
 This is done by executing the already implemented operations multiple times.
 \textit{gmp\_mpz\_class} uses the \textit{GNU Multi Precision Arithmetic Library (GMP)} to scale not just the entries but also the RDPFs.
 This allows the user to store and retrieve elements of arbitrary size with a single operation.
 Both approaches require the user to commit to a maximum entry size before compilation.
 
-Both approaches are tested on 64, 128, and 256 bit.
+Both approaches are tested on elements of size 64, 128, and 256 bit.
 Larger bit sizes cannot be executed due to technical restrictions of the author's machine.
 
 \textit{new\_input\_type} proved to be faster on average for both the preprocessing and the online phase.
@@ -22,26 +22,27 @@ This pushes its performance for 128 and 256 bits to almost the performance of th
 Performance, however, heavily deteriorates for low bandwidths.
 Also, it has heavier storage requirements for depths greater 15 than \textit{gmp\_mpz\_class} and a higher consumption of RDPF-triples.
 
-\textit{gmp\_mpz\_class} is faster for lower bandwidths as messages are sent in smaller packages.
+\textit{gmp\_mpz\_class} is faster for low bandwidths as messages are sent in smaller packages.
 As consequently more messages need to be sent, performance deteriorates for higher latencies.
-The underlying datatype \code{mpz\_class} has a memory overhead of factor $1.5$ on average for trivial datatypes of the same size.
+The underlying datatype \code{mpz\_class} has a memory overhead of factor $1.4$ on average for trivial datatypes of the same size.
 It has, however, lower storage requirements than \textit{new\_input\_type} as fewer RDPF-triples need to be generated due to lower consumption during the online phase.
 Also, bit operations on \code{mpz\_class} values are slower than bit operations on trivial datatypes of the same size.
 This was proven true by testing for XOR and bit shifting operations, which are heavily used throughout the implementation.
-Finally, communication is slower due to the need of serialization and deserialization while sending or receiving.
+Finally, communication is slower due to the need of serialization and deserialization.
 
 Therefore, \textit{new\_input\_type} is preferable on machines with larger storage and environments of high bandwidth and varying latency.
 \textit{gmp\_mpz\_class} proved to be the better approach for machines with smaller storage, varying bandwidth, and smaller latency.
 
 GMP in general provides useful datatypes and classes for this research's goal of scaling \textit{DUORAM}.
 \code{mpz\_t} represents an integer of arbitrary size.
-Yet, it does not provide automatic memory management which makes it uneasy to handle in a complex program without compromising type safety.
+Yet, it does not provide automatic memory management.
+This makes it uneasy to handle in a complex program without compromising type safety.
 \code{mpz\_class} holds a single attribute of type \code{mpz\_t} and provides automatic memory management.
 It has, as previously shown, drawbacks in its storage overhead.
 Also, bit operations on \code{mpz\_t} and \code{mpz\_class} are slower than on trivial datatypes of the same size.
 Another practical drawback is its characteristics during compilation.
 Since both \code{mpz\_t} and \code{mpz\_class} are evaluated during runtime they cannot be set as template parameters which needs the properties' arguments during preprocessing.
-However, as \code{mpz\_t} and \code{mpz\_class} provide arbitrarily scalable integers, bit operations of acceptable performance and a usable documentation they proved the most useful for this research.
+However, as \code{mpz\_t} and \code{mpz\_class} provide arbitrarily scalable integers, bit operations of acceptable performance, and a usable documentation, they proved the most useful for this research.
 
 \paragraph{Future Research}\label{par:futureResearch}
 This work leaves open some interesting directions for future research.
@@ -49,16 +50,16 @@ This work leaves open some interesting directions for future research.
 First, one can test the existing implementation on more performant machines.
 This includes testing for larger bit sizes, larger numbers of preprocessed RDPF-triples, RDPF-triples of greater depth, and more items retrieved or updated during the online phase.
 
-Second, the existing approaches can be tested for different datatypes.
+Second, the existing approaches, especially \textit{gmp\_mpz\_class}, should be tested with different datatypes.
 Possible alternatives are \textit{Boost.Multiprecision} or \textit{Fast Library for Number Theory (FLINT)}.
-These libraries might provide faster bit operations or more storage friendly ways of working with arbitrarily scalable unsigned integers.
+These libraries might provide faster bit operations and more storage friendly ways of working with arbitrarily scalable unsigned integers.
 
 Next, other approaches can be analyzed that could not be implemented or described for time reasons.
 One approach of this type could use two DCFs (\ref{cha:DistributedComparisonFunctions}) per operation.
 These DCFs define an interval in the database in which one reads or updates her entries.
 This is similar to the introduced \textit{new\_input\_type} approach (\ref{sub:PossibilityLargerRegisterType}).
 It might, however, reduce the variable RDPF consumption dependent from the chosen data size to a constant amount of CDPF pairs.
-This reduces not just storage requirements in the preprocessing phase, but might also heavily increase reading and writing performance.
+This reduces not just storage requirements in the preprocessing phase, but might also heavily increase reading and writing performance and communication efficiency.
 
 Boyle et al. \cite{boyle2025non} presented the concept of \textit{Non-Interactive Distributed Point Functions (NIDPF)}.
 NIDPFs eliminate the need for a trusted dealer by reading a key from a public bulletin.

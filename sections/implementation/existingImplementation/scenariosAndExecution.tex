@@ -1,8 +1,10 @@
-As specified in the previous paragraph \ref{subsub:implementationMpcioAndCommunication}, \code{prac} is executed three times simultaneously.
+As specified in \ref{subsub:implementationMpcioAndCommunication}, \code{prac} is executed three times simultaneously.
 Hence, assuming one executes locally without using docker, one needs to run \code{prac} in three terminals at once.
-Calling \code{prac} requires several arguments: player number, which mode to execute (-p, -o, or blank), number of threads for faster execution (-t).
-The server $P_2$ additionally requires the type, amount and depth of functions to calculate.
-\code{r} will represent RDPFs.
+Executions need to be started separately for preprocessing and the online phase.
+Calling \code{prac} requires several arguments: player number, which mode to execute (-p, -o, or blank), and number of threads for faster execution (-t).
+For preprocessing, $P_2$ additionally requires the type, amount and depth of functions to calculate.
+In the online phase, all parties require the depth of the RDPF-Triples and the amount of items to retrieve or store as input.
+\code{r} represents RDPFs.
 
 Thus, the function calls for preprocessing will look as follows:
 \begin{enumerate}
@@ -10,24 +12,28 @@ Thus, the function calls for preprocessing will look as follows:
     \item \code{./prac -t 3 -p 1 localhost}
     \item \code{./prac -t 3 -p 2 localhost localhost r20:20}
 \end{enumerate}
-This will execute the precomputation generating 20 RDPF-triples, each of depth 20, with each instance working in three threads.
+Executes preprocessing generating 20 RDPF-triples, each of depth 20.
+Each instance is assigned three threads.
 
 \begin{enumerate}
     \item \code{./prac -t 3 0 duoram 20 5}
     \item \code{./prac -t 3 1 localhost duoram 20 5}
     \item \code{./prac -t 3 2 localhost localhost duoram 20 5}
 \end{enumerate}
-Will execute the online phase, again with three threads each sending 5 messages using RDPFs of depth 20.
+Executes the online phase, again with three threads each.
+Each read or write operation retrieves or stores 5 elements.
+
+Execution via docker is introduced in \ref{sub:expEvaConstruction}.
 
 \subsubsection*{General Execution}
 The following sections denote the computational peers $P_0,P_1$ as "player", $P_2$ is called "server".
 All executions start in \code{prac.cpp} which accommodates the \code{main} method.
 This includes the starting points for both the players' and the server's computations.
-If parses the given arguments, sets the adresses of the other parties, and decides whether the current execution is a player's or server's computation.
+It parses the given arguments, sets the addresses of the other parties, and decides whether the current execution is a player's or server's computation.
 That means it calls \code{comp\_player\_main} or \code{server\_player\_main}.
 
 \code{comp\_player\_main} represents the players' computation.
-It is, again, separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the online phase.
+It is separated into \code{preprocessing\_comp} and \code{online\_main} representing the preprocessing computation and the computations necessary for performing the online phase.
 
 \code{server\_player\_main} represents the server's computations.
 It, too, is separated into its phases \code{preprocessing\_server} and \code{online\_main}.
@@ -60,17 +66,18 @@ Each player then sends her offset to the other player and simultaneously receive
 The server receives both offsets.
 It will then send the cancellation terms to the players as defined in \ref{sub:DuoramReadingAndWriting}.
 
-Reading in general can be done by indexing into the shape implemented by the duoram.
-This will return the reading protocol including cyclic shifting.
-The operation will return either \code{MemRefInd} meaning references to indipendent memory indices, or \code{MemRefExpl}, which represents an explicit memory reference.
-Each memory-reference type implements two operators that allow them to be casted into either an additively or XOR shared register entry.
-This will allow the client to access the data-value of the memory-referece.
+Reading in general indexes into the shape implemented by the duoram.
+The operation returns either \code{MemRefInd} meaning independent memory references, or \code{MemRefExpl}, which represents an explicit memory reference.
+Overloads of the indexing operator are implemented accordingly.
+Each reference type implements two operators that allow them to be implicitly casted into either an additively or XOR shared register entry.
+This will allow the client to access the data-value of the memory reference.
 
 \paragraph{Cyclic Shifting for Writing}
-\code{Duoram::Shape::MemRefS::oram\_update()} implements the writing operation which also performs the cyclic shift.
-Both players again calculate the offset, send it to the other player and receive it from the other player.
+\code{Duoram::Shape::MemRefS::oram\_update()} implements the writing operation including the cyclic shift.
+Both players calculate the offset, send it to the other player and receive it from the other player.
 After combining the offsets, each player performs the cyclic shift, evaluates all three RDPFs and sets the database on the target index to the new target value.
 The server follows the basic writing protocol which includes receiving both offsets and combining them, using the same implementations as the players.
 
 Since writing is both reading and updating, the update operation (\code{+=}) is done on the memory reference returned by reading at index \code{ind}.
 This memory-reference will then be written into the duoram automatically using the \code{duoram\_update} operation.
+\code{duoram\_update} includes refreshing the blinds.

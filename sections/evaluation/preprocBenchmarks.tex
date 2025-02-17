@@ -21,11 +21,11 @@ Its storage requirements for 50 RDPF-triples of increasing depth are shown in \r
 Each limb holds 8 bytes.
 When values exceed a single limb, more limbs are allocated.
 \code{mpz\_class} allocates these limbs at runtime, keeping track of its capacity and current length.
-Therefore, even for the same bit size, a single \textit{mpz\_class} requires about $1.5x$ more storage than \code{uint64\_t} as used in \textit{base}.
+Therefore, even for the same bit size, a single \textit{mpz\_class} requires about $1.4$ times the storage \code{uint64\_t} requires in \textit{base}.
 \textit{gmp\_mpz\_class}, consequently, requires more storage than \textit{base}.
 Recall that \textit{new\_input\_type} requires up to four times more RDPF-triples than \textit{base} during the online phase.
 Therefore, around four times the storage is required.
-Note that due to the exponential growth of the RDPF-trees, storage requirements increase heavily, again starting from depth 15.
+Note that due to the exponential growth of the RDPF trees, storage requirements increase heavily, again starting from depth 15.
 
 This exponential growth can also be observed in \ref{fig:aesOpsDepthPreproc}.
 The graph shows the amount of local AES operations for increasing depth.
@@ -44,7 +44,7 @@ A similar effect is observed for \textit{gmp\_mpz\_class}, yet, due to smaller s
 
 Varying the latency, however, slows down \textit{gmp\_mpz\_class} but not \textit{new\_input\_type}.
 Taking a closer look at the implementation explains this issue:
-In \textit{base} and \textit{new\_input\_type} message are stored in a buffer.
+For \textit{base} and \textit{new\_input\_type} message are stored in a buffer.
 As each message has a fixed size of 8 bites, one can store messages in a buffer of fixed size.
 Once the buffer is filled, one sends it and empties the buffer.
 The set buffer size directly impacts the number of sent messages.

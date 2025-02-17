@@ -4,7 +4,6 @@ They both represent a single register entry holding either an additive or XOR sh
 The most trivial approach of representing values larger than \code{value\_t} can be acheived by combining register entries.
 Therefore, this first approach considers new structs \code{BigAS}, \code{BigXS} implementing lists of registers.
 Due to the need for different constructors, the author chose to introduce two new structs for index representation, namely \code{IndexAS} and \code{IndexXS}.
-More detailed information are provided in this subsection.
 
 The author's adapted implementation is located on branch \code{NewInputType} on GitHub\footnote{The author's implementation of this approach is located here:\\ https://github.com/FelixWeik/PrivateRandomAccessComputations/tree/newInputType}.
 
@@ -13,37 +12,38 @@ These types represent a list of fixed length holding elements of type \code{RegA
 Length restrictions are set in \code{types.hpp}.
 It introduces new macros \code{INPUT\_BITS} and \code{INPUT\_PARTITION}.
 \code{INPUT\_BITS} represents the bit-length of the value to represent.
-\code{INPUT\_PARTITION} represents the division $\frac{\text{INPUT\_BITS}}{\text{VALUE\_BITS}}$ which will return the length of the list.
+It is set by the client and commits the execution to the chosen bitsize.
+\code{INPUT\_PARTITION} represents the division $\frac{\text{INPUT\_BITS}}{\text{VALUE\_BITS}}$ which returns the length of the list.
 Thus, by having \code{BigAS} or \code{BigXS} hold a list of \code{INPUT\_PARTITION} many elements, these lists reassemble a value of length \code{INPUT\_BITS}.
 The general abstraction of \code{BigAS} and \code{BigXS} is called \textit{Large Register Type} in the following paragraphs.
 
 A large register type is created using newly introduced constructors:
-Using the standard constructor sets each list-element to 0. 
+The standard constructor sets each list-element to 0. 
 It can be populated anytime using the \code{set} method specifying the element and its position in the list.
 Using a \code{RegAS} or \code{RegXS} pointer, respectively, populates the list using the copied values of the pointer.
 Please ensure the amount of elements the pointer points to match the value of \code{INPUT\_PARTITION}.
 
-Performing operations on either \code{BigAS} or \code{BigXS} must return results just like performing calculations on a similar vector of similar size.
-Choosing \code{INPUT\_PARTITION} equal to $2$, for example, and multiplying it by $4$ must return the same result as performing the same calculation on a \code{uint128\_t} vector.
+Performing operations on either \code{BigAS} or \code{BigXS} must return results just like performing calculations on a vector of similar size.
+Setting $\code{INPUT\_PARTITION} = 2$, for example, and multiplying it by $4$ must return the same result as performing the same calculation on a \code{uint128\_t} vector.
 This marks the importance of adjusting the operators on these values.
 This must also hold true for other operations like bit-shifts, additions, or logical operations.
 Code snippets of \code{BigAS} are given in appendix \ref{lst:bigas}.
 
 \subsubsection*{IndexAS and IndexXS} \label{subsub:IndexASandIndexXS}
-Since the client wants to retrieve values of size \code{INPUT\_BITS}, the index type must grow similarly.
+Since the client wants to retrieve values of size \code{INPUT\_BITS}, the index type must adjust its size accordingly.
 This will lead to her retrieving multiple entries of the database.
-Each result on itself is either of type \code{RegAS} or \code{RegAS}, wrapped in a list which itself is represented using a large register type.
+Each result is either of type \code{RegAS} or \code{RegXS}, wrapped in a list which itself is represented using a large register type.
 
 Of course, one could use the same struct for \code{BigAS}, \code{IndexAS}, or \code{BigXS}, \code{IndexXS} respectively.
 Two reasons led to the design decision of separating both structs.
 First, the code becomes easier to read, test, and expand if the general structure is clear.
-Next, indices and large register types offering different constructors makes testing easier.
+Next, indices and large register types require different constructors.
 The default constructor for large register entries populates each entry with $0$.
-This postpones the decision of what to write and if a large register entry $M$ is used by mistake no data will be manipulated.
+This postpones the decision of what to write.
 If an insufficient value of the wrong size is given, an error is thrown.
 Indices must offer different behavior:
-The default constructor will populate the list with random values.
-This means, \code{INPUT\_PARTITION} many random indices of the database will be generated in this case.
+The default constructor populates the list with random values.
+This means, \code{INPUT\_PARTITION} many random indices of the database are generated in this case.
 Since the size of each index-element is of type \code{value\_t}, one cannot run into the error of reading from an index out of bounds.
 Another index constructor takes a starting index as argument.
 It generates $\text{INPUT\_PARTITION} - 1$ new indices beginning at the starting index.
@@ -51,9 +51,9 @@ This represents \code{INPUT\_PARTITION} many continuous reads or writes using th
 An implementation example of \code{IndexAS} is given in appendix \ref{lst:indexas}.
 
 \subsubsection*{Reading and Writing Operations using MemRefInd} \label{subsub:ReadingWritingUsingMemRefInd} 
-As introduced in \ref{subsub:implementationCyclicShifting}, reading and writing is done on memory-references.
-Reading will cast the reference into a register type, which is either \code{RegAS} or \code{RegXS}.
-This is specified by using a template type \code{T} which will be of either type.
+As introduced in \ref{subsub:implementationCyclicShifting}, reading returns memory references, writing is executed on memory references.
+Reading casts the reference into a register type, which is either \code{RegAS} or \code{RegXS}.
+This is specified by using a template type \code{T} which is of either type.
 For larger registers of type \code{BigAS} and \code{BigXS} reading and writing is especially performed on type \code{MemRefInd}.
 It represents independent memory references which itself is a vector of explicit memory references.
 These references can be accessed independently, reading and writing can be done in parallel.
@@ -64,29 +64,22 @@ The adapted operations using the new index types in context of reads and writes 
 \subsubsection*{DPF-Nodes and Leaf-Nodes}\label{subsub:largerRegisterTypeDPFNodesAndLeafLabels}
 Recall the general concepts of \code{DPFNode} and \code{LeafNode} (\ref{itemize:importantAliases}).
 A main question is whether \code{DPFNode}, initially set as \code{\_\_m128i}, needs to be scaled too when using different values for \code{INPUT\_PARTITION}.
-Note that scaling \code{DPFNode} will automatically scale \code{LeafNode} as well.
+Note that scaling \code{DPFNode} automatically scales \code{LeafNode} as well.
 
 \ref{subsub:implementationDuoram} introduced the concepts of the \code{context} operation.
 It is utilized by shapes for refreshing their context while keeping the underlying database untouched.
 A single context is parametrized, for example, by the RDPF-Triple used for accessing a certain memory location.
-This means updating the context will also use a new set of RDPF-Triples.
-Therefore, for every new operation on the database, this approach will use a fresh set of RDPF-Triples.
+This means updating the context uses a new set of RDPF-Triples.
+Therefore, for every new operation on the database, this approach consumes a fresh set of RDPF-Triples.
 Every element of the large index acts like a single access operation.
 Thus, there is no need for scaling \code{DPFNode} and with that \code{LeafNode}.
 
 \subsubsection*{Introducing new Tests} \label{subsub:IntroducingNewTests}
-All implemented approaches are tested and benchmarked \ref{sub:testingAndBenchmarking}.
-The according testing function in \code{duoram.hpp}.
-\code{big()} tests for independent and interleaved reads and writes.
-It can be called using \code{big} instead of \code{duoram} while keeping the same notation of \ref{sub:implementationScenarios}.
+Test functions are implemented in \code{duoram.hpp}.
+A new function \code{big()} executes independent reads and writes.
+It is called using \code{big} instead of \code{duoram} while keeping the same notation of \ref{sub:implementationScenarios}.
 Note that this test replaces solely the online phase, the preprocessing phase must be executed beforehand.
 The notation for executing the preprocessing phase stays the same.
 This approach is more RDPF hungry for reading and writing, consider generating more RDPF triples in the preprocessing phase.
 
-\subsubsection*{General Discussion} \label{subsub:DiscussingLargerRegisterTypes}
-\begin{itemize}
-    \item Reading and Writing indipendently (if multiple threads are used). => no big overhead for single operations
-    \item Multiple DPFs needed (\code{INPUT\_PARTITION} many) for each read and write. => longer preprocessing times
-    \item One can use the already built in functions under the hood and just needs to adjust the function calls.
-\end{itemize}
-More detailed informations, tests, and benchmarking results will be further discussed in \ref{sub:testingAndBenchmarking}.
+More detailed information, tests, and benchmarking results is discussed further in \ref{sub:expEvalBenchmarks}.

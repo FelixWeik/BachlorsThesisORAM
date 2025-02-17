@@ -6,7 +6,7 @@ AES keys are represented using an array holding eleven \code{\_\_m128i} values, 
 Eleven values are necessary since AES for 128-bit values takes place in ten rounds, with each round being assigned a distinct key plus the initial input called \textit{seed} in the following.
 AES implementations as presented by Rijmen et al. \cite{rijmen2001advanced}, however, exist for no more than 256 bits.
 
-Recall that the implementation does not use AES for secure encryption but for its deterministic and pseudorandom properties given a fixed key and input (\ref{subsub:implementationAesni}).
+The implementation does not use AES for secure encryption but for its deterministic and pseudorandom properties given a fixed key and input (\ref{subsub:implementationAesni}).
 Thus, AES in \textit{Electronic Code Book Mode (ECB)} is used for simulating a \textit{Pseudorandom Number Generator (PRG)}.
 Note that AES keeps this deterministic properties when dividing an input into $n$ blocks and executing AES on each block independently \cite{gentry2012homomorphic}.
 This means, executing AES $n$ times and concatenating each output into a single result is still considered pseudorandom \cite{gentry2012homomorphic}.
@@ -14,16 +14,16 @@ This means, executing AES $n$ times and concatenating each output into a single 
 Implementing a new, arbitrarily scalable AES protocol for simulating a PRG exceeds the efforts of this research.
 Therefore, the author chose to reuse the existing implementation on 128-bit values and concatenate outputs leaving \code{AES\_KEY} (\ref{itemize:importantAliases}) untouched.
 This results in the requirements that all inputs, or the labels of given inputs, must be multiples of 128 bits.
-These inputs then can be split into 128-bit blocks, encrypted or decrypted using the 128-bit AES implementation on fixed keys, and finally concatenated to produce a single result.
-This result is then the same length as the input, which is the equivalent of executing AES on the complete input instead of the divided block structure.
+These inputs are split into 128-bit blocks, encrypted or decrypted using the 128-bit AES implementation on fixed keys, and finally concatenated to produce a single result.
+The result is then the same length as the input, which is the equivalent of executing AES on the complete input instead of the divided block structure.
 
 As the values passed into AES are twice as large as the underlying value to store or retrieve, each database entry must have a minimum size of 64 bits.
-%//TODO beschreiben wo und wie die skalierung funktioniert (alle approaches sind gleich da immer gleiche lösung)
 
 \subsection{Limitations on WIDTH and LWIDTH}\label{sub:LimitWIDTHandLWIDTH}
 Recall the definition of \code{WIDTH} and \code{LWIDTH} from \ref{subsub:WIDTHandLWIDTH}.
 The codebase by Vadapalli et al. limits \code{WIDTH} to values reaching from $1$ up to $5$.
-As \code{LWIDTH} is directly derived from \code{WIDTH} it is affected as well and can reach values from $1$ up to $3$.
+\code{LWIDTH} is derived from \code{WIDTH}.
+It reaches values from $1$ up to $3$.
 
 This is due to the input parameter \code{subtype} as used in function \code{preprocessing\_comp()} located in \code{preproc.cpp}.
 Recall the input and output structure of the preprocessing phase (\ref{itemize:preprocessingStructure}).
@@ -32,9 +32,10 @@ The documentation of file \code{preproc.cpp} shows, that cases handling differen
 \code{0x00} indicates no \code{RDPF}s will be generated.
 This could be the case if one already has a set of generated RDPFs.
 Setting \code{subtype} to a value reaching from \code{0x01} up to \code{0x05} manipulates \code{WIDTH} to a value between $1$ and $5$.
-Not setting it intentionally while generating RDPFs will automatically set \code{subtype} to \code{0x01} which means $\text{WIDTH}=1$.
-The same applies for generating incremental RDPFs: Here, \code{subtype} will be XORed with \code{0x80} meaning values will reach from \code{0x81} to \code{0x85}.
-Incremental RDPFs are not of great importance in this research and will therefore be left out in the following.
+Not setting it intentionally while generating RDPFs automatically sets \code{subtype} to \code{0x01} which means $\text{WIDTH}=1$.
+For incremental RDPFs, \code{subtype} is XORed with \code{0x80}.
+Thus, values reach from \code{0x81} to \code{0x85}.
+Incremental RDPFs are not of great importance in this research and are therefore left out in the following.
 
 Note, that both \code{WIDTH} and \code{LWIDTH} are limited to a fixed interval of numbers.
 Case distinctions affecting the template parametrization of \code{RDPF} and the generation of \code{RDPFTriple}s are solely implemented for these \code{WIDTH} values reaching from $1$ to $5$.

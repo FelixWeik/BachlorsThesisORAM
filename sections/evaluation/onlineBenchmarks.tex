@@ -16,7 +16,8 @@
 \ref{fig:readIncLatencyOnline} and \ref{fig:updIncLatencyOnline} show similar results as in the preprocessing phase.
 For both reading and updating \textit{gmp\_mpz\_class} is slower than \textit{new\_input\_type} and \textit{base}.
 \textit{new\_input\_type} performs nearly as well as \textit{base}.
-Recall its construction of performing independent reads or updates in parallel (\ref{sub:PossibilityLargerRegisterType}).
+
+Recall the idea of \textit{new\_input\_type} where independent reads or updates are executed in parallel (\ref{sub:PossibilityLargerRegisterType}).
 Therefore, especially when multithreading, \textit{new\_input\_type} has nearly no performance overhead comparing it with \textit{base}.
 This changes, however, for decreasing bandwidth.
 Again, for reading (\ref{fig:readIncLatencyOnline}) and updating (\ref{fig:updIncLatencyOnline}) \textit{new\_input\_type} slows down once the bandwidth drops.

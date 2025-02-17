@@ -1,6 +1,7 @@
 \label{sec:experimentalEvaluation}
-The author implemented \textit{gmp\_mpz\_class} (\ref{sub:approachGMP}) for 64, 128, and 256 bits.
-512 bits and above are also possible in theory yet exceed the storage limitations of the author's machine.
+The author implemented \textit{gmp\_mpz\_class} (\ref{sub:approachGMP}) for arbitrary bit sizes.
+The implementation is tested on values of size 64, 128, and 256 bits.
+512 bits and above is also possible in theory yet exceeds the storage limitations of the author's machine.
 Testing larger bit-sizes is therefore left for future research given a more performant machine.
 
 \textit{new\_input\_type} (\ref{sub:PossibilityLargerRegisterType}) has similar properties for bit-sizes.
@@ -13,7 +14,7 @@ It is called \textit{base} in the following.
 \section{Construction}\label{sub:expEvaConstruction}
 The author uses \textit{Docker} and \textit{Docker Compose} to create a uniform testing environment.
 Each test runs three containers with each container resembling a single party $P_b$.
-These containers are then strapped together via \textit{Docker Compose} providing networking and a uniform interface for setting testing parameters.
+These containers are strapped together via \textit{Docker Compose} providing networking and a uniform interface for setting testing parameters.
 
 \paragraph{Communication and Linux Traffic Control}\label{sub:dockerCommunication}
 All approaches use \textit{Boost.Asio v1.18.1} for asynchronous communication.
@@ -30,12 +31,12 @@ For testing purposes, the author chose to manipulate the bandwidth of the networ
 If not explicitly specified latency is set to 1ms, bandwidth to 100mbits.
 
 \paragraph{Resulting Construction}\label{par:dockerConstruction}
-These changes result in a single Dockerfile that can be reused for all implemented approaches.
-It will generate a fitting Docker-Image given the source code and generate the \code{prac} executable.
+These changes result in a single Dockerfile that is reused for all implemented approaches.
+It generates a fitting Docker-Image given the source code.
 Each image is tagged with the name of the approach.
-This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach as different images are referenced.
+This image is then referenced in the \code{docker-compose.yaml} which is unique for each approach.
 The compose-file itself uses an \code{.env} file to set its environment variables, such as the depth of the RDPF-Triples or the number of elements to retrieve from the database.
-Each compose-file will then run the tests of the chosen approach returning the given performance numbers.
+Each compose-file then runs the tests of the chosen approach returning the given performance numbers.
 The following section describes these numbers in greater detail.
 
 \section{Test Metrics and Types}\label{sub:testMetricsAndTypes}
@@ -45,7 +46,6 @@ These logs show slight variations between the parties.
 However, these differences are very small and occur by definition of the protocol.
 Therefore, all evaluated results are based on the logs of $P_0$, or container \code{p0} respectively.
 These results can be further separated into preprocessing and online phase.
-Different tests and benchmarks are executed for preprocessing and writing.
 
 \paragraph{Logs and Operations}\label{par:expOutputs}
 Logs in general show the following information:
@@ -109,7 +109,7 @@ Online benchmarks will check the following metrics:
 All the benchmarks are executed separately for reading and updating.
 Executing these tests requires the preprocessing to be executed in advance.
 This means 50 RDPF-Triples of depth 15 for both \textit{gmp\_mpz\_class} and \textit{base}, 200 RDPF-Triples of depth 15 for \code{new\_input\_type}.
-It will, however, not be included in the online results as the preprocessing phase in benchmarked separately.
+Preprocessing, however, is not included in the online results as the preprocessing phase in benchmarked separately.
 
 The standard values of bandwidth (100mbits) and latency (1ms) from above remain valid.
 If not given explicitly, the number of retrieved or updated items per operation is set to 5.

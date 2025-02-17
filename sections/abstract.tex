@@ -1,8 +1,8 @@
 \Abstract
-\textit{Oblivious Random Access Memory (ORAM)} enables secure access to storage, primarily in the context of databases, by obfuscating access patterns.
+\textit{Oblivious Random Access Memory (ORAM)} provides secure access to storage, primarily in the context of databases, by obfuscating access patterns.
 An attacker cannot infer any information from these access patterns.
 \textit{Distributed ORAM (DORAM)} considers the partitioning of storage among multiple parties such that no single party can reconstruct the data by itself.
-A fixed number of cooperating parties is required to reconstruct the secret, which means the stored data.
+A fixed number of cooperating parties is required to reconstruct the data.
 This research focuses on \textit{DUORAM}, a \textit{DORAM} implementation by Vadapalli et al.
 While \textit{DUORAM} supports efficient read and write operations for 64-bit values, scaling it to arbitrary element sizes remains a challenge.
 This research discusses and implements possible extensions of \textit{DUORAM} to support elements of arbitrary size.

@@ -1,14 +1,14 @@
 \chapter{Introduction}\label{ch:introduction}
 Consider a ticketing system as used in public transport.
-A client checks into the train by scanning his ticket while entering.
-When needed, a conductor can additionally check whether a given ticket is valid.
-The underlying system therefore stores the clients' tickets in a database to allow the conductor to check whether a single ticket is valid.
+A client checks into the train by scanning her ticket while entering.
+When needed, a conductor additionally checks whether a given ticket is valid.
+The underlying system stores the clients' tickets in a database to allow the conductor to check whether a single ticket is valid.
 This database is queried in a client-server environment.
 If the database is not trusted, however, it might leak information and sensitive passenger data.
 Encryption only hides the data.
 Yet, reading and writing accesses itself can still be tracked.
-The server can observe values changing and track which data element was retrieved or written to.
-Therefore, it can track down which data structure was used, which data elements are requested, and use this knowledge to deduct sensitive information.
+The server can observe values changing and track which element was retrieved or written to.
+Therefore, it can track down which data structure was used, which elements are requested, and use this knowledge to deduct sensitive information.
 In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a sequence of ticket-entries.
 Also, considering checking into the train changes the according ticket element in the database, the server could deduct which passengers are sitting in which train even without a conductor checking the tickets.
 Thus, access patterns need to be hidden as well.
@@ -49,7 +49,7 @@ This research aims to extend this implementation for values of arbitrary size re
     \item Are there any general concepts or datatypes that prove particularly useful in terms of scalability?
 \end{enumerate}
 
-\section*{Roadmap}\label{sec:roadmap}
+\section{Roadmap}\label{sec:roadmap}
 To answer these questions, the research is structured as follows:
 \ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in \ref{ch:ORAM}.
 \ref{ch:Implementation} builds upon these theoretical introductions to further dive into the theoretical reading- and updating-protocols used in \textit{DUORAM}.
@@ -61,7 +61,7 @@ These metrics are based on bandwidth, entry-size, communication efficiency, and 
 Each approach is tested, benchmarked and compared with its fellow-approaches based on these metrics.
 The results are then used in \ref{ch:Conclusion} to answer the research questions and highlights unanswered questions as well as potential approaches for further research in the future.
 
-\section*{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
+\section{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
 This section introduces further research the benevolent reader might be interested in.
 It is, however, not required to read all of it for understanding this research.
 
