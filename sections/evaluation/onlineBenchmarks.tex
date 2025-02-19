@@ -2,14 +2,26 @@
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/online/wct_latency_read_online.png}
-    \caption{Online reading for increasing latency, constant bandwidth, and constant number of elements retrieved.}
+    \caption{Online: Reading for increasing latency, constant bandwidth, and constant number of elements retrieved.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:readIncLatencyOnline}
 \end{figure}
 
 \begin{figure}
     \centering 
     \includegraphics[width=0.8\textwidth]{plots/plots/online/wct_latency_update_online.png}
-    \caption{Online updating for increasing latency, constant bandwidth, and constant number of elements updated.}
+    \caption{Online: Updating for increasing latency, constant bandwidth, and constant number of elements updated.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:updIncLatencyOnline}
 \end{figure}
 
@@ -40,27 +52,51 @@ Therefore, \textit{gmp\_mpz\_class} is only preferable on systems with high late
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/online/wct_bandwidth_read_online.png}
-    \caption{Online reading for increasing bandwidth, constant latency, and constant number of elements retrieved.}
+    \caption{Online: Reading for increasing bandwidth, constant latency, and constant number of elements retrieved.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:readIncBandwidthOnline}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/online/wct_bandwidth_update_online.png}
-    \caption{Online updating for increasing bandwidth, constant latency, and constant number of elements updated.}
+    \caption{Online updating for increasing bandwidth, constant latency, and constant number of elements updated.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:updIncBandwidthOnline}
 \end{figure}
 
 \begin{figure}
     \centering 
     \includegraphics[width=0.8\textwidth]{plots/plots/online/message_num_read_online.png}
-    \caption{Number of messages sent for retrieving an increasing number of elements of constant depth.}
+    \caption{Online: Number of messages sent for retrieving an increasing number of elements of constant depth.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:readMsgSentOnline}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/online/message_num_update_online.png}
-    \caption{Number of messages sent for updating an increasing number of elements of constant depth.}
+    \caption{Online: Number of messages sent for updating an increasing number of elements of constant depth.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:updMsgSentOnline}
 \end{figure}

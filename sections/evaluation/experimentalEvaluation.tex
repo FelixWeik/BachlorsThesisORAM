@@ -100,10 +100,9 @@ The standard value for depth is 15 resulting in a database holding up to $2^{15}
 \paragraph{Online Benchmarks and Default Values}\label{par:onlineBenchmarksNumbers}
 Online benchmarks will check the following metrics:
 \begin{itemize}
-    \item Wall-Clock time for increasing latency, constant number of elements retrieved or updated, and constant bandwidth
-    \item Wall-Clock time for increasing bandwidth, constant number of elements retrieved or updated, and constant latency 
-    \item Number of sent messages for increasing number of retrieved or updated items, constant bandwidth, and constant latency 
-    \item Amount of message bytes sent for increasing number of retrieved or updated items, constant bandwidth, and constant latency
+    \item Wall-Clock time for increasing latency, constant number of elements retrieved or updated, and constant bandwidth (\ref{fig:readIncLatencyOnline}, \ref{fig:updIncLatencyOnline})
+    \item Wall-Clock time for increasing bandwidth, constant number of elements retrieved or updated, and constant latency (\ref{fig:updIncBandwidthOnline}, \ref{fig:readIncBandwidthOnline})
+    \item Number of sent messages for increasing number of retrieved or updated items, constant bandwidth, and constant latency (\ref{fig:updMsgSentOnline}, \ref{fig:readMsgSentOnline})
 \end{itemize}
 
 All the benchmarks are executed separately for reading and updating.

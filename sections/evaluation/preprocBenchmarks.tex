@@ -46,16 +46,20 @@ Varying the latency, however, slows down \textit{gmp\_mpz\_class} but not \texti
 Taking a closer look at the implementation explains this issue:
 For \textit{base} and \textit{new\_input\_type} message are stored in a buffer.
 As each message has a fixed size of 8 bites, one can store messages in a buffer of fixed size.
-Once the buffer is filled, one sends it and empties the buffer.
-The set buffer size directly impacts the number of sent messages.
-\textit{gmp\_mpz\_class} has no such buffer as messages are of variable size.
+Once it is filled, one sends and empties the buffer.
+The set size of the buffer directly impacts the number of sent messages.
+\textit{gmp\_mpz\_class} has no such buffer as this was a debugging issue.
 Therefore, messages are sent directly.
 Also, \textit{gmp\_mpz\_class} sends two messages where \textit{base} and \textit{new\_input\_type} require only a single message as both the size of the data and the data itself are sent separately.
 This not only results in increased message overhead as shown in \ref{fig:numSentMessagesIncDepthPreproc} but also in a higher performance degradation as latency increases.
+Note that this general issue of decreased performance due to a larger communication overhead is solely due to its implementation.
+Refining the implementation might solve this issue and is therefore left for future research.
+Possible solutions are given there.
 Recall that \textit{mpz\_class} values need to be serialized before sending and deserialized when received (\ref{subsub:gmpCommunication}).
 This significantly slows down each communication operation.
 When tested, each sending operation including serialization required $0.01$ seconds on average, receiving took $0.02$ seconds on average.
 This heavily impacts performance compared with $0.0001$ seconds for sending and $0.0025$ seconds for receiving a \code{uint64\_t} message.
+This was tested by timing reading and writing operations from \textit{base} and \textit{gmp\_mpz\_class} using the \code{chrono} library.
 
 Finally, bit operations on \code{mpz\_class} values are less performant than on \code{uint64\_t} values.
 Testing showed that especially on \code{mpz\_class} values containing multiple limbs, bit shifts and XOR operations are around $5$ times slower than similar operations on \code{uint64\_t}.
@@ -73,16 +77,28 @@ Therefore, preprocessing in \textit{gmp\_mpz\_class} can be preferred for larger
 \begin{figure}
     \centering 
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/wall_clock_preproc.png}
-    \caption{Wall-Clock time for increasing depth and constant number of generated RDPF-Triples}
+    \caption{Preprocessing: Wall-Clock time for increasing depth and constant number of generated RDPF-Triples.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:wallClockDepthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/wall_clock_incnum_preproc.png}
-    \caption{Wall-Clock time for constant depth and increasing number of generated RDPF-Triples.
+    \caption{Preprocessing: Wall-Clock time for constant depth and increasing number of generated RDPF-Triples.
     Note here that \textit{new\_input\_type} is left out as it uses the same RDPF generation algorithm as \textit{base}.
     Therefore, both \textit{base} and \textit{new\_input\_type} have the exact same wall clock time for generating the same amount of RDPF-Triples of the same depth.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
     }
     \label{fig:wallClockIncNumPreproc}
 \end{figure}
@@ -90,34 +106,72 @@ Therefore, preprocessing in \textit{gmp\_mpz\_class} can be preferred for larger
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/storage_requirements_preproc.png}
-    \caption{Storage Requirements for constant number of generated RDPF-Triples and increasing depth.}
+    \caption{Preprocessing: Storage Requirements for constant number of generated RDPF-Triples and increasing depth.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.}
     \label{fig:storageReqDepthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/aes_ops_preproc.png}
-    \caption{Number of local AES operations for constant number of generated RDPF-Triples and increasing depth.}
+    \caption{Preprocessing: Number of local AES operations for constant number of generated RDPF-Triples and increasing depth.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.}
     \label{fig:aesOpsDepthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/time_decreasing_bandwidth_preproc.png}
-    \caption{Wall-Clock time for increasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency.}
+    \caption{Preprocessing: Wall-Clock time for increasing bandwidth, constant number of generated RDPF-Triples, constant depth, and constant latency.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:wallClockDecreasingBandwidthPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/time_decreasing_latency_preproc.png}
-    \caption{Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth.}
+    \caption{Preprocessing: Wall-Clock time for increasing latency, constant number of generated RDPF-Triples, constant depth, and constant bandwidth.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:wallClockIncLatencyPreproc}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{plots/plots/preproc/sent_messages_preproc.png}
-    \caption{Number of sent messages for constant number of generated RDPF-Triples and increasing depth.}
+    \caption{Preprocessing: Number of sent messages for constant number of generated RDPF-Triples and increasing depth.
+    Note \textit{new\_input\_type} generating 200 triples while all other approaches generate 50 RDPF-Triples.
+    This is due to its higher RDPF-triple consumption, which can reach up to four RDPF-Triples per online-operation for 256 bits.
+    The green curve is the base implementation by Vadapalli et al. 
+    Red curves represent \textit{gmp\_mpz\_class}.
+    The darker the red, the greater the entry size.
+    \textit{128 bit}, for example, implies entry sizes of up to 128 bit.
+    The blue curve represents \textit{new\_input\_type}.
+    }
     \label{fig:numSentMessagesIncDepthPreproc}
 \end{figure}

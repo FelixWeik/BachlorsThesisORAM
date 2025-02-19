@@ -54,7 +54,22 @@ Second, the existing approaches, especially \textit{gmp\_mpz\_class}, should be 
 Possible alternatives are \textit{Boost.Multiprecision} or \textit{Fast Library for Number Theory (FLINT)}.
 These libraries might provide faster bit operations and more storage friendly ways of working with arbitrarily scalable unsigned integers.
 
-Next, other approaches can be analyzed that could not be implemented or described for time reasons.
+As mentioned in \ref{sec:experimentalEvaluation}, parts of the poor performance observed in \textit{gmp\_mpz\_class} originate from the implementation.
+The necessary change of leaving out the queue used as a buffer in the communication introduced a greater number of sent messages.
+The resulting decrease in communication efficiency can be solved by refining the implementation of \textit{gmp\_mpz\_class}. 
+Reintroducing the queue as used in \textit{base} and \textit{new\_input\_type}, however, leads to double free errors as shown in \ref{par:doubleFree}.
+Therefore, two possible solutions should be checked.
+\begin{enumerate}
+    \item Pad \code{mpz\_class} values to a fixed size.
+    Hardcoding this size according to the given value for \code{VALUE\_BITS} allows sending messages without sending its size first.
+    One can then reintroduce the queue, resulting in less messages and thus in a smaller number of sent messages and slimmer communication overhead.
+    \item Queue up a fixed number of values per message.
+    One could arrange items in the queue including their size and value.
+    \code{[3,101,5,10001,2,11]}, for example, contains three deserialized \code{mpz\_class} values of different size.
+    This requires rules for constructing and deconstructing binary values from and to \code{mpz\_class} values but overall might heavily increase communication performance.
+\end{enumerate}
+
+Next, other approaches can be analyzed that are not be implemented or described due to time restrictions.
 One approach of this type could use two DCFs (\ref{cha:DistributedComparisonFunctions}) per operation.
 These DCFs define an interval in the database in which one reads or updates her entries.
 This is similar to the introduced \textit{new\_input\_type} approach (\ref{sub:PossibilityLargerRegisterType}).
@@ -67,4 +82,4 @@ Parties $P_0,P_1$ then negotiate their DPF-keys together without sharing the act
 Instead of using binary trees (\ref{sub:BGIDPFConstruction}) they use matrices for DPF representation.
 Also, instead of using synchronous, round-based communication for every DPF level, messages are shared asynchronously and in a single round.
 This might not just speed up the preprocessing phase, but might also decrease the RDPF-triple's storage requirements.
-Moreover, sending fewer and presumably smaller messages could reduce the susceptibility of preprocessing to lower bandwidth or higher latencies.
+Moreover, sending fewer messages could reduce the susceptibility of preprocessing to higher latencies.
