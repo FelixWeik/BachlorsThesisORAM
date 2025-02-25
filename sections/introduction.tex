@@ -7,10 +7,14 @@ This database is queried in a client-server environment.
 If the database is not trusted, however, it might leak information and sensitive passenger data.
 Encryption only hides the data.
 Yet, reading and writing accesses itself can still be tracked.
-The server can observe values changing and track which element was retrieved or written to.
-Therefore, it can track down which data structure was used, which elements are requested, and use this knowledge to deduct sensitive information.
+Therefore, one can track down which data structure was used, which elements are requested, and use this knowledge to deduct sensitive information.
+The server or unknown third parties can observe values changing and track which element was retrieved or written to.
+Note that data and its addresses are often closely intertwined.
+Observing data accesses alone gives enough information to assign addresses to certain passengers.
+The server or a malicious third party can gather even more information from side channels.
 In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a sequence of ticket-entries.
 Also, considering checking into the train changes the according ticket element in the database, the server could deduct which passengers are sitting in which train even without a conductor checking the tickets.
+Adding side-channel information not only reveals the exact train the passenger is on, but also its destination and current location.
 Thus, access patterns need to be hidden as well.
 
 The most trivial solution is to access the database in its whole for each query.
@@ -109,14 +113,3 @@ Retrieved elements are then moved up in the hierarchy to provide faster executio
 It is therefore considered a mixture of both construction forms.
 This means, each party holds a database constructed as a set of tables while each table is secret shared.
 In short, this mixture provides an efficiency improvement of more than $100x$ due to reducing the communication complexity \footnote{GigaDORAM is implemented in the paper and can be found here: https://github.com/jacob14916/GigaDORAM-USENIX23-Artifact/tree/main}.
-
-%//TODO vllt noch einbauen, dass DUORAM eine communication complexity von O(mlgn) mit m wörter pro kommunikation (sind konstant) und n Größe der Datenbank
-% MEEEEEHR ruhig eine ganze Seite (das soll schon fast eine literaturrecherche werden)
-% andere Orams zum beispiel (gigadoram) so aktueller stand von orams
-% duoram overview state of the art
-% es gibt hierarchy based und dpf based orams
-% wenn man das auf datenbankgröße erweitert wie man das vergleichen kann
-% Absatz zu DPFs
-% privacy preserving datenbanken sind related (schnell nachrecherchieren vllt gibts da bessere begriffe lol) privacy preserving data collection 
-
-% privat set intersection weglassen
