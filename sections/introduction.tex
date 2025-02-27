@@ -1,21 +1,28 @@
 \chapter{Introduction}\label{ch:introduction}
-Consider a ticketing system as used in public transport.
-A client checks into the train by scanning her ticket while entering.
-When needed, a conductor additionally checks whether a given ticket is valid.
-The underlying system stores the clients' tickets in a database to allow the conductor to check whether a single ticket is valid.
-This database is queried in a client-server environment.
-If the database is not trusted, however, it might leak information and sensitive passenger data.
-Encryption only hides the data.
-Yet, reading and writing accesses itself can still be tracked.
-Therefore, one can track down which data structure was used, which elements are requested, and use this knowledge to deduct sensitive information.
-The server or unknown third parties can observe values changing and track which element was retrieved or written to.
+In times of digitalization more and more data about each of us is collected.
+Without proper security measures, an interested third party or even the communication partner could deduct highly sensitive information about the underlying data.
+
+Consider, for example, an anonymous ticketing system as used in public transport.
+A client checks into the train by scanning her ticket electronically while entering.
+This creates an instance of a \textit{trip} in a database.
+It stores her departure location and the train she is on.
+Once checked out it is extended with the time spent on the train, her destination, and billing information.
+The trip data must be stored in such a way, that the provider is unable to link it to its customers.
+However, if the service additionally implements a monthly payment service, for example, one requires the trips to be linkable to customers. 
+A naive solution would be to assign each customer a unique address and store the trip information encrypted through e.g. threshold encryption, such that a single transportation provider is unable to see the underlying data.
+This works for hiding the data.
+Yet, since trips for a customer are always inserted at the same location, by observing the access patterns and using additional background information a transportation provider is still able to deduct the user that created the trip and potentially also the trip information.
+
 Note that data and its addresses are often closely intertwined.
-Observing data accesses alone gives enough information to assign addresses to certain passengers.
-The server or a malicious third party can gather even more information from side channels.
-In our ticketing system, for example, the server could deduct which passengers were on a certain train if the conductor retrieves a sequence of ticket-entries.
-Also, considering checking into the train changes the according ticket element in the database, the server could deduct which passengers are sitting in which train even without a conductor checking the tickets.
-Adding side-channel information not only reveals the exact train the passenger is on, but also its destination and current location.
-Thus, access patterns need to be hidden as well.
+Observing data accesses in the example from above gives enough information to assign addresses to certain passengers.
+One can track down which data structure are used, which elements are requested, and ultimately use this knowledge to deduct sensitive information.
+Utilizing side channels leaks even more sensitive information:
+In the example the server could deduct which passengers were on a certain train if a sequence of encrypted trips is created in a small timeframe.
+Adding side-channel information not only reveals the exact train the passengers are on, but also its destination and current location.
+Once a passenger is known, one can deduct personal data and information about her habits.
+For example, if a certain passenger takes a train frequently it might be her commuting route.
+Once she skips the ride, this indicates her being on vacation or on sick leave.
+To make these conclusions impossible, one must not just hide the data itself but also must hide access patterns on the database.
 
 The most trivial solution is to access the database in its whole for each query.
 This is known as \textit{Linear Scan} \cite{doerner2017scale}.
@@ -57,18 +64,14 @@ This research aims to extend this implementation for values of arbitrary size re
 To answer these questions, the research is structured as follows:
 \ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in \ref{ch:ORAM}.
 \ref{ch:Implementation} builds upon these theoretical introductions to further dive into the theoretical reading- and updating-protocols used in \textit{DUORAM}.
-Starting from there, an initial theoretical scaling-approach is outlined.
-The same chapter will then introduce the given implementation by Vadapalli et al. including first executions and scenarios.
-This implementation will then be expanded for each scaling-approach.
+It introduces the given implementation by Vadapalli et al. including first executions and scenarios.
+\ref{ch:ExtendingTheImplementation} then expands the protocols both in theory and the implementation for each scaling-approach.
 Finally, \ref{ch:Evaluation} executes benchmarks on each approach while deriving performance metrics.
 These metrics are based on bandwidth, entry-size, communication efficiency, and storage-efficiency.
 Each approach is tested, benchmarked and compared with its fellow-approaches based on these metrics.
 The results are then used in \ref{ch:Conclusion} to answer the research questions and highlights unanswered questions as well as potential approaches for further research in the future.
 
 \section{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
-This section introduces further research the benevolent reader might be interested in.
-It is, however, not required to read all of it for understanding this research.
-
 \textit{ORAM}s can be separated into two general groups regarding their construction:
 \paragraph{ORAMs with Function Secret Sharing}\label{par:oramsWithFSS}
 This concept considers ORAMs that use \textit{Function Secret Sharing (FSS)} and Multi \textit{Party Computations (MPC)} for hiding access patterns.
@@ -100,6 +103,9 @@ Hierarchical ORAM, too, is executed in a client-server setting.
 The server holds the database, which is divided into a hierarchy of tables.
 The tables are of progressively larger size \cite{peserico2023hierarchical}.
 To access a data element, one either recursively searches the tables and layers or utilizes \textit{Pseudo Random Function (PRF)}.
+Data accesses in this context are always a trade-off between network- and computational efficiency.
+Hierarchical ORAM is more efficient in its computation.
+This, however, increases its susceptibility against varying network conditions like low bandwidth or high latency.
 
 \textbf{\textit{Optimal Oblivious Parallel RAM (OOPRAM)}} was introduced by Asharov et al. \cite{asharov2022oopram}.
 Its database is constructed as a hierarchy of hash-tables.

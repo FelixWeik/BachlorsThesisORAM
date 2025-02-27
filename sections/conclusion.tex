@@ -44,6 +44,20 @@ Another practical drawback is its characteristics during compilation.
 Since both \code{mpz\_t} and \code{mpz\_class} are evaluated during runtime they cannot be set as template parameters which needs the properties' arguments during preprocessing.
 However, as \code{mpz\_t} and \code{mpz\_class} provide arbitrarily scalable integers, bit operations of acceptable performance, and a usable documentation, they proved the most useful for this research.
 
+Recall the example from the Introduction: The anonymous ticketing system.
+Each \textit{trip} instance requires a few kilobytes of free space.
+In order to hide access patterns, one uses \textit{DUORAM} including one of its implemented extensions.
+With \textit{gmp\_mpz\_class} each \textit{trip} is retrieved or updated using a single operation.
+Then, however, each object is limited to an upper size limitation.
+Also, operations are timely and computationally expensive.
+Queries with \textit{new\_input\_type} are presumably faster.
+This requires each \textit{trip} to be split into a fitting amount of 64-bit chunks.
+At the moment, the amount of maximum chunks is set to a fixed size before compilation.
+Therefore, size restrictions as before are still valid.
+As this results in a lot of chunks, one requires multiple RDPF-Triples for one access.
+As this increases the overall RDPF-Triple consumption, more RDPF-Triples need to be generated slowing down preprocessing.
+If one is willing to accept this trade-off of reduced performance in exchange for secret access patterns, the leakage of sensitive information through observed data accesses, as described in the introduction, is avoided.
+
 \paragraph{Future Research}\label{par:futureResearch}
 This work leaves open some interesting directions for future research.
 
@@ -58,7 +72,7 @@ As mentioned in \ref{sec:experimentalEvaluation}, parts of the poor performance 
 The necessary change of leaving out the queue used as a buffer in the communication introduced a greater number of sent messages.
 The resulting decrease in communication efficiency can be solved by refining the implementation of \textit{gmp\_mpz\_class}. 
 Reintroducing the queue as used in \textit{base} and \textit{new\_input\_type}, however, leads to double free errors as shown in \ref{par:doubleFree}.
-Therefore, two possible solutions should be checked.
+Therefore, two possible solutions should be checked:
 \begin{enumerate}
     \item Pad \code{mpz\_class} values to a fixed size.
     Hardcoding this size according to the given value for \code{VALUE\_BITS} allows sending messages without sending its size first.
