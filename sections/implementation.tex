@@ -1,5 +1,4 @@
-\chapter{Implementation}
-\label{ch:Implementation}
+\chapter{Existing Implementation}\label{ch:Implementation}
 
 \label{sec:ImplementationTarget}
 This research aims to scale ORAMs arbitrarily, using \textit{3-Party DUORAM} as an example.
@@ -7,14 +6,16 @@ The already existing \textit{DUORAM} implementation by Vadapalli et al. \cite{va
 Larger values are not supported yet.
 After further expanding the theoretical foundations of the \textit{DUORAM} and explaining the existing code, this chapter highlights and discusses the most promising approaches.
 
-\section{Scaling in Theory}
-\input{sections/implementation/ScalingBasedOnProtocol.tex}
-
 \section{Existing Implementation}
 \input{sections/implementation/existingImplementation/ExistingImplementation.tex}
 
 \section{General Limitations}
 \input{sections/implementation/StructuralLimitations.tex}
+
+\chapter{Extending the Implementation}\label{ch:ExtendingTheImplementation}
+
+\section{Scaling in Theory}
+\input{sections/implementation/ScalingBasedOnProtocol.tex}
 
 \section{Approaches}\label{sec:approaches}
 \subsection{Introducing a larger Register Type (\textit{new\_input\_type})}
