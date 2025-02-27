@@ -2427,19 +2427,19 @@
     <bcf:citekey order="48" intorder="1">medium2024beaver</bcf:citekey>
     <bcf:citekey order="49" intorder="1">pullonen2013actively</bcf:citekey>
     <bcf:citekey order="50" intorder="1">kyle2023grotto</bcf:citekey>
-    <bcf:citekey order="51" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="52" intorder="1">ata01priv</bcf:citekey>
-    <bcf:citekey order="53" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="54" intorder="1">ata01priv</bcf:citekey>
-    <bcf:citekey order="55" intorder="1">yadav2022survey</bcf:citekey>
+    <bcf:citekey order="51" intorder="1">kyle2023grotto</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="53" intorder="1">ata01priv</bcf:citekey>
+    <bcf:citekey order="54" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="55" intorder="1">ata01priv</bcf:citekey>
     <bcf:citekey order="56" intorder="1">yadav2022survey</bcf:citekey>
-    <bcf:citekey order="57" intorder="1">gasarch2004survey</bcf:citekey>
+    <bcf:citekey order="57" intorder="1">yadav2022survey</bcf:citekey>
     <bcf:citekey order="58" intorder="1">gasarch2004survey</bcf:citekey>
-    <bcf:citekey order="59" intorder="1">lipmaa2010pirwriting</bcf:citekey>
-    <bcf:citekey order="60" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="61" intorder="1">pinkas2010oblivious</bcf:citekey>
+    <bcf:citekey order="59" intorder="1">gasarch2004survey</bcf:citekey>
+    <bcf:citekey order="60" intorder="1">lipmaa2010pirwriting</bcf:citekey>
+    <bcf:citekey order="61" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="62" intorder="1">pinkas2010oblivious</bcf:citekey>
-    <bcf:citekey order="63" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="63" intorder="1">pinkas2010oblivious</bcf:citekey>
     <bcf:citekey order="64" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="65" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="66" intorder="1">vadapalli2023duoram</bcf:citekey>
@@ -2450,20 +2450,21 @@
     <bcf:citekey order="71" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="72" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="73" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="74" intorder="1">rijmen2001advanced</bcf:citekey>
-    <bcf:citekey order="75" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="76" intorder="1">rijmen2001advanced</bcf:citekey>
-    <bcf:citekey order="77" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="74" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="75" intorder="1">rijmen2001advanced</bcf:citekey>
+    <bcf:citekey order="76" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="77" intorder="1">rijmen2001advanced</bcf:citekey>
     <bcf:citekey order="78" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="79" intorder="1">rijmen2001advanced</bcf:citekey>
-    <bcf:citekey order="80" intorder="1">gentry2012homomorphic</bcf:citekey>
+    <bcf:citekey order="79" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="80" intorder="1">rijmen2001advanced</bcf:citekey>
     <bcf:citekey order="81" intorder="1">gentry2012homomorphic</bcf:citekey>
-    <bcf:citekey order="82" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="83" intorder="1">boyle2016function</bcf:citekey>
-    <bcf:citekey order="84" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="82" intorder="1">gentry2012homomorphic</bcf:citekey>
+    <bcf:citekey order="83" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="84" intorder="1">boyle2016function</bcf:citekey>
     <bcf:citekey order="85" intorder="1">vadapalli2023duoram</bcf:citekey>
     <bcf:citekey order="86" intorder="1">vadapalli2023duoram</bcf:citekey>
-    <bcf:citekey order="87" intorder="1">boyle2025non</bcf:citekey>
+    <bcf:citekey order="87" intorder="1">vadapalli2023duoram</bcf:citekey>
+    <bcf:citekey order="88" intorder="1">boyle2025non</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">

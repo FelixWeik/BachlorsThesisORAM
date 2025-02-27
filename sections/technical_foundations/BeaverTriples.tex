@@ -5,17 +5,16 @@ The general structure is of the form $\langle a,b,c\rangle$ such that $c=a\cdot 
 Let $a_i,b_i,c_i$ be the shares of the according secret held by party $P_i$.
 
 To generate the beaver triples a \textit{Preprocessing Phase} is executed prior to the Multi Party Computation (MPC). 
-The servers' goal is to compute three secret representations $a_i,b_i,c_i$.
-$a_i,b_i$ are random and unknown to all other parties.
+The servers' goal is to compute three secret representations $a_i,b_i,c_i$, where $a_i,b_i$ are random and unknown to all other parties.
 
 Now, one wants to compute two secret representation $x_i,y_i$ of $z_i$ where $z=x\cdot y$.
-This is done in the MPC by using the multiplication protocol as follows:
+MPC uses the multiplication protocol as follows:
 \begin{itemize}
     \item Open $a_i+x_i$ so all other parties learn $A=x+a$
     \item Open $b_i+y_i$ so all other parties learn $B=y+b$
     \item Let all servers compute $z_i=A\cdot y_i+(-B)\cdot a_i+c_i$
 \end{itemize}
-Since $z=x\cdot y+a\cdot y-y\cdot a-b\cdot a+a\cdot b=x\cdot y$ the protocol is correct \cite{medium2024beaver}.
+Since $z=x\cdot y+a\cdot y-y\cdot a-b\cdot a+a\cdot b=x\cdot y$, the protocol is correct \cite{medium2024beaver}.
 The synchronous, more communication expensive part of the calculation is done in the preprocessing phase.
 Therefore, one can generate multiple beaver triples in parallel.
 Every multiplication will consume one beaver triple, since using it multiple times may lead to reconstructing the secret with linear combination \cite{pullonen2013actively}.

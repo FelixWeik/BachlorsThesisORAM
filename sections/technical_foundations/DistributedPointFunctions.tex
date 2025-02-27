@@ -3,7 +3,7 @@
 \label{sub:PointFunctions}
 On a high level view, a \textit{Point Function} $f$ is defined around a target index $\alpha$ and its target value $\beta$.
 For each input $i\neq\alpha$ the point function will output $0$.
-Only if the input $i$ is equal to the target index $\alpha$, $f$ will output $\beta$ \cite{gilboa2014distributed}.
+Only if the input $i$ is equal to the target index $\alpha$, $f$ will output $\beta$ (\cite{gilboa2014distributed}).
 \[
 f_{\alpha,\beta}(i) = \begin{cases} 
       \beta & \text{if } i = \alpha, \\
@@ -17,7 +17,6 @@ $f$ evaluates $\alpha$ to $\beta$ and to $0\in G$ for all other inputs.
 Thus, $f_{\alpha,\beta}=(N,G,\alpha,\beta)$ represents the valid point function $f$.
 
 In this research all following point functions will evaluate to $1$ for a given target index $\alpha$.
-So:
 \[
 f_{\alpha,1}(i) = \begin{cases} 
       1 & \text{if } i = \alpha, \\
@@ -28,13 +27,13 @@ This implies that this special case $f_{\alpha,1}$ is a functional representatio
 Such representations will be necessary for representing the target index of which element to retrieve from the database later on.
 
 Note that Point Functions can be represented by using binary trees.
-Figure 2 presented in the paper of Vadapalli et al. \cite{vadapalli2023duoram} descriptively describes this concept.
+Figure 2 presented in the paper of Vadapalli et al. \cite{vadapalli2023duoram} describes this concept.
 It shows a binary tree having leafs holding $0$ everywhere but the leaf at the target index holding the value of the target index.
 
 \subsection{Distributed Point Functions}
 \label{sub:DistributedPointFunctions}
-\textit{Distributed Point Functions (DPFs)} are considered the simplest nontrivial special case of function secret sharing (\ref{sub:FunctionSecretSharingScheme}) \cite{boyle2016function}.
-Parallels between both concepts are clearly visible.
+\textit{Distributed Point Functions (DPFs)} are considered to be the simplest nontrivial special case of function secret sharing (\ref{sub:FunctionSecretSharingScheme}) \cite{boyle2016function}.
+As both concepts use the same basic building blocks parallels are clearly visible.
 DPFs were introduced first by Gilboa et al. \cite{gilboa2014distributed}.
 
 The tuple of PPT algorithms $\Pi = (Gen, Eval_0, ..., Eval_{m-1})$ defines an \textit{m-DPF} \cite{boyle2023information}.
@@ -47,9 +46,10 @@ The algorithms are designed as follows \cite{boyle2023information,gilboa2014dist
 
 $\Pi$ needs to fulfil the criteria of Correctness and Security \cite{boyle2023information}.
 Boyle et al. \cite{boyle2023information} define correctness as follows: 
-$$
-\forall\lambda,f_{\alpha,\beta}=(N,G,\alpha,\beta),x\in [N]:(k_0,...,k_{m-1})\leftarrow Gen(1^\lambda, f_{\alpha,\beta})\Rightarrow PR[\sum_{i=0}^{m-1}Eval_i(k_i,x)=f_{\alpha,\beta}] = 1
-$$
+\[
+\forall\lambda,f_{\alpha,\beta}=(N,G,\alpha,\beta),x\in [N]:
+(k_0,...,k_{m-1})\leftarrow Gen(1^\lambda, f_{\alpha,\beta})\Rightarrow PR[\sum_{i=0}^{m-1}Eval_i(k_i,x)=f_{\alpha,\beta}] = 1
+\]
 
 The most general DPF is a \textit{(m,t)-DPF}.
 It distributes a point function among $m$ parties, such that no coalition of fewer than $t$ parties can learn the target point or the target value \cite{vadapalli2023duoram}.
@@ -82,45 +82,47 @@ Using a length-doubling PRG on a random seed, which takes any $n$-bit seed and r
 
 To represent a DPF, the following tree invariants \cite{boyle2023information} must be met:
 \begin{itemize}
-   \item Nodes on the path to the target index $\alpha$ must not be identical
-   \item Nodes that do not lead to target index $\alpha$ must be identical 
+   \item Nodes on the path to the target index $\alpha$ must not be identical.
+   \item Nodes that do not lead to target index $\alpha$ must be identical. 
 \end{itemize}
 Identical here means both node-labels are the same and thus will XOR to $0$.
 Since PRGs are pseudorandom, equal labels will lead to equal subtrees.
 By keeping the tree invariants intact, every tree will represent the share of the DPF which will XOR to $0$ for every leaf unequal to the target index and to $\beta$ for the leaf pair on the target index $\alpha$.
-The vanilla implementation of Vadapalli et al. \cite{vadapalli2023duoram} creates DPFs in way which will keep this tree-invariant intact by design.
+The vanilla implementation of Vadapalli et al. \cite{vadapalli2023duoram} creates DPFs in a way which will keep this tree-invariant intact by design.
 
 We will use the following notation:
 The subscript indicates the party to which the tree belongs.
-The superscript indicates the path - $0$ for left, $1$ for right.
-For example, $s_0^0$ is the left child of the seed in party 0s tree.
+The superscript indicates the path: $0$ for left, $1$ for right.
+For example, $s_0^0$ is the left child of the seed in $P_0$'s tree.
 The seeds $s_0^{[]},s_1^{[]}$ are chosen randomly by each party.
 A \textit{Node Pair} is a pair of nodes with one from each tree respectively and the same superscript, for example $(s_0^{01},s_1^{01})$.
 
 Since this concept uses a length-doubling PRG on a random starting label both trees will be completely random.
 To tackle this issue, Boyle et al. \cite{boyle2016function} introduce \textit{Correction Words (cw)} and \textit{Flag Bits (fb)}.
-\begin{itemize}
-   \item{Correction Words (cw)}: 
-   Are used to equalize a node pair. 
-   Both trees keep the same list of correction words with each level being assigned one correction word.
-   A \textit{Final Correction Word ($F$)} is assigned to the leaf layer.
-   It will change the random label of the leaf layer at the target index to reach the target value.
-   Using $F$ on a non-target leaf will evaluate to a random value, which is equal for a leaf pair.
-   Therefore, each binary DPF-tree of height $n$ holds a tuple of type $(cw_1, ..., cw_n, F)$.
-   \item{Flag Bits (fb)}:
-   Each label is assigned a single flag bit.
-   It indicates, whether the cw will be XORed into the label or not.
-   Recall the tree invariant of nodes being different on the path and equal if they are not.
-   This can be easily implemented by keeping the flag bits on node pairs on the path unqual while having them equal in node pairs not on the path.
-\end{itemize}
 
+\paragraph{Correction Words (cw)}
+Are used to equalize a node pair. 
+Both trees keep the same list of correction words with each level being assigned one correction word.
+A \textit{Final Correction Word ($F$)} is assigned to the leaf layer.
+It will change the random label of the leaf layer at the target index to reach the target value.
+Using $F$ on a non-target leaf will evaluate to a random value, which is equal for a leaf pair.
+Therefore, each binary DPF-tree of height $n$ holds a tuple of type $(cw_1, ..., cw_n, F)$.
+
+\paragraph{Flag Bits (fb)}
+Each label is assigned a single flag bit.
+It indicates whether the \textit{cw} will be XORed into the label or not.
+Recall the tree invariant: Nodes on the path to the target index are unequal and vice versa.
+This can be easily implemented by keeping the flag bits on node pairs on the path unequal while having them equal in node pairs not on the path.
+
+\paragraph{Tree Evaluation}
 To evaluate the tree, Vadapalli et al. \cite{vadapalli2023duoram} propose the $EVALFULL$ method.
 It traverses the DPF-tree in a depth first search (DFS) like manner and returns two vectors $(v_b,t_b)$.
 After evaluation $v_b$ will hold a vector of all leaf labels of tree $b$.
 $t_b$ will hold a vector of all flag bits of tree $b$'s leaf layer.
 The result can be obtained by XORing the results of both trees.
-$t_0\oplus t_1 = e_\alpha$ which is the one hot vector with the one at index $\alpha$ (also called the \textit{Shifting Vector}).
-$v_0\oplus v_1 = e_\alpha\cdot\beta$ with $\beta$, again, being the target value. 
+The XOR operation $t_0\oplus t_1 = e_\alpha$ results in the one hot vector with the one at index $\alpha$.
+It is also called the \textit{Shifting Vector}.
+XORing $v_0\oplus v_1 = e_\alpha\cdot\beta$ with $\beta$ results in the target value. 
 
 This means, a DPF tree can be represented by its seed, the vector of flag bits, and the vector of correction words.
 Alternatively, to minimize calculation time, Vadapalli et al. \cite{vadapalli2023duoram} store a DPF tree by saving the random seed, the vector holding the correction words, $v_b$, and $t_b$.
@@ -128,10 +130,10 @@ Alternatively, to minimize calculation time, Vadapalli et al. \cite{vadapalli202
 \subsection{Cyclic-Shifting Protocol}
 \label{sub:CyclicShiftingProtocol}
 A \textit{Cyclic-Shifting Protocol} allows parties to shift shares in their DPFs \cite{vadapalli2023duoram}.
-It is called Cyclic-shifting since it relies on cyclic bit-shifts.
-DUORAM's \textit{Online Phase} (\ref{subsub:DuoramOnlinePhase}) uses a cyclic shifting protocol to either postpone the decision of where to read/write or postpone the decision of what to write.
-This means, one can change the shifting-vector $e_i$ or the target value $M$ by executing a cyclic-shifting protocol.
-Explicit constructions and further descriptions can be found in \ref{subsub:DuoramOnlinePhase}.
+It is called \textit{Cyclic-Shifting} as it relies on cyclic bit-shifts.
+DUORAM's \textit{Online Phase} (\ref{subsub:DuoramOnlinePhase}) uses such protocol to either postpone the decision of where to read/write or postpone the decision of what to write.
+This means, one can change the shifting-vector $e_i$ or the target value $M$ with cyclic shifting.
+Explicit constructions and further descriptions are given in \ref{subsub:DuoramOnlinePhase}.
 
 \subsection{Traversing the DPF Tree}
 \label{sub:TraversingTheDPFTree}
@@ -140,12 +142,12 @@ So for a tree with $n$ elements, one needs an input $i$ of size $log(n)$.
 The algorithm will perform a bit-shift on $i$ to assess the most significant bit.
 This bit will decide which child to evaluate, 0 for the left child and 1 for right.
 By using the \textit{Pseudo-Random-Generator (PRG)} one generates the label for the next node.
-The flag bit will decide whether the cw will be XORed into the label.
+The flag bit will decide whether the \textit{cw} will be XORed into the label.
 This label will then be used for the next iteration until the leaf level is reached.
 On this level, one XORs the final correction word ($F$) if the flag bit allows it to.
 This is the result of the DPF and can be used to calculate the point function's evaluation by evaluating the other part of the DPF in the same way and XORing both results together.
 
-Note, that our implementation will not use this way of evaluation in the standard read or write operations.
+Note that our implementation will not use this way of evaluation in the standard read or write operations.
 The DPF is stored in an already evaluated form and can be used by first performing the cyclic shift and then using it in the wanted context.
 
 (Distributed) Comparison Functions (\ref{cha:DistributedComparisonFunctions}), however, use this form of evaluation to assess whether a given value is larger or less than $0$.
