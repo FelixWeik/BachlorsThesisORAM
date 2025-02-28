@@ -4,7 +4,7 @@
 This research aims to scale ORAMs arbitrarily, using \textit{3-Party DUORAM} as an example.
 The already existing \textit{DUORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}\footnote{The original implementation by Vadapalli et al. can be found at https://git-crysp.uwaterloo.ca/iang/prac.git} is optimized for 64-bit values.
 Larger values are not supported yet.
-After further expanding the theoretical foundations of the \textit{DUORAM} and explaining the existing code, this chapter highlights and discusses the most promising approaches.
+This section explains the existing implementation and its execution scenarios.
 
 \section{Existing Implementation}
 \input{sections/implementation/existingImplementation/ExistingImplementation.tex}
@@ -13,8 +13,9 @@ After further expanding the theoretical foundations of the \textit{DUORAM} and e
 \input{sections/implementation/StructuralLimitations.tex}
 
 \chapter{Extending the Implementation}\label{ch:ExtendingTheImplementation}
+After conducting a theoretical analysis of how to scale \textit{DUORAM} arbitrarily, the most promising approaches for scaling the implementation are highlighted.
 
-\section{Scaling in Theory}
+\section{Scaling in Theory}\label{sec:ScalingInTheory}
 \input{sections/implementation/ScalingBasedOnProtocol.tex}
 
 \section{Approaches}\label{sec:approaches}

@@ -1,33 +1,33 @@
 \chapter{Introduction}\label{ch:introduction}
-In times of digitalization more and more data about each of us is collected.
-Without proper security measures, an interested third party or even the communication partner could deduct highly sensitive information about the underlying data.
+As digitalization advances, an increasing amount of personal data is being collected. 
+Without appropriate security measures third parties, infrastructure providers, and communication partners may infer highly sensitive information about the underlying data.
 
 Consider, for example, an anonymous ticketing system as used in public transport.
 A client checks into the train by scanning her ticket electronically while entering.
 This creates an instance of a \textit{trip} in a database.
-It stores her departure location and the train she is on.
+It contains her departure location and the train she is on.
 Once checked out it is extended with the time spent on the train, her destination, and billing information.
 The trip data must be stored in such a way, that the provider is unable to link it to its customers.
 However, if the service additionally implements a monthly payment service, for example, one requires the trips to be linkable to customers. 
 A naive solution would be to assign each customer a unique address and store the trip information encrypted through e.g. threshold encryption, such that a single transportation provider is unable to see the underlying data.
 This works for hiding the data.
-Yet, since trips for a customer are always inserted at the same location, by observing the access patterns and using additional background information a transportation provider is still able to deduct the user that created the trip and potentially also the trip information.
+Yet, since trips for a customer are always inserted at the same location, by observing the access patterns and using additional background information a transportation provider is still able to infer the user that created the trip and potentially also the trip information.
 
-Note that data and its addresses are often closely intertwined.
+Note that this general phenomenon, where data and its addresses are closely intertwined, can be observed quite frequently.
 Observing data accesses in the example from above gives enough information to assign addresses to certain passengers.
-One can track down which data structure are used, which elements are requested, and ultimately use this knowledge to deduct sensitive information.
-Utilizing side channels leaks even more sensitive information:
-In the example the server could deduct which passengers were on a certain train if a sequence of encrypted trips is created in a small timeframe.
+One can track down which data structures are used, which elements are requested, and ultimately use this knowledge to infer sensitive information.
+Utilizing side channels leaks even more sensitive information.  
+In the example from above the server could infer which passengers were on a certain train if a sequence of encrypted trips is created in a small timeframe.
 Adding side-channel information not only reveals the exact train the passengers are on, but also its destination and current location.
-Once a passenger is known, one can deduct personal data and information about her habits.
-For example, if a certain passenger takes a train frequently it might be her commuting route.
+Once a passenger is known, one can infer personal data and information about her habits.
+For example, if a certain passenger takes a train on weekdays it might be her commuting route.
 Once she skips the ride, this indicates her being on vacation or on sick leave.
-To make these conclusions impossible, one must not just hide the data itself but also must hide access patterns on the database.
+To prevent such conclusions, one must not only hide the data itself but also conceal access patterns to the database.
 
 The most trivial solution is to access the database in its whole for each query.
 This is known as \textit{Linear Scan} \cite{doerner2017scale}.
 This technique, however, is inefficient due to its high costs of bandwidth and storage.
-Also, increasing the size of the database scales extremely badly in terms of general performance.
+Moreover, increasing the size of the database and its entries scales extremely poorly in terms of overall performance.
 
 \textit{Oblivious Random Access Memory (ORAM)} to the rescue! 
 ORAM hides access patterns such that tracking them reveals no information about the given input, the stored data, and the general structure of the database.
@@ -61,15 +61,14 @@ This research aims to extend this implementation for values of arbitrary size re
 \end{enumerate}
 
 \section{Roadmap}\label{sec:roadmap}
-To answer these questions, the research is structured as follows:
-\ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in \ref{ch:ORAM}.
-\ref{ch:Implementation} builds upon these theoretical introductions to further dive into the theoretical reading- and updating-protocols used in \textit{DUORAM}.
-It introduces the given implementation by Vadapalli et al. including first executions and scenarios.
-\ref{ch:ExtendingTheImplementation} then expands the protocols both in theory and the implementation for each scaling-approach.
+To answer these questions, this research is structured as follows:
+Chapter \ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in chapter \ref{ch:ORAM}.
+Chapter \ref{ch:Implementation} introduces the given implementation by Vadapalli et al. \cite{vadapalli2023duoram} including first executions and scenarios.
+Chapter \ref{ch:ExtendingTheImplementation} further develops both the theoretical protocols and the protocols used in the implementation for each scaling approach.
 Finally, \ref{ch:Evaluation} executes benchmarks on each approach while deriving performance metrics.
 These metrics are based on bandwidth, entry-size, communication efficiency, and storage-efficiency.
-Each approach is tested, benchmarked and compared with its fellow-approaches based on these metrics.
-The results are then used in \ref{ch:Conclusion} to answer the research questions and highlights unanswered questions as well as potential approaches for further research in the future.
+Each approach is tested, benchmarked and compared to its fellow-approaches based on these metrics.
+The results are then used in chapter \ref{ch:Conclusion} to answer the research questions and to highlight unanswered questions as well as potential approaches for future research.
 
 \section{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
 \textit{ORAM}s can be separated into two general groups regarding their construction:
@@ -89,7 +88,7 @@ As these numbers are highly dependent upon the size of each element in the datab
 
 \textbf{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram} is a prime example.
 It is an extension of \textit{FLORAM} by Doerner et al. \cite{doerner2017scale}.
-Vadapalli et al. chose to reduce the communication complexity by generating DPFs locally.
+Vadapalli et al. \cite{vadapalli2023duoram} chose to reduce the communication complexity by generating DPFs locally.
 As little communication as possible is used during generation of the DPFs on random target indices.
 For read and write operations, both parties require a share of a common target index.   
 Both DPFs are therefore shifted after exchanging the target index shares.
@@ -118,4 +117,4 @@ Retrieved elements are then moved up in the hierarchy to provide faster executio
 \textbf{\textit{GigaDORAM}} \cite{falk2023gigadoram} implements a \textit{DORAM} for three parties while using a hierarchical database. 
 It is therefore considered a mixture of both construction forms.
 This means, each party holds a database constructed as a set of tables while each table is secret shared.
-In short, this mixture provides an efficiency improvement of more than a factor 100 due to reducing the communication complexity \footnote{GigaDORAM is implemented in the paper and can be found here: https://github.com/jacob14916/GigaDORAM-USENIX23-Artifact/tree/main}.
+In short, this mixture provides an efficiency improvement of more than a factor 100 due to reducing the communication complexity \footnote{An implementation of GigaDORAM is found here: https://github.com/jacob14916/GigaDORAM-USENIX23-Artifact/tree/main}.

@@ -6,8 +6,9 @@ A fixed number of cooperating parties is required to reconstruct the data.
 This research focuses on \textit{DUORAM}, a \textit{DORAM} implementation by Vadapalli et al.
 While \textit{DUORAM} supports efficient read and write operations for 64-bit values, scaling it to arbitrary element sizes remains a challenge.
 This research discusses and implements possible extensions of \textit{DUORAM} to support elements of arbitrary size.
+Allowing the user to store and retrieve elements of arbitrary size enables the usage of \textit{DUORAM} in the context of databases, where elements of varying size are handled.
 Various approaches to scaling are discussed, along with all necessary technical foundations.
-The proposed approaches have been implemented and benchmarked.
+The proposed approaches are implemented and benchmarked.
 Tests regarding efficiency in terms of bandwidth, communication overhead, and storage requirements are executed.
 The results provide insights into the trade-offs between computational complexity and practical feasibility, highlighting key limitations and potential optimizations for future research.
 
@@ -20,6 +21,7 @@ Diese Research betrachtet \textit{DUORAM}, eine \textit{DORAM} Implementierung v
 Während \textit{DUORAM} effiziente Lese- und Schreiboperationen für 64 bit Werte unterstützt, bleibt die Skalierung auf beliebige Elementgrößen eine Herausforderung.
 Diese Research erweitert und implementiert \textit{DUORAM}, um Elemente beliebiger Größe zu unterstützen.
 Es werden verschiedene Ansätze zur Skalierung diskutiert, einschließich aller benötigten technischen Grundlagen.
-Die Ansätze wurden implementiert und gebenchmarked.
+Durch die Skalierung kann \textit{DUORAM} als Datenbank verwendet werden, da in jenem Kontext häufig Elemente unterschiedlicher Größe verarbeitet werden müssen.
+Die Ansätze werden implementiert und gebenchmarked.
 Tests bezüglich Effizienz in Bezug auf Bandbreite, Kommunikationseffizienz und Speicherbedarf werden analysiert.
 Die Ergebnisse liefern Einblicke in die Abwägungen zwischen Rechenkomplexität und praktischer Umsetzbarkeit und zeigen wesentliche Einschränkungen sowie mögliche weitere Optimierungen für künftige Forschung auf.

@@ -1,8 +1,6 @@
-\subsection{Scaling in Theory} \label{sub:ScalingInTheory}
-This section conducts a theoretical analysis of how to arbitrarily scale \textit{DUORAM} to fulfil the objective of this research.
-It is based on reading and writing protocol from \ref{sub:AdvancedReadingAndWriting} taken from Vadapalli et al. \cite{vadapalli2023duoram}.
+This theoretical analysis is based on reading and writing protocol from \ref{sub:AdvancedReadingAndWriting} taken from Vadapalli et al. \cite{vadapalli2023duoram}.
 
-\subsubsection*{General Assumptions} \label{subsub:ScalingInTheoryGeneralAssumptions}
+\subsection*{General Assumptions} \label{subsub:ScalingInTheoryGeneralAssumptions}
 This paragraph highlights general thoughts and assumptions on arbitrarily scaling duoram entries.
 The affected values are independent of the phase and operation executed, thus placed separately in this subsection.
 
@@ -18,7 +16,7 @@ They therefore grow at the same rate when the size of $D$ is adjusted keeping th
 
 These general assumptions are taken as granted in this theoretic part.
 
-\subsubsection*{Scaling during Preprocessing} \label{subsub:ScalingDuringPreprocessing}
+\subsection*{Scaling during Preprocessing} \label{subsub:ScalingDuringPreprocessing}
 As preprocessing for reading and writing is nearly similar in their goals and processes, both preprocessing phases are covered in this subsection.
 As the main goal of preprocessing is to generate RDPF-Triples for each peer, this process is affected the most during scaling and will affect its derived values.
 
@@ -56,7 +54,7 @@ This means the size of $t_b^k$ will not be affected by scaling $D[i]$.
 To conclude, adjusting the entry size of $D[i]$ results in $v_b^k,F^k_b,\text{ and }M_b$ adjusting their size in the same manner.
 Changing the size of these values will result in size-changes while generating DPFs and in the preprocessing phase in general.
 
-\subsubsection*{Online-Phase Scaling} \label{subsub:ScalingDuringOnlinePhase}
+\subsection*{Online-Phase Scaling} \label{subsub:ScalingDuringOnlinePhase}
 The online-phase does not yield any new values but the indices $ri$ and $i$.
 They indicate which element of the database to retrieve, thus affecting the offset $S$ during cyclic shifting.
 This, however, is not dependent from the size of entry $D[b]$ but the amount of entries.
