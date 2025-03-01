@@ -12,7 +12,7 @@ Thus, the function calls for preprocessing will look as follows:
     \item \code{./prac -t 3 -p 1 localhost}
     \item \code{./prac -t 3 -p 2 localhost localhost r20:20}
 \end{enumerate}
-Executes preprocessing generating 20 RDPF-triples, each of depth 20.
+Will execute preprocessing generating 20 RDPF-triples, each of depth 20.
 Each instance is assigned three threads.
 
 \begin{enumerate}
@@ -61,8 +61,8 @@ The general process from \ref{sub:DuoramReadingAndWriting}, however, stays the s
 \paragraph{Cyclic Shifting for Reading}
 Reading requires the player to calculate the distance of the random target index to the share of the new target.
 This distance is called offset.
-Each player then sends her offset to the other player and simultaneously receive the offset of the other player.
-\code{ParallelEval()} then evaluates the DPFs on the new share, use it to read from the given shape, and return the result of the read operation.
+Each player then sends her offset to the other player and simultaneously receives the offset of the other player.
+\code{ParallelEval()} then evaluates the DPFs on the new share, uses it to read from the given shape, and returns the result of the read operation.
 The server receives both offsets.
 It will then send the cancellation terms to the players as defined in \ref{sub:DuoramReadingAndWriting}.
 
@@ -80,4 +80,4 @@ The server follows the basic writing protocol which includes receiving both offs
 
 Since writing is both reading and updating, the update operation (\code{+=}) is done on the memory reference returned by reading at index \code{ind}.
 This memory-reference will then be written into the duoram automatically using the \code{duoram\_update} operation.
-\code{duoram\_update} includes refreshing the blinds.
+\code{duoram\_update} then refreshes the blinds.

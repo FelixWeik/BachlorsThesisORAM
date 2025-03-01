@@ -11,7 +11,7 @@ The trip data must be stored in such a way, that the provider is unable to link 
 However, if the service additionally implements a monthly payment service, for example, one requires the trips to be linkable to customers. 
 A naive solution would be to assign each customer a unique address and store the trip information encrypted through e.g. threshold encryption, such that a single transportation provider is unable to see the underlying data.
 This works for hiding the data.
-Yet, since trips for a customer are always inserted at the same location, by observing the access patterns and using additional background information a transportation provider is still able to infer the user that created the trip and potentially also the trip information.
+However, since trips for a given customer are always inserted at the same location, one can still infer the identity of the user and her trip details by analyzing access patterns.
 
 Note that this general phenomenon, where data and its addresses are closely intertwined, can be observed quite frequently.
 Observing data accesses in the example from above gives enough information to assign addresses to certain passengers.
@@ -22,7 +22,7 @@ Adding side-channel information not only reveals the exact train the passengers 
 Once a passenger is known, one can infer personal data and information about her habits.
 For example, if a certain passenger takes a train on weekdays it might be her commuting route.
 Once she skips the ride, this indicates her being on vacation or on sick leave.
-To prevent such conclusions, one must not only hide the data itself but also conceal access patterns to the database.
+To prevent such conclusions, one must not only hide the data itself but also conceal access patterns to the storage.
 
 The most trivial solution is to access the database in its whole for each query.
 This is known as \textit{Linear Scan} \cite{doerner2017scale}.
@@ -32,7 +32,7 @@ Moreover, increasing the size of the database and its entries scales extremely p
 \textit{Oblivious Random Access Memory (ORAM)} to the rescue! 
 ORAM hides access patterns such that tracking them reveals no information about the given input, the stored data, and the general structure of the database.
 Asharov et al. \cite{asharov2022oopram} define this property as "\textit{[...] the observed access pattern should essentially be uncorrelated with the inputs of [the ORAM]}".
-Multiple flavors of ORAM exist, separated in its construction and query types.
+There exist multiple flavors of ORAM, which differ in their construction and query types.
 Yet, they all implement read and write operations in sublinear runtime while obfuscating access patterns.
 The two major construction types are further introduced in \ref{sec:relatedWorks}.
 
@@ -41,7 +41,7 @@ Distributed here means the database is secretly shared among multiple parties.
 This research primarily focuses on \textit{DUORAM}, an \textit{ORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
 It, too, hides access patterns while implementing read and write operations.
 This is achieved by sharing the database either additively or via XOR between two non-colluding parties $P_0,P_1$. 
-Read and write accesses are then executed such that each server on its own cannot find out which element was retrieved or written to and what the element was.
+Read and write accesses are executed such that each server on its own cannot find out which element was retrieved or written to and what the element was.
 Combining both results, again via XOR or addition, returns the requested database entry.
 Protocols and implementations exist for two and three parties.
 Introducing a third auxiliary party $P_2$, which does not hold any data but merely facilitates the communication, eliminates the need for a trusted party by enabling \textit{(2+1)-Party Multi Party Computation ((2+1)-Party MPC)} protocols.
@@ -62,55 +62,56 @@ This research aims to extend this implementation for values of arbitrary size re
 
 \section{Roadmap}\label{sec:roadmap}
 To answer these questions, this research is structured as follows:
-Chapter \ref{ch:TechnicalFoundations} lays the mathematical and conceptual fundamentals for understanding \textit{ORAM} and \textit{DUORAM} introduced in chapter \ref{ch:ORAM}.
+Chapter \ref{ch:TechnicalFoundations} establishes the mathematical and conceptual foundations.
+Building on this, Chapter \ref{ch:ORAM} introduces \textit{ORAM} and \textit{DUORAM}.
 Chapter \ref{ch:Implementation} introduces the given implementation by Vadapalli et al. \cite{vadapalli2023duoram} including first executions and scenarios.
 Chapter \ref{ch:ExtendingTheImplementation} further develops both the theoretical protocols and the protocols used in the implementation for each scaling approach.
-Finally, \ref{ch:Evaluation} executes benchmarks on each approach while deriving performance metrics.
+Finally, Chapter \ref{ch:Evaluation} executes benchmarks on each approach while deriving performance metrics.
 These metrics are based on bandwidth, entry-size, communication efficiency, and storage-efficiency.
 Each approach is tested, benchmarked and compared to its fellow-approaches based on these metrics.
-The results are then used in chapter \ref{ch:Conclusion} to answer the research questions and to highlight unanswered questions as well as potential approaches for future research.
+The results are then utilized in Chapter \ref{ch:Conclusion} to address the research questions, identify open problems, and outline potential directions for future research.
 
 \section{Related Work and Overview over State of the Art}\label{sec:relatedWorks}
 \textit{ORAM}s can be separated into two general groups regarding their construction:
 \paragraph{ORAMs with Function Secret Sharing}\label{par:oramsWithFSS}
-This concept considers ORAMs that use \textit{Function Secret Sharing (FSS)} and Multi \textit{Party Computations (MPC)} for hiding access patterns.
+This concept considers ORAMs that use \textit{Function Secret Sharing (FSS)} (\ref{ch_FunctionSecretSharing}) and Multi \textit{Party Computations (MPC)} for hiding access patterns.
 It is primarily used in \textit{Distributed ORAM (DORAM)} which secretly shares its database between multiple parties.
 To reconstruct a read or write operation to the database, one needs to secret share her index or data element.
 The servers then execute the operation on their shares.
 Combining both return values results in the requested data element or in writing the given element to the requested index.
-Both concepts of FSS and MPC are further defined and extended by Boyle et al. \cite{boyle2015function,boyle2016function,boyle2021function,boyle2023information}.
+Both concepts of \textit{FSS} and \textit{MPC} are further defined and extended by Boyle et al. \cite{boyle2015function,boyle2016function,boyle2021function,boyle2023information}.
 
 To reconstruct the data element, the parties involved in the computation need to exchange functions and data elements.
-Bandwidth here is the bottleneck of the DORAM.
-Therefore, general efficiency of DORAMs is measured in its communication complexity per queue.
-This means, in order to make DORAMs using FSS more efficient, one needs to reduce the number of communication rounds and the size of messages exchanged.
-As these numbers are highly dependent upon the size of each element in the database and the number of entries stored, expanding the database negatively impacts the DORAM's performance.
+Bandwidth here is the bottleneck of the \textit{DORAM}.
+Therefore, general efficiency of \textit{DORAMs} is measured in its communication complexity per queue.
+This means, in order to make \textit{DORAMs} using \textit{FSS} more efficient, one needs to reduce the number of communication rounds and the size of messages exchanged.
+As these numbers are highly dependent upon the size of each element in the database and the number of entries stored, expanding the database negatively impacts the \textit{DORAM}'s performance.
 
 \textbf{DUORAM}, as introduced by Vadapalli et al. \cite{vadapalli2023duoram} is a prime example.
 It is an extension of \textit{FLORAM} by Doerner et al. \cite{doerner2017scale}.
-Vadapalli et al. \cite{vadapalli2023duoram} chose to reduce the communication complexity by generating DPFs locally.
-As little communication as possible is used during generation of the DPFs on random target indices.
+Vadapalli et al. \cite{vadapalli2023duoram} chose to reduce the communication complexity by generating \textit{DPFs} (\ref{sub:DistributedPointFunctions}) locally.
+As little communication as possible is used during generation of the \textit{DPFs} on random target indices.
 For read and write operations, both parties require a share of a common target index.   
-Both DPFs are therefore shifted after exchanging the target index shares.
-This significantly reduces communication complexity to a sublinear $O(m log n)$ with $n$ being the number of elements in the database.
+Both \textit{DPFs} are therefore shifted after exchanging the target index shares.
+This significantly reduces communication complexity to a sublinear $O(m\cdot log(n))$ with $n$ being the number of elements in the database.
 $m$ is the number of words exchanged per query.
 As it has an upper bound of $O(m)$ the number of exchanged messages per query is constant.
 This research primarily focuses on \textit{DUORAM}.
 
 \paragraph{Hierarchical ORAM}\label{par:hierarchicalORAM}
-Hierarchical ORAM, too, is executed in a client-server setting.
+\textit{Hierarchical ORAM}, too, is executed in a client-server setting.
 The server holds the database, which is divided into a hierarchy of tables.
-The tables are of progressively larger size \cite{peserico2023hierarchical}.
-To access a data element, one either recursively searches the tables and layers or utilizes \textit{Pseudo Random Function (PRF)}.
+These tables are of progressively larger size \cite{peserico2023hierarchical}.
+To access a data element, one either recursively searches the tables and layers or utilizes \textit{Pseudo Random Functions (PRFs)}.
 Data accesses in this context are always a trade-off between network- and computational efficiency.
-Hierarchical ORAM is more efficient in its computation.
+\textit{Hierarchical ORAM} is more efficient in its computation.
 This, however, increases its susceptibility against varying network conditions like low bandwidth or high latency.
 
-\textbf{\textit{Optimal Oblivious Parallel RAM (OOPRAM)}} was introduced by Asharov et al. \cite{asharov2022oopram}.
+\textbf{\textit{Optimal Oblivious Parallel RAM (OOPRAM)}} is introduced by Asharov et al. \cite{asharov2022oopram}.
 Its database is constructed as a hierarchy of hash-tables.
-It provides read and write accesses in a sublinear runtime of $O(log n)$ with $n$ being the size of the database.
+It provides read and write accesses in sublinear runtime of $O(log(n))$ with $n$ being the size of the database.
 The elements and tables are shuffled in a first step.
-Retrieving elements is then executed via One-Time-Keys.
+Retrieving elements is then executed via \textit{One-Time-Keys}.
 This key is then searched recursively in the hash-tables on shared memory using high-level multithreading.
 Retrieved elements are then moved up in the hierarchy to provide faster execution when retrieving the item for a second time.
 

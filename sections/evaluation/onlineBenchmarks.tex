@@ -35,7 +35,7 @@ This changes, however, for decreasing bandwidth.
 Again, for reading (\ref{fig:readIncLatencyOnline}) and updating (\ref{fig:updIncLatencyOnline}) \textit{new\_input\_type} slows down once the bandwidth drops.
 The same reasons mentioned above apply:
 \textit{new\_input\_type} sends fewer messages compared to \textit{gmp\_mpz\_class} on the same bit size as, again, \textit{gmp\_mpz\_class} needs to send at least two messages for each message \textit{new\_input\_type} sends.
-This proves true for reading (\ref{fig:readMsgSentOnline}) and updating (\ref{fig:updMsgSentOnline}).
+The larger number of sent messages for \textit{gmp\_mpz\_class} is plotted for reading (\ref{fig:readMsgSentOnline}) and updating (\ref{fig:updMsgSentOnline}).
 Also, messages in \textit{gmp\_mpz\_class} are smaller on average since, again, using a buffer is not possible.
 Messages need to be sent directly.
 

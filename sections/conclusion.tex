@@ -18,7 +18,7 @@ Larger bit sizes cannot be executed due to technical restrictions of the author'
 Its communication methods are faster, and bit operations can be executed on sizes supported directly by the system.
 Also, no serialization and deserialization methods need to be executed before communicating.
 \textit{new\_input\_type} can utilize multithreading to perform reads and updates in parallel.
-This pushes its performance for 128 and 256 bits to almost the performance of the base implementation by Vadapalli et al.
+This pushes its performance for 128 and 256 bits to almost the performance of the base implementation.
 Performance, however, heavily deteriorates for low bandwidths.
 Also, it has heavier storage requirements for depths greater 15 than \textit{gmp\_mpz\_class} and a higher consumption of RDPF-triples.
 
@@ -33,7 +33,8 @@ Finally, communication is slower due to the need of serialization and deserializ
 Therefore, \textit{new\_input\_type} is preferable on machines with larger storage and environments of high bandwidth and varying latency.
 \textit{gmp\_mpz\_class} proved to be the better approach for machines with smaller storage, varying bandwidth, and smaller latency.
 
-GMP in general provides useful datatypes and classes for this research's goal of scaling \textit{DUORAM}.
+\textit{GMP} in general provides useful datatypes and classes for this research's goal of scaling \textit{DUORAM}.
+The data types studied are \code{mpz\_t} and \code{mpz\_class}.
 \code{mpz\_t} represents an integer of arbitrary size.
 Yet, it does not provide automatic memory management.
 This makes it uneasy to handle in a complex program without compromising type safety.
@@ -56,19 +57,20 @@ At the moment, the amount of maximum chunks is set to a fixed size before compil
 Therefore, size restrictions as before are still valid.
 As this results in a lot of chunks, one requires multiple RDPF-Triples per access.
 As this increases the overall RDPF-Triple consumption, more RDPF-Triples need to be generated slowing down preprocessing.
+
 If one is willing to accept this trade-off of reduced performance in exchange for secret access patterns, the leakage of sensitive information through observed data accesses, as described in the introduction, is avoided.
 
 \paragraph{Future Research}\label{par:futureResearch}
 This work leaves open some interesting directions for future research.
 
 First, one can test the existing implementation on more performant machines.
-This includes testing for larger bit sizes, larger numbers of preprocessed RDPF-triples, RDPF-triples of greater depth, and more items retrieved or updated during the online phase.
+This includes testing for larger bit sizes, larger numbers of preprocessed RDPF-triples, RDPF-triples of greater depth, and more retrieved or updated items during the online phase.
 
-Second, the existing approaches, especially \textit{gmp\_mpz\_class}, should be tested with different datatypes.
+Second, the existing approaches, especially \textit{gmp\_mpz\_class}, should be tested with different datatypes and libraries.
 Possible alternatives are \textit{Boost.Multiprecision} or \textit{Fast Library for Number Theory (FLINT)}.
 These libraries might provide faster bit operations and more storage friendly ways of working with arbitrarily scalable unsigned integers.
 
-As mentioned in \ref{sec:experimentalEvaluation}, parts of the poor performance observed in \textit{gmp\_mpz\_class} originate from the implementation.
+As mentioned in \ref{sec:experimentalEvaluation}, part of the poor performance observed in \textit{gmp\_mpz\_class} stems from implementation-specific factors.
 The necessary change of leaving out the queue used as a buffer in the communication introduced a greater number of sent messages.
 The resulting decrease in communication efficiency can be solved by refining the implementation of \textit{gmp\_mpz\_class}. 
 Reintroducing the queue as used in \textit{base} and \textit{new\_input\_type}, however, leads to double free errors as shown in \ref{par:doubleFree}.
@@ -83,17 +85,18 @@ Therefore, two possible solutions should be checked:
     This requires rules for constructing and deconstructing binary values from and to \code{mpz\_class} values but overall might heavily increase communication performance.
 \end{enumerate}
 
-Next, other approaches can be analyzed that are not be implemented or described due to time restrictions.
-One approach of this type could use two DCFs (\ref{cha:DistributedComparisonFunctions}) per operation.
-These DCFs define an interval in the database in which one reads or updates her entries.
+Next, approaches omitted due to time constraints can be analyzed.
+One approach of this type could use two \textit{DCFs} (\ref{cha:DistributedComparisonFunctions}) per operation.
+These \textit{DCFs} define an interval in the database in which one reads or updates her entries.
 This is similar to the introduced \textit{new\_input\_type} approach (\ref{sub:PossibilityLargerRegisterType}).
 It might, however, reduce the variable RDPF consumption dependent from the chosen data size to a constant amount of CDPF pairs.
-This reduces not just storage requirements in the preprocessing phase, but might also heavily increase reading and writing performance and communication efficiency.
+This reduces not just storage requirements in the preprocessing phase, but might also heavily increase reading and writing performance and overall communication efficiency.
+The decreased message size might reduce the susceptibility to dropping bandwidth of \textit{new\_input\_type}.
 
 Boyle et al. \cite{boyle2025non} presented the concept of \textit{Non-Interactive Distributed Point Functions (NIDPF)}.
-NIDPFs eliminate the need for a trusted dealer by reading a key from a public bulletin.
+\textit{NIDPFs} eliminate the need for a trusted dealer by reading a key from a public bulletin.
 Parties $P_0,P_1$ then negotiate their DPF-keys together without sharing the actual key.
-Instead of using binary trees (\ref{sub:BGIDPFConstruction}) they use matrices for DPF representation.
-Also, instead of using synchronous, round-based communication for every DPF level, messages are shared asynchronously and in a single round.
+Instead of using binary trees (\ref{sub:BGIDPFConstruction}) they use matrices for \textit{DPF} representation.
+Also, instead of using synchronous, round-based communication for every \textit{DPF} level, messages are shared asynchronously and in a single round.
 This might not just speed up the preprocessing phase, but might also decrease the RDPF-triple's storage requirements.
 Moreover, sending fewer messages could reduce the susceptibility of preprocessing to higher latencies.

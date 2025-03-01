@@ -1,8 +1,8 @@
 \label{sub:MultiplicationAdditionTriples}
-\textit{AND-Triples} on vectors and \textit{Dot-Product Triples} on additive shares help facilitate computing (bitwise) AND operations and dot products on secret shares in an MPC environment \cite{kyle2023grotto}.
-Due to their construction they are often called \textit{Beaver like triples} \cite{kyle2023grotto}.
+\textit{AND-Triples} on vectors and \textit{Dot-Product Triples} on additive shares help facilitate computing (bitwise) AND operations and dot products on secret shares in an \textit{MPC} environment \cite{kyle2023grotto}.
+Due to their construction they are often called "\textit{Beaver like triples}" \cite{kyle2023grotto}.
 
-This research will use both the definitions of \textit{AND-Triples} and \textit{Dot-Product Triples} by Vadapalli et al. \cite{vadapalli2023duoram}.
+This research uses the definitions of \textit{AND-Triples} and \textit{Dot-Product Triples} by Vadapalli et al. \cite{vadapalli2023duoram}.
 \begin{quote}
     \textit{AND-Triples}:
     Let $(X_0,Y_0,Z_0)\in \{0,1\}^\lambda\times\{0,1\}^\lambda\times\{0,1\}^\lambda$ and $(X_1,Y_1,Z_1)\in \{0,1\}^\lambda\times\{0,1\}^\lambda\times\{0,1\}^\lambda$.
@@ -22,10 +22,10 @@ This research will use both the definitions of \textit{AND-Triples} and \textit{
     \end{enumerate}
 \end{quote}
 
-Similar to Beaver Triples, performing one AND or dot-product operation will consume a single triple of each party.
-Therefore, again, one can precompute the communication expensive parts and perform the safe MPC operation on the real values later on.
+Similar to \textit{Beaver Triples}, performing one AND or dot-product operation will consume a single triple of each party.
+Therefore, again, one can precompute the communication expensive parts and perform the safe \textit{MPC} operation on the real values later on.
 
 The implementation (\ref{ch:Implementation}) uses the \textit{Du-Atallah Protocol} \cite{ata01priv} to calculate its AND and \textit{Dot-Product Triples}.
-It is a \textit{(2+1)-MPC Protocol}, often called \textit{Server-Adided 2-MPC}, which describes a 2-party MPC protocol with a third party \cite{vadapalli2023duoram}.
-This third party does not collude with the other two parties and facilitates the MPC by sending some correlated randomness to the two MPC parties.
+It is a \textit{(2+1)-MPC Protocol}, often called \textit{Server-Adided 2-MPC}, which describes a 2-party \textit{MPC} protocol with a third party \cite{vadapalli2023duoram}.
+This third party does not collude with the other two parties and facilitates the \textit{MPC} by sending some correlated randomness to the two \textit{MPC} parties.
 A more explicit description of the \textit{Du-Atallah Protocol} can be found in the according paper by Du and Atallah \cite{ata01priv}.

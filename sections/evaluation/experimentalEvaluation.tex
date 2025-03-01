@@ -44,7 +44,7 @@ This section describes the tests executed and the measured performance metrics.
 Each party logs its own test results.
 These logs show slight variations between the parties.
 However, these differences are very small and occur by definition of the protocol.
-Therefore, all evaluated results are based on the logs of $P_0$, or container \code{p0} respectively.
+Therefore, all evaluated results are based on the logs of $P_0$ or container \code{p0} respectively.
 These results can be further separated into preprocessing and online phase.
 
 \paragraph{Logs and Operations}\label{par:expOutputs}
@@ -108,7 +108,7 @@ Online benchmarks will check the following metrics:
 All the benchmarks are executed separately for reading and updating.
 Executing these tests requires the preprocessing to be executed in advance.
 This means 50 RDPF-Triples of depth 15 for both \textit{gmp\_mpz\_class} and \textit{base}, 200 RDPF-Triples of depth 15 for \code{new\_input\_type}.
-Preprocessing, however, is not included in the online results as the preprocessing phase in benchmarked separately.
+Preprocessing is not included in the online benchmarks as the preprocessing phase in benchmarked separately.
 
 The standard values of bandwidth (100mbits) and latency (1ms) from above remain valid.
 If not given explicitly, the number of retrieved or updated items per operation is set to 5.

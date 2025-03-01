@@ -1,17 +1,17 @@
 \subsection*{Oblivious Transfer (OT)} \label{sub:ObliviousTransfer}
-Consider the following scenario:
+Consider the following scenario from Yadav et al. \cite{yadav2022survey}:
 \begin{quotation}
     Bob has a database with 10 entries.
     Alice would like to query it.
-    \textit{Oblivious Transfer (OT)} allows Alice to retreive an entry of her choosing without Bob learning which one Alice was interested in.
+    \textit{Oblivious Transfer (OT)} allows Alice to retrieve an entry of her choosing without Bob learning which one Alice was interested in.
     Bob is guaranteed that Alice can only see the single entry she chose.
     She will not get any information about the other entries.
 \end{quotation}
 
 Yadav et al. \cite{yadav2022survey} describe \textit{Oblivious Transfer Protocols (OTP)} as crucial tools for securely executing multi party computations.
-These protocols implement oblivious transfer and come in three flavors:
+These protocols implement \textit{Oblivious Transfer} and come in three flavors:
 \textit{1-out-of-2 OT}, \textit{1-out-of-n OT}, and \textit{k-out-of-n OT}.
-This research will focus on \textit{1-out-of-n OT} as it can be used in \textit{Private Information Retreival} as described in the following subsection (\ref{sub:PrivateInformationRetreival}).
+This research will focus on \textit{1-out-of-n OT} as it can be used in \textit{Private Information Retrieval} as described in the following subsection (\ref{sub:PrivateInformationRetreival}).
 Notations and definitions are taken from Yadav et al. \cite{yadav2022survey}.
 
 On a high level \textit{1-out-of-n OT} describes the data exchange of two parties, a sender and a receiver.
@@ -20,25 +20,25 @@ The receiver has a selection number $r\in [0,...,n-1]$.
 After protocol execution the receiver learns $x_r$ while the sender learns nothing about $r$.
 Note, that the receiver does not learn anything about inputs $x_\psi$ with $\psi\in [0,...,n-1] \text{ and } \psi\neq r$.
 
-\subsection*{Private Information Retreival (PIR)} \label{sub:PrivateInformationRetreival}
-\textit{Private Information Retreival (PIR)} relaxes the security requirements of Oblivious Transfer \cite{gasarch2004survey}.
-The difference can be explained by revisiting the scenario from above:
+\subsection*{Private Information Retrieval (PIR)} \label{sub:PrivateInformationRetreival}
+\textit{Private Information Retrieval (PIR)} relaxes the security requirements of \textit{Oblivious Transfer} \cite{gasarch2004survey}.
+The difference becomes clearer by adjusting the scenario from above:
 \begin{quotation}
     Alice would like to query Bob's database, which, again, holds 10 entries.
-    PIR allows Alice to retreive elements of this database.
+    \textit{PIR} allows Alice to retrieve elements of this database.
     Bob will not learn which element Alice was interested in.
     Alice, however, has access to the full database.
 \end{quotation}
 
-The most trivial PIR variant is Alice retreiving the database completely \cite{gasarch2004survey}.
+The most trivial \textit{PIR} variant is Alice retrieving the database completely \cite{gasarch2004survey}.
 This PIR-variant is linear in the size of the database.
 
-PIR also exists for writing in form of so called \textit{PIR-Writing Protocols}.
+\textit{PIR} also exists for writing in form of so called \textit{PIR-Writing Protocols}.
 Lipmaa and Zhang \cite{lipmaa2010pirwriting} define it as a protocol, in which the client updates one element of an encrypted database so that the semi-honest server the client writes to neither gets to know which value was updated nor the index the update was written to.
-In our case, the database is shared between two non-colluding servers and thus secret for each single server.
+In our case, the database is shared between two non-colluding servers and thus in secret for each server.
 It can be seen as equivalent to encrypting the database for a single semi-honest server.
-The most trivial PIR-Writing protocol is Alice retreiving Bob's database, replacing the $i^*$ th element with the updated value.
+The most trivial PIR-Writing protocol is Alice retrieving Bob's database, replacing the $i^*$ th element with the updated value.
 She then reencrypts the database and sends it back to Bob.
 This variant too has a runtime linear in the size of the database.
 
-\textit{DUORAM} (\ref{sec:3pDuoram}) uses DPFs to implement both non-trivial Private Information Retreival and PIR-write with $O(log(n))$ with $n$ being the size of the database \cite{vadapalli2023duoram}.
+\textit{DUORAM} (\ref{sec:3pDuoram}) uses \textit{DPFs} to implement both non-trivial \textit{Private Information Retrieval} and \textit{PIR-Write} in $O(log(n))$ with $n$ being the size of the database \cite{vadapalli2023duoram}.

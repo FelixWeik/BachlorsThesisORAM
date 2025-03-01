@@ -1,10 +1,10 @@
 \label{sub:BeaverTriples}
-Beaver triples aim to simplify multiplication on secret shared inputs \cite{pullonen2013actively}.
-It can be interpreted as preprocessing a multiplication with a probably less efficient multiplication protocol on random values, and compute it securely on the chosen values using the faster beaver triples in the acutal computation lateron.
+\textit{Beaver Triples} aim to simplify multiplication on secret shared inputs \cite{pullonen2013actively}.
+It can be interpreted as preprocessing a multiplication with a probably less efficient multiplication protocol on random values, and compute it securely on the chosen values using the faster \textit{Beaver Triples} in the acutal computation lateron.
 The general structure is of the form $\langle a,b,c\rangle$ such that $c=a\cdot b$ \cite{pullonen2013actively}.
 Let $a_i,b_i,c_i$ be the shares of the according secret held by party $P_i$.
 
-To generate the beaver triples a \textit{Preprocessing Phase} is executed prior to the Multi Party Computation (MPC). 
+To generate the \textit{Beaver Triples} a \textit{Preprocessing Phase} is executed prior to the \textit{Multi Party Computation (MPC)}. 
 The servers' goal is to compute three secret representations $a_i,b_i,c_i$, where $a_i,b_i$ are random and unknown to all other parties.
 
 Now, one wants to compute two secret representation $x_i,y_i$ of $z_i$ where $z=x\cdot y$.
@@ -16,5 +16,5 @@ MPC uses the multiplication protocol as follows:
 \end{itemize}
 Since $z=x\cdot y+a\cdot y-y\cdot a-b\cdot a+a\cdot b=x\cdot y$, the protocol is correct \cite{medium2024beaver}.
 The synchronous, more communication expensive part of the calculation is done in the preprocessing phase.
-Therefore, one can generate multiple beaver triples in parallel.
+Therefore, one can generate multiple \textit{Beaver Triples} in parallel.
 Every multiplication will consume one beaver triple, since using it multiple times may lead to reconstructing the secret with linear combination \cite{pullonen2013actively}.

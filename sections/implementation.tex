@@ -1,12 +1,15 @@
 \chapter{Existing Implementation}\label{ch:Implementation}
 
 \label{sec:ImplementationTarget}
-This research aims to scale ORAMs arbitrarily, using \textit{3-Party DUORAM} as an example.
-The already existing \textit{DUORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}\footnote{The original implementation by Vadapalli et al. can be found at https://git-crysp.uwaterloo.ca/iang/prac.git} is optimized for 64-bit values.
+This research aims to scale \textit{ORAMs} arbitrarily, using \textit{3-Party DUORAM} as an example.
+The already existing \textit{DUORAM} implementation\footnote{The original implementation by Vadapalli et al. can be found at https://git-crysp.uwaterloo.ca/iang/prac.git} by Vadapalli et al. \cite{vadapalli2023duoram} is optimized for 64-bit values.
 Larger values are not supported yet.
 This section explains the existing implementation and its execution scenarios.
+Explaining the full \textit{C++} implementation by Vadapalli et al. \cite{vadapalli2023duoram}, however, exceeds the scope of this research.
+Instead, the code is explained by highlighting the most important fragments and scenarios.
+This author's extension using C++17 can be found \hyperlink{https://github.com/FelixWeik/PrivateRandomAccessComputations}{at his GitHub profile}.
+Each approach is assigned a respective branch.
 
-\section{Existing Implementation}
 \input{sections/implementation/existingImplementation/ExistingImplementation.tex}
 
 \section{General Limitations}

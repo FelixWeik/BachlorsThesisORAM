@@ -1,18 +1,18 @@
-\subsubsection*{Representing DPFs} \label{subsub:implementationRepresentingDPFs}
-Both, Distributed Point Functions (\ref{sub:DistributedPointFunctions}) and Distributed Comparison Functions (\ref{sub:DistributedComparisonFunctions}), inherit from the same parent class \code{dpf}.
-Again, recall the representation of point- and comparison-functions as binary trees.
-Thus, the most trivial representation of a single DPF is saving the seed of the root node and generating the whole tree every time the point function is used.
-Since this approach is too computational expensive for repetitive evaluations, DPFs are stored in an already evaluated form with the possibility to recreate the tree when needed.
+\subsection*{Representing DPFs} \label{subsub:implementationRepresentingDPFs}
+Both, \textit{Distributed Point Functions} (\ref{sub:DistributedPointFunctions}) and \textit{Distributed Comparison Functions} (\ref{sub:DistributedComparisonFunctions}), inherit from the same parent class \code{dpf}.
+Recall the representation of \textit{DPFs} and \textit{DCFs} as binary trees.
+Thus, the most trivial representation of a single \textit{DPF} is saving the seed of the root node and generating the whole tree every time the point function is used.
+Since this approach is too computational expensive for repetitive evaluations, \textit{DPFs} are stored in an already evaluated form with the possibility to recreate the tree when needed.
 
 Therefore, the base class \code{dpf} stores the seed of the root node.
 Also, it stores a vector \code{cfbits} which holds all flag bits on the path to target index $\alpha$.
 Bit $i$ of this vector represents the bit of the $i$'th node on the path to $\alpha$.
 It also implements the functionality to descend a tree given a seed and a bool indicating which child to calculate.
-The code further defines special DPFs namely \textit{Distributed Point Functions for Memory Access (RDPF)} and \textit{Distributed Comparison Functions (CDPF)}.
+The code further defines special \textit{DPFs} namely \textit{Distributed Point Functions for Memory Access (RDPF)} and \textit{Distributed Comparison Functions (CDPF)}.
 
 \paragraph{RDPFs}\label{par:preliminariesRDPFs}
-RDPFs inherit from the basic DPF implementation.
-It expands its parent with further attributes and the \code{LeafInfo} struct.
+RDPFs inherit from the general \code{dpf} implementation.
+It extends its parent with further attributes and the \code{LeafInfo} struct.
 \code{leaf\_cfbits} stores the correction-flag bits for the leaf level.
 Recall the correction-flag bits being the low words of the labels (\ref{sub:BGIDPFConstruction}).
 This is equivalent to $t_b$ from the high-level \textit{DUORAM} overview in \ref{sec:3pDuoram}, which means bit $i$ holds the correction flag-bit of leaf $i$.
@@ -50,7 +50,7 @@ This process is similar to RDPFs, since both CDPFs within a tuple hold the same 
 Thus, combining the targets of $P_0,P_1$ results in the actual target index.
 A tuple of CDPFs allows the client to compare a given value to $0$ as described in \ref{sub:CDPFConstruction}.
 
-\subsubsection*{types.hpp} \label{subsub:implementationTypeshpp}
+\subsection*{types.hpp} \label{subsub:implementationTypeshpp}
 This file defines basic macros, aliases, structs, and their operators.
 
 The most prominent type-aliases are:
@@ -64,7 +64,7 @@ The most prominent type-aliases are:
     The default datatype for this alias is \code{bool}.
     \item \code{address\_t}: 
     Decides the size of the addresses in the secret-shared memory.
-    Is set to \code{uint32\_t}.
+    It is set to \code{uint32\_t} by default.
     \item \code{DPFnode}: 
     Implements the datatype of a DPFnode and establishes the basis for defining Leaf nodes.
     It is of type \code{\_\_m128i}.
@@ -97,11 +97,11 @@ The most prominent structs are:
     Represents a register holding a bit-share of type \code{bit\_t} which itself is a \code{bool} type-alias.
 \end{itemize}
 
-\subsubsection*{Intel AES-NI} \label{subsub:implementationAesni}
+\subsection*{Intel AES-NI} \label{subsub:implementationAesni}
 The existing source code is optimized for Intel's \textit{Advanced Encryption Standard New Instruction Set (AES-NI)}\footnote{Intel's publication on AES-NI is published on their \hyperlink{https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf}{website} (https://www.intel.com/content/dam/doc/white-paper/advanced-encryption-standard-new-instructions-set-paper.pdf)}.
 As the name suggests, it extends and optimizes Intel's existing instruction set for AES-operations.
 These improvements come in form of the \code{wmmintrin.h} and \code{emmintrin.h} header files implementing core functions of \textit{AES-ECB (Advanced Encryption Standard in Electronic Code Book Mode)} based on \textit{AES-NI}.
-As this header file is included in the gcc compiler, no additional installations for using both headers are required.
+As this header file is included in the gcc compiler, no additional installations are necessary.
 Yet, the flags \code{-maes}, and \code{-msse2} need to be included for the linker to work.
 Since AES-ECB is of great use when generating DPFs, these optimizations will foster great performance improvements.
 Operations like \code{AES\_key\_gen\_assist} are optimized for the \code{\_\_m128i} \textit{Single Instruction Multiple Data (SIMD)} datatype, representing a 128-bit vector.
@@ -128,7 +128,7 @@ For AES to be pseudorandom, keys need to be the same throughout instances.
 Thus, all instances use the same \code{PRGKey} instances for creating labels and leafs, called \code{prgkey} and \code{leafprgkeys[3]}.
 Note \code{leafprgkeys[3]} being an array holding three \code{PRGKey} structs.
 This distinction between keys for label and leaf generation is necessary as one needs to differentiate cases handling different values for \code{LWIDTH} (\ref{subsub:WIDTHandLWIDTH}).
-A non-standard value of \code{LWIDTH}, which means any value $x\neq1$, requires multiple keys in the leaf layer as several Leaf labels need to be instantiated (\ref{subsub:DpfNodeAndLeafLabel}).
+A non-standard value of \code{LWIDTH}, which means any value $x\neq1$, requires multiple keys in the leaf layer as several leaf labels need to be instantiated (\ref{subsub:DpfNodeAndLeafLabel}).
 As this matter is only present in the leaf layer, using separate keys during generation increase performance and readability of the code.
 The implementation uses the first 20 digits of $\pi$ for \code{prgkey} and 20 digits of $e$ for each instance of \code{leafprgkeys}.
 
@@ -139,7 +139,7 @@ One practical drawback of using \code{\_\_m128i} vectors is its debugging incomp
 It is, however, not compatible for using SIMD datatypes which triggers an error and ultimately stops program execution.
 The author uses \textit{ASan}\footnote{More information can be found in the documentation by Microsoft Learn: https://learn.microsoft.com/de-de/cpp/sanitizers/asan?view=msvc-170} instead.
 
-\subsubsection*{Duoram and Shapes} \label{subsub:implementationDuoram}
+\subsection*{Duoram and Shapes} \label{subsub:implementationDuoram}
 Each party is assigned a \code{duoram} object.
 It holds the following information: 
 \begin{itemize}
@@ -164,7 +164,8 @@ Each \code{duoram} must be accessed via a hierarchy of \textit{Shapes}.
 The implementation uses a hierarchy consisting of a single shape called \code{Flat}.
 A shape provides basic functions for reading and updating the duoram.
 This is primarily the index operator \code{[]} for reading and the \code{+=} operator for updating.
-This has the great advantage of updating accessing contexts while keeping the underlying database consistent.
+
+Using shapes provides the great advantage of updating independent accessing contexts while keeping the underlying database consistent.
 For example, when executing multiple database accesses multiple RDPF-Triples and thus separate contexts are needed as keeping the context might leak accessing-information due to reusing the same RDPF-Triple.
 Instead of assigning these contexts to the same database introducing a great overhead one simply updates the underlying shape introducing a fresh context.
 Without a shape, one manually has to update the database, reassign new RDPF-Triples to each player and manipulate their \code{mpcio} objects.
@@ -172,12 +173,13 @@ Without a shape, one manually has to update the database, reassign new RDPF-Trip
 This reduces the overhead to a minimum when executing independent reads and writes.
 
 The base implementation uses the \code{Flat} shape only.
-Extensions on different shapes are not planned or necessary, thus no further descriptions on different shapes and shape hierarchies are required.
+Extensions on different shapes are not planned or necessary. 
+Thus, no further descriptions on different shapes and shape hierarchies are required and provided.
 
-\subsubsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
+\subsection*{WIDTH and LWIDTH}\label{subsub:WIDTHandLWIDTH}
 RDPFs can be reused for reading.
-This, however, will leak the information that reads were executed on the same location multiple times.
-The location stays secret \cite{vadapalli2023duoram}.
+This, however, leaks the information that reads were executed on the same location multiple times.
+The location itself stays secret \cite{vadapalli2023duoram}.
 
 This process is similar for writing, yet it requires a few code adjustments.
 In short, one simply extends the given leaf construction (\ref{par:leafConstruction}) by adding as many 64-bit values representing shares of $M$ as wanted.
@@ -199,8 +201,8 @@ Therefore, the array representing leaf nodes must be adjusted to hold $n+1$ 64-b
 
 Limitations on these values are listed in \ref{sub:LimitWIDTHandLWIDTH}, more information on this construction is given in the following section.
 
-\subsubsection*{DPFNode and LeafNode}\label{subsub:DpfNodeAndLeafLabel}
-The concepts of DPF nodes, leafs, \code{WIDTH}, and \code{\_\_m128i} vectors are closely intertwined.
+\subsection*{DPFNode and LeafNode}\label{subsub:DpfNodeAndLeafLabel}
+The concepts of DPF nodes and leafs, \code{WIDTH}, and \code{\_\_m128i} vectors are closely intertwined.
 
 As already mentioned, DPF trees are generated using AES-ECB (\ref{subsub:implementationAesni}).
 For the goal of storing 64-bit values in the base implementation, one needs to simulate a length-doubling PRG.
@@ -215,11 +217,11 @@ This means, to implement a DPF tree with a certain value of \code{WIDTH}, one ne
 Thus, \code{LeafNode} is the type alias for a vector holding \code{LWIDTH} many \code{\_\_m128i} values or \code{DPFnode}s respectively.
 This results in the type definition \code{using LeafNode = std::vector<DPFNode, LWIDTH>}. 
 
-\subsubsection*{mpcio and Communication} \label{subsub:implementationMpcioAndCommunication}
-All three parties execute the same executable \code{prac}.
+\subsection*{mpcio and Communication} \label{subsub:implementationMpcioAndCommunication}
+All three parties run the same executable \code{prac}.
 It is generated using a \code{MAKEFILE}.
 These executables communicate asynchronously via TCP-sockets.
-When executed locally, which this research assumes to be the default, the peers addresses are all hosted on the \code{localhost}.
+When executed locally, which this research assumes to be the default, the peers' addresses are all hosted on the \code{localhost}.
 Sockets, player information, sent and received messages and the functionality to send and receive are implemented in the \code{MPCPeerIO} struct.
 \code{MPCPeerIO} can be freely translated to \textit{"Input and Output Functionality for performing MCP communication with computational peers"}.
 It is one of the first structs to instantiate and is used to create most of the other objects.
@@ -232,13 +234,13 @@ The program offers three modes:
     Defines the \code{PRECOMPUTATION\_MODE}, which executes the preprocessing phase as explained in section \ref{subsub:DuoramPreprocessing}.
     \item Leaving the specifier blank: 
     Executes the \code{ONLINE\_MODE}.
-    Note that this requires the preprocessing mode to be executed first since it requires RDPF-triples for reads and writes.
+    Note that this requires the preprocessing mode to be executed first as it requires RDPF-Triples for reads and writes.
     The user can specify which tests to execute.
     The default test is called \code{duoram}.
     It executes reads and writes, each independent and interleaved.
     \item -o:
     Executes the \code{ONLINE\_ONLY} mode.
-    This means no preprocessing takes place, all needed resources are computed on the fly.
+    This means no preprocessing takes place, resources are computed on the fly.
     Of course, this impacts performance but will come in handy for performing smaller tests.
     With this specifier, too, one can choose which tests to execute.
     These tests are be the same as in the online mode.

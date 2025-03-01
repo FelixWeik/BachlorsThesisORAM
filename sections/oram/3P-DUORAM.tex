@@ -1,8 +1,8 @@
 \label{sec:3pDuoram}
 \textit{DUORAM} is an \textit{DORAM} implementation by Vadapalli et al. \cite{vadapalli2023duoram}.
 It can either be used as 3-party or 2-party protocol.
-This research will focus solely on the 3-party variant.
-\textit{DUORAM} uses (2,2)-DPFs to represent \textit{Private Information Retrieval (PIR)} and PIR-Writing queries (\ref{sub:PrivateInformationRetreival}).
+This research puts its focus solely on the 3-party variant.
+\textit{DUORAM} uses \textit{(2,2)-DPFs} (\ref{sub:DistributedPointFunctions}) to represent \textit{Private Information Retrieval (PIR)} and \textit{PIR-Writing} queries (\ref{sub:PrivateInformationRetreival}).
 All the following protocols and notations are as described by Vadapalli et al. \cite{vadapalli2023duoram}.
 
 At a high level, the database $D$ is additively secret shared among two non-colluding parties $P_0,P_1$.
@@ -18,7 +18,7 @@ This index $i^*$ is represented by the shifting vector $e_i = e_{i_0+i_1}$ repre
 
 For writing accesses both parties additionally hold additive shares $M_0,M_1$ of the target value $M=M_0+M_1$.
 
-Each party holds three RDPFs in form of \textit{RDPF-Triples}.
+Each party holds three \textit{RDPFs} in form of \textit{RDPF-Triples}.
 Evaluating them, either by using \code{EVALFULL} (\ref{sub:TraversingTheDPFTree}) or while generating both RDPF-Triples on target index $i^*$ (\ref{sub:BGIDPFConstruction}), returns six pairs of word vectors $(t_b^k,v_b^k), b\in\{0,1\}\text{ and }k\in\{1,2,3\}$ with the property that $t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3=e_{i^*}$ and $v_0^1+v_1^1=v_0^2+v_1^2=v_0^3+v_1^3=M\cdot e_{i^*}$.
 
 Also, each party carries a \textit{Blinding Factor ($\zeta$)} that will be used to mask its share of the database $D_i$.
@@ -30,7 +30,7 @@ This 3-party variant also has a stateful auxiliary part $P_2$.
 It holds neither the database $D$ nor index shares, and merely facilitates the computation.
 This allows executing (2+1)-MPC protocols.
 This means, three parties compute the result on two secret inputs with one party facilitating the computation without holding secret inputs itself.
-3-Party Duoram uses (2+1)-MPC protocols to replace the trusted source \cite{vadapalli2023duoram}.
+3-Party \textit{DUORAM} uses (2+1)-MPC protocols to replace the trusted source \cite{vadapalli2023duoram}.
 
 \subsection{Reading and Writing}
 \label{sub:DuoramReadingAndWriting}
@@ -61,7 +61,7 @@ One needs to refresh them to guarantee correctness in the following operations.
 This means party $P_b, b\in\{0,1\}$ has to refresh $\widetilde{D}_b$ so it matches $D_{1-b}+\zeta_{1-b}$ and party $P_{1-b}$ has to refresh its blind $\zeta_{1-b}$ before.
 
 This specific operation is not of great importance in this research.
-If not specified differently, $\text{RefreshBlinds}$ will just be adapted to the given datasize.
+If not specified differently, refreshing the blinds will just be adapted to the given data size.
 The benevolent reader may read the more detailed research by Vadapalli et al. \cite{vadapalli2023duoram}.
 
 \subsection{Preprocessing- and Online-Phase}
@@ -72,13 +72,13 @@ The intention is to shift the calculation and communication expensive part to th
 \subsubsection*{Preprocessing-Phase}
 \label{subsub:DuoramPreprocessing}
 Preprocessing generates RDPF-Triples (\ref{sub:DistributedPointFunctions}).
-Depending on the parameters given, one can also generate distributed comparison functions (\ref{sub:DistributedComparisonFunctions}), multiplication triples, and addition triples (\ref{sub:BeaverTriples}).
-Each RDPF-Triple is generated on the same share, thus all three DPFs by $P_0$ have the same index, and all DPFs held by $P_1$ share the same index too.
+Depending on the parameters given, one can also generate \textit{DCFs} (\ref{sub:DistributedComparisonFunctions}), \textit{Multiplication Triples}, and \textit{Addition Triples} (\ref{sub:BeaverTriples}).
+Each RDPF-Triple is generated on the same share, thus all three \textit{DPFs} by $P_0$ have the same index, and all \textit{DPFs} held by $P_1$ share the same index too.
 Of course, these do not have to be equal.
 
-\textit{DUORAM} uses a (2+1)-Party MPC protocol for generating their DPFs, which allows to replace the trusted source by a stateless third party $P_2$.
+\textit{DUORAM} uses a (2+1)-Party MPC protocol for generating their \textit{DPFs}, which allows to replace the trusted source by a stateless third party $P_2$.
 Both parties $P_0,P_1$ choose a random index $\widetilde{ri}_0,\widetilde{ri}_1$ with $\widetilde{ri}_0\oplus\widetilde{ri}_1=ri$.
-The DPFs will be generated on these target indices using the BGI-construction (\ref{sub:BGIDPFConstruction}).
+The \textit{DPFs} will be generated on these target indices using the BGI-construction (\ref{sub:BGIDPFConstruction}).
 This results in DPF-Triples $(\overline{k}_0^1,\overline{k}_0^2,\overline{k}_0^3)$ and $(\overline{k}_1^1,\overline{k}_1^2,\overline{k}_1^3)$.
 $P_0$ will then send $\overline{k}_0^2$ to $P_2$ and $P_1$ will send $\overline{k}_1^3$ to $P_2$.
 Note the usage of XOR shares here while the rest of \textit{DUORAM} works on additive shares.
@@ -88,7 +88,7 @@ These will be turned to additive shares too.
 A more detailed explanation of the MPC protocol to change from XOR to additive shares can be found in the research of Vadapalli et al. \cite{vadapalli2023duoram}.
 
 Preprocessing results in both parties $P_0,P_1$ holding DPF-Triples and their evaluations in form of additive shares. 
-$P_2$ holds the DPFs $(\overline{k}_0^2, \overline{k}_1^3)$.
+$P_2$ holds the \textit{DPFs} $(\overline{k}_0^2, \overline{k}_1^3)$.
 
 \subsubsection*{Online-Phase}
 \label{subsub:DuoramOnlinePhase}
@@ -109,10 +109,10 @@ $P_2$ receives $i^*_b-ri_b$ from $P_b$ and can also compute $cs$.
 \paragraph{Postponing the decision of \textit{what} to write:}
 Recall the goal of the writing-operation: Adding $M=M_0+M_1$ at the already shifted target index $i^*$ to the database $D$.
 At the moment, evaluating the RDPF at position $i^*$ results in a random word.
-Therefore, one must set the final correction word $F$ to change the random result into the message $M$.
+Therefore, one must set the \textit{Final Correction Word} $F$ to change the random result into the message $M$.
 
-$P_0,P_1$ exchange $M_b+F_b$ (with $F$ being the final correction word).
-This allows both parties to reconstruct $M-(v_0[i^*]+v_1[i^*])$ which will serve as the new final correction word $F'$ to write $M$ in the desired location.
+$P_0,P_1$ exchange $M_b+F_b$ (with $F$ being the \textit{Final Correction Word}).
+This allows both parties to reconstruct $M-(v_0[i^*]+v_1[i^*])$ which will serve as the new \textit{Final Correction Word} $F'$ to write $M$ in the desired location.
 The cyclic shift results in the shifted vectors $\tilde{t}_b^i,\tilde{v}_b^i, (i\in\{1,2,3\},b\in\{0,1\})$ with the final properties described in \ref{sec:3pDuoram}.
 Finally, all three parties execute the writing or reading protocol from \ref{sub:DuoramReadingAndWriting}.
 
@@ -139,8 +139,8 @@ It, too, generates two XOR-shared RDPF-Triples $(\overline{k}_b^1,\overline{k}_b
 The distribution of triples between parties also stays the same.
 Fully evaluating both triples would each return three XOR-shared vectors $\overline{v}_b^k,\overline{t}_b^k,F_b^k \text{ with }b\in\{0,1\},k\in\{1,2,3\}$.
 Note $F$ not being overlined as it stays XOR-shared and will not be converted to an additive share.
-Recall $t$ being the bit-vector holding the flagbit of leaf $i$ at position $i$, $v$ being the vector holding all leaf labels and $F$ being the final-correction-word (\ref{sub:BGIDPFConstruction}). %//TODO nochmal Final Correction Word nachschauen und bei bedarf weiter ausführen
-$t_b^k$ has the property of $e_{i^*}=t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3$ with $e_{i^*}$ being the shifting vector representing a unit vector holding a single $1$ at index $i^*$. 
+Recall $t$ being the bit-vector holding the flagbit of leaf $i$ at position $i$, $v$ being the vector holding all leaf labels and $F$ being the final-correction-word (\ref{sub:BGIDPFConstruction}).
+$t_b^k$ has the property of $e_{i^*}=t_0^1+t_1^1=t_0^2+t_1^2=t_0^3+t_1^3$ with $e_{i^*}$ being the shifting vector. 
 
 Due to these properties, advanced reading does not require the RDPF-Triples to be fully evaluated but only needs the six flagbit vectors $t_b^k$. 
 As evaluation on XOR-shared RDPF-Triples returns XOR-shared vectors, these need to be converted to additive shares using an (2+1)-MPC protocol (\ref{sec:3pDuoram}).
@@ -150,7 +150,7 @@ This provides consistency throughout the implementation as the database itself i
 The online phase combines both cyclic shifting (\ref{sub:CyclicShiftingProtocol}) and the already introduced reading protocol (\ref{par:DuoramReading}).
 This means reading first executes cyclic shifting to decide where to read and then executes the basic reading protocol. 
 It results in parties $P_0,P_1$ returning $\text{read}_0,\text{read}_1$ with $\text{read}_0+\text{read}_1=D[i^*_0+i^*_1]$
-Figure 5 in the research of Vadapalli et al. \cite{vadapalli2023duoram} provide a nice overview over the reading online protocol.
+Figure 5 in the research of Vadapalli et al. \cite{vadapalli2023duoram} provides a nice overview over the reading online protocol.
 
 \subsubsection*{Writing}\label{subsub:advancedWriting}
 Recall the fundamentals of the writing operation from section \ref{par:DuoramWriting}.
@@ -165,23 +165,23 @@ $P_2$ gets $(\xi_0,\xi_1)$ with the same properties as above.
 In short, message $M$ is written at position $i^*$ into the shared database $D$ resulting in the new database $D'$ which, still, is shared additively among the peers.
 
 \paragraph{Preprocessing}\label{par:advancedWritingPreproc}
-Advanced preprocessing, too, does not extend the already defined preprocessing from \ref{subsub:DuoramPreprocessing}.
-This means $P_0,P_1$ again generate the same RDPF-Triples on random indices and distribute them as above. 
+Advanced preprocessing, again, does not extend the already defined preprocessing from \ref{subsub:DuoramPreprocessing}.
+This means $P_0,P_1$ generate the same RDPF-Triples on random indices and distribute them as above. 
 However, more parameters are extracted compared to the reading operation (\ref{par:advancedReadingPreproc}).
 
-During RDPF generation $P_0,P_1$ learn XOR-shares of the random final correction words (\ref{sub:BGIDPFConstruction}) $F_0^k,F_1^k\text{ with }k\in\{1,2,3\}$.
+During RDPF generation $P_0,P_1$ learn XOR-shares of the random \textit{Final Correction Words} (\ref{sub:BGIDPFConstruction}) $F_0^k,F_1^k\text{ with }k\in\{1,2,3\}$.
 These will be important during the online phase as they incorporate the message $M$.
 Note, that both the message $M$ and its additive shares $M_0,M_1$ are the same for both RDPF-Triples.
 
 Finally, $\widetilde{v}_b^k,\widetilde{t}_b^k$ are converted to additive shares.
-Note that despite the final corrections words being XOR-shared they are not be converted to additive shares as the RDPF itself stays XOR-shared.
+Note that despite the \textit{Final Correction Words} being XOR-shared they are not be converted to additive shares as the RDPF itself stays XOR-shared.
 
 \paragraph{Online-Phase}\label{par:advancedWritingOnline}
 The online phase for writing combines cyclic shifting, updating the database, and refreshing the blinds.
 This means cyclic shifting needs to determine both where and what to write.
 Therefore, $P_0,P_1$ exchange $(i^*_b+ri_b),(M_b+F_b^k)$.
-$P_2$ will receive all of that but $(M_0+F_0^1),(M_1+F_1^1)$
-These values allow the peers to reconstruct three final correction words $F^k\leftarrow(M_0+F_0^k+M_1+F_1^k)$ and the server and the peers to reconstruct the offset $S\leftarrow(i_0^*+ri_0+i_1^*+ri_1)$.
+$P_2$ will receive all of that but $(M_0+F_0^1),(M_1+F_1^1)$.
+These values allow the peers to reconstruct three \textit{Final Correction Words} $F^k\leftarrow(M_0+F_0^k+M_1+F_1^k)$ and the server and the peers to reconstruct the offset $S\leftarrow(i_0^*+ri_0+i_1^*+ri_1)$.
 The server, too, reconstructs $F^k$ but only for $k\in\{2,3\}$.
 Note that $F_b^k$ is the negative sum of the according RDPF's leaf labels $F_b^k=-\sum^n_i{v_b^k[i]}$.
 
@@ -210,7 +210,7 @@ Due to
 \end{align*}
 $D[i]$ stays at the initial unchanged value for every index $i\neq i^*$.
 
-$P_2$ is not directly involved while updating. 
+$P_2$ is not directly involved in the updating process. 
 It solely updates its own copy of the peers' blinds for data-consistency in the next read operation.
 
 Figure 6 in the research of Vadapalli et al. \cite{vadapalli2023duoram} provides a great overview over the writing online-phase.
